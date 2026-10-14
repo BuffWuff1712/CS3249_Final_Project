@@ -1,9 +1,3 @@
-"""Exercise: pause for review, then record approve/reject. No checkout.
-
-Run from backend/: python -m app.workflow_review
-Complete TODOs 1-7 before running. The previous app.workflow stays unchanged.
-"""
-
 import hashlib
 import json
 from typing import Literal
