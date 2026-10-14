@@ -90,6 +90,18 @@ Verified during initial implementation: 8 backend tests passed; frontend TypeScr
 
 ## Owner-led LangGraph integration sequence
 
+The standalone learning graph in `backend/app/workflow.py` now runs
+`search → propose → check_policy → summarise`. From `backend/`, run
+`.\.venv\Scripts\python.exe -m app.workflow`. It consumes a structured
+`ShoppingIntent`, selects the cheapest matching catalogue product (ID breaks
+price ties), evaluates saved preferences, and reports the result. With default
+inputs it selects p4 and reports a merchant restriction. Policy passes leave the
+proposal pending; this graph has no approval interrupt or checkout and is not
+connected to the HTTP routes or frontend yet. Request constraints currently filter
+search results; the policy module checks saved preferences. The catalogue's fixed
+substitution flag remains a mock limitation. All 18 backend tests passed after
+this stage, including five graph tests.
+
 1. Study the DTOs, workflow, and policy tests; keep the deterministic policy authoritative.
 2. Implement a LangGraph adapter behind `ShoppingAgent`, starting with the same fictional catalogue. Extend its input to include intent, conversation, and saved boundaries explicitly; keep the mock adapter for repeatable tests.
 3. Map graph progress/events into the activity and audit contracts, add cancellation and an approval interrupt, and recheck policy immediately before any consequential action. Preserve HTTP DTOs or version them deliberately.
