@@ -6,18 +6,19 @@ from langgraph.types import Command
 
 from app.intent import ShoppingIntent
 from app.models import Preferences
-from app.workflow_review import ReviewState, build_review_workflow
+from app.checkout import CheckoutState, ReceiptStore
+from app.workflow import build_workflow
 
 
 @pytest.fixture
 def review_run():
     # A fresh saver per test prevents checkpoint leakage between tests.
-    graph = build_review_workflow()
+    graph = build_workflow(ReceiptStore())
     config = {'configurable': {'thread_id': str(uuid4())}}
     return graph, config
 
 
-def initial_state(preferences=None, maximum_price=100) -> ReviewState:
+def initial_state(preferences=None, maximum_price=100) -> CheckoutState:
     return {
         'intent': ShoppingIntent(category='Headphones', maximum_price=maximum_price, currency='SGD'),
         'candidates': [],
@@ -27,6 +28,8 @@ def initial_state(preferences=None, maximum_price=100) -> ReviewState:
         'violations': [],
         'decision': None,
         'action_fingerprint': None,
+        'receipt': None,
+        'checkout_error': None,
     }
 
 
@@ -66,7 +69,9 @@ def test_matching_approval_resumes_same_proposal(review_run):
     assert result['proposal'].status == 'approved'
     assert result['decision'].model_dump() == response
     assert result['violations'] == []
-    assert 'No checkout occurred' in result['outcome']
+    assert result['receipt'].proposal_id == paused['proposal'].id
+    assert result['receipt'].status == 'simulated'
+    assert result['checkout_error'] is None
 
 
 def test_rejection_resumes_without_approval(review_run):

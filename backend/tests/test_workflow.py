@@ -2,7 +2,7 @@ from uuid import UUID
 
 from app.intent import ShoppingIntent
 from app.models import Preferences
-from app.workflow import ShoppingState, build_workflow
+from app.shopping_nodes import ShoppingState, search_node, propose_node, check_policy_node, summarise_node
 
 
 def run_workflow(category='Headphones', maximum_price=100, preferences=None):
@@ -15,7 +15,10 @@ def run_workflow(category='Headphones', maximum_price=100, preferences=None):
         # Ensure the policy node replaces old reasons, including on no-match runs.
         'violations': ['stale reason'],
     }
-    return build_workflow().invoke(state)
+    # Test extracted nodes without creating a second graph builder.
+    for node in (search_node, propose_node, check_policy_node, summarise_node):
+        state.update(node(state))
+    return state
 
 
 def test_cheapest_headphones_blocked_by_merchant_restriction():

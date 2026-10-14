@@ -90,17 +90,45 @@ Verified during initial implementation: 8 backend tests passed; frontend TypeScr
 
 ## Owner-led LangGraph integration sequence
 
-The standalone learning graph in `backend/app/workflow.py` now runs
-`search → propose → check_policy → summarise`. From `backend/`, run
-`.\.venv\Scripts\python.exe -m app.workflow`. It consumes a structured
-`ShoppingIntent`, selects the cheapest matching catalogue product (ID breaks
-price ties), evaluates saved preferences, and reports the result. With default
-inputs it selects p4 and reports a merchant restriction. Policy passes leave the
-proposal pending; this graph has no approval interrupt or checkout and is not
-connected to the HTTP routes or frontend yet. Request constraints currently filter
-search results; the policy module checks saved preferences. The catalogue's fixed
-substitution flag remains a mock limitation. All 18 backend tests passed after
-this stage, including five graph tests.
+The standalone graph is now consolidated into these modules:
+
+| Module | Responsibility |
+| --- | --- |
+| `backend/app/shopping_nodes.py` | Shopping state, search, proposal, policy and summary nodes |
+| `backend/app/review.py` | Review state/decision, fingerprint, interrupt and approval validation |
+| `backend/app/checkout.py` | Checkout state, simulated receipts, shared in-memory receipt store and checkout guard |
+| `backend/app/workflow.py` | The single `build_workflow(store)` graph builder |
+| `backend/app/run_workflow.py` | Interactive terminal runner |
+
+Run from `backend/`:
+
+```powershell
+# Default preferences: cheapest headphone merchant is restricted, so no prompt.
+.\.venv\Scripts\python.exe -m app.run_workflow
+
+# Explicit demo permission: inspect the proposal, then type approve or reject.
+.\.venv\Scripts\python.exe -m app.run_workflow --allow-market-lane
+
+# No-match example.
+.\.venv\Scripts\python.exe -m app.run_workflow --maximum-price 50
+```
+
+The runner uses structured inputs (`--category`, `--maximum-price`, `--currency`),
+not LLM intent extraction. Approval resumes the same graph/thread and creates a
+simulated receipt only after independent approval, fingerprint, policy, and intent
+checks. Rejection creates no receipt. Repeated checkout calls share a receipt
+store keyed by proposal ID; lookup and insertion use one lock. Receipt storage
+and graph checkpoints are in memory and do not survive process restart. Saved
+preferences are graph-state snapshots; integration must supply current server-side
+permissions before consequential execution. The fixed catalogue substitution flag
+remains a mock limitation. Beany's HTTP routes/frontend still use the original
+mock flow and are not connected to this graph yet.
+
+After consolidation, all 48 backend tests passed, including the original safety
+checks, concurrent receipt retries, and terminal approve/reject/cancellation paths.
+The older `workflow_review.py` and `workflow_checkout.py` modules were removed;
+use the new module paths above. Earlier shopping-stage tests now exercise extracted
+nodes directly; review and checkout tests use the one complete graph.
 
 1. Study the DTOs, workflow, and policy tests; keep the deterministic policy authoritative.
 2. Implement a LangGraph adapter behind `ShoppingAgent`, starting with the same fictional catalogue. Extend its input to include intent, conversation, and saved boundaries explicitly; keep the mock adapter for repeatable tests.

@@ -3,19 +3,13 @@ from threading import Lock
 from typing import Literal
 from uuid import uuid4
 
-from langgraph.checkpoint.memory import InMemorySaver
-from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, ConfigDict, Field
 
 from .models import Product
 from .policy import evaluate
-from .workflow import check_policy_node, propose_node, search_node, summarise_node
-from .workflow_review import (
+from .review import (
     ReviewState,
-    fingerprint,
-    human_review_node,
-    prepare_review_node,
-    route_after_policy,
+    fingerprint
 )
 
 
@@ -157,32 +151,3 @@ def route_after_human_review(state: ReviewState) -> Literal['approved', 'not_app
         return "approved"
 
     return "not_approved"
-
-def build_checkout_workflow(store: ReceiptStore):
-    """Build a new exercise graph; retain the working review-only graph."""
-    builder = StateGraph(CheckoutState)
-    builder.add_node('search', search_node)
-    builder.add_node('propose', propose_node)
-    builder.add_node('check_policy', check_policy_node)
-    builder.add_node('summarise', summarise_node)
-    builder.add_node('prepare_review', prepare_review_node)
-    builder.add_node('human_review', human_review_node)
-    # Closure injects the shared store; it is NOT checkpoint state.
-    builder.add_node('checkout', lambda state: checkout_node(state, store))
-
-
-    builder.add_edge(START, 'search')
-    builder.add_edge('search', 'propose')
-    builder.add_edge('propose', 'check_policy')
-    builder.add_conditional_edges('check_policy', route_after_policy, {
-        'summarise': 'summarise', 'prepare_review': 'prepare_review',
-    })
-    builder.add_edge('prepare_review', 'human_review')
-    builder.add_edge('summarise', END)
-    builder.add_conditional_edges(
-            'human_review', route_after_human_review,
-            {'approved': 'checkout', 'not_approved': END}
-        )
-    builder.add_edge('checkout', END)
-
-    return builder.compile(checkpointer=InMemorySaver())

@@ -8,8 +8,9 @@ from langgraph.types import Command
 from app.agent import CATALOGUE
 from app.intent import ShoppingIntent
 from app.models import Preferences, Proposal
-from app.workflow_checkout import ReceiptStore, build_checkout_workflow, checkout_node
-from app.workflow_review import ReviewDecision, fingerprint
+from app.checkout import ReceiptStore, checkout_node
+from app.workflow import build_workflow
+from app.review import ReviewDecision, fingerprint
 
 
 def approved_state():
@@ -89,7 +90,7 @@ def test_concurrent_retries_create_only_one_receipt():
 
 def start_checkout(preferences=None, maximum_price=100):
     store = ReceiptStore()
-    graph = build_checkout_workflow(store)
+    graph = build_workflow(store)
     config = {'configurable': {'thread_id': str(uuid4())}}
     state = {
         'intent': ShoppingIntent(category='Headphones', maximum_price=maximum_price, currency='SGD'),

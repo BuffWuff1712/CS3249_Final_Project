@@ -1,23 +1,14 @@
 import hashlib
 import json
 from typing import Literal
-from uuid import uuid4
 
-from langgraph.checkpoint.memory import InMemorySaver
-from langgraph.graph import END, START, StateGraph
-from langgraph.types import Command, interrupt
+from langgraph.types import interrupt
 from pydantic import BaseModel, ConfigDict
 
-from .intent import ShoppingIntent
-from .models import Preferences, Proposal
+
+from .models import Proposal
 from .policy import evaluate
-from .workflow import (
-    ShoppingState,
-    check_policy_node,
-    propose_node,
-    search_node,
-    summarise_node,
-)
+from .shopping_nodes import ShoppingState
 
 
 class ReviewDecision(BaseModel):
@@ -129,82 +120,3 @@ def human_review_node(state: ReviewState) -> dict:
                     "Approval recorded. No checkout occurred."
                 ),
             }
-
-
-def build_review_workflow():
-    builder = StateGraph(ReviewState)
-    builder.add_node('search', search_node)
-    builder.add_node('propose', propose_node)
-    builder.add_node('check_policy', check_policy_node)
-    builder.add_node('summarise', summarise_node)
-    builder.add_node('prepare_review', prepare_review_node)
-    builder.add_node('human_review', human_review_node)
-
-    builder.add_edge(START, 'search')
-    builder.add_edge('search', 'propose')
-    builder.add_edge('propose', 'check_policy')
-
-
-    builder.add_conditional_edges(
-        'check_policy', route_after_policy,
-        {'summarise': 'summarise', 'prepare_review': 'prepare_review'}
-    )
-
-    builder.add_edge('prepare_review', 'human_review')
-    builder.add_edge('human_review', END)
-    builder.add_edge('summarise', END)
-
-    return builder.compile(checkpointer=InMemorySaver())
-
-
-def main():
-    workflow = build_review_workflow()
-    config = {'configurable': {'thread_id': str(uuid4())}}
-    initial_state: ReviewState = {
-        'intent': ShoppingIntent(category='Headphones', maximum_price=100, currency='SGD'),
-        'candidates': [],
-        'outcome': '',
-        'preferences': Preferences(restricted_merchants=[]),
-        'proposal': None,
-        'violations': [],
-        'decision': None,
-        'action_fingerprint': None,
-    }
-
-    result = workflow.invoke(initial_state, config=config)
-
-    # Completed runs may omit __interrupt__; avoid calling len(None).
-    if not result.get('__interrupt__'):
-        print(result["outcome"])
-        return
-
-    payload = result['__interrupt__'][0].value
-    print(json.dumps(payload, indent=2))
-
-    while True:
-        try:
-            approval_decision = input('Approve or reject? ').strip().lower()
-        except (EOFError, KeyboardInterrupt):
-            print('\nReview cancelled. No decision recorded; no checkout occurred.')
-            return
-        if approval_decision in ('approve', 'reject'):
-            break
-        print('Please type approve or reject.')
-
-    resume_data = {
-        'proposal_id': payload['proposal_id'],
-        'action_fingerprint': payload['action_fingerprint'],
-        'action': approval_decision,
-    }
-
-    # Resume the same checkpoint using the same graph instance and thread ID.
-    resumed = workflow.invoke(Command(resume=resume_data), config=config)
-    print(resumed['outcome'])
-    decision = resumed['decision']
-    print('Decision:', decision.model_dump() if decision is not None else None)
-    proposal = resumed['proposal']
-    print('Proposal status:', proposal.status if proposal is not None else None)
-
-
-if __name__ == '__main__':
-    main()
