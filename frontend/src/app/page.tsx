@@ -1,23 +1,397 @@
-'use client';
-import {useEffect, useRef, useState} from 'react';
-import {api} from '@/lib/api';
-import type {Session, Scenario} from '@/lib/contracts';
-import {PreferencesPanel} from '@/components/PreferencesPanel';
-import {ProposalCard} from '@/components/ProposalCard';
-const scenarios: {id: Scenario; label: string; hint: string}[] = [{id:'normal', label:'Within budget',hint:'Find comfortable wireless headphones for studying.'},{id:'budget',label:'Over budget',hint:'Show me the premium headphone demo.'},{id:'substitution',label:'Substitution',hint:'Explore the alternative product demo.'},{id:'merchant',label:'Restricted merchant',hint:'Show me the merchant restriction demo.'}];
+"use client";
+import { useEffect, useRef, useState } from "react";
+import { request, Session, Action } from "@/lib/beany";
+import { Brief } from "@/components/Brief";
+const starters = [
+  "Find me running shoes under $200.",
+  "I need headphones but don’t know which ones to buy.",
+  "Help me choose a backpack for university.",
+  "What can you help me shop for?",
+];
 export default function Home() {
-  const [session, setSession] = useState<Session | null>(null); const [busy, setBusy] = useState(true); const [error, setError] = useState(''); const [notice, setNotice] = useState(''); const [text, setText] = useState(''); const [scenario, setScenario] = useState<Scenario>('normal'); const started = useRef(false); const bottom = useRef<HTMLDivElement>(null);
-  async function run(work: () => Promise<void>) {setBusy(true); setError(''); setNotice(''); try {await work();} catch(e) {setError(e instanceof Error ? e.message : 'Connection failed. Check that the backend is running.');} finally {setBusy(false);}}
-  useEffect(() => {if (!started.current) {started.current = true; void run(async () => setSession(await api.create()));}}, []);
-  useEffect(() => {bottom.current?.scrollIntoView({behavior:'smooth', block:'nearest'});}, [session?.messages.length]);
-  async function send() {if (!session || !text.trim()) return; const message = text; await run(async () => {setSession(await api.chat(session.id, message, scenario)); setText('');});}
-  const proposal = session?.proposals.at(-1);
-  return <div className="shell"><header><a className="brand" href="/" aria-label="Beany home"><span className="brand-icon">b</span>Beany<span className="brand-dot">.</span></a><div className="header-right"><span className="demo-badge"><i/>FICTIONAL DEMO</span><button disabled={busy} onClick={() => void run(async () => {if(session) await api.reset(session.id); setSession(null); setSession(await api.create()); setText(''); setScenario('normal'); setNotice('Demo reset. All previous session data deleted.');})}>↻ Reset demo</button></div></header>
-    <div className="intro"><div><div className="eyebrow">YOUR SHOPPING COPILOT</div><h1>AI does the shopping.<br/><span>You stay in control.</span></h1><p>A little less searching. A lot more peace of mind.</p></div><div className="promise"><span>✓</span><div><strong>Your boundaries come first</strong><p>Nothing moves forward without your review.</p></div></div></div>
-    <div className="demo-note">SANDBOX <span>A seeded catalogue, scripted scenarios, and simulated approvals. No internet search or real purchases.</span></div>
-    {error && <div className="error" role="alert">{error} {!session && <button disabled={busy} onClick={() => void run(async () => setSession(await api.create()))}>Retry connection</button>}</div>}{notice && <p className="notice" role="status">{notice}</p>}
-    <main><section className="panel conversation"><div className="panel-heading"><div><h2>Let’s find your fit</h2><p className="muted">Plan together. Review before proceeding.</p></div><span className="online">● Demo agent</span></div><div className="messages" aria-live="polite">{!session && <p>{busy ? 'Connecting to Beany…' : 'Start the FastAPI backend, then retry the connection.'}</p>}{session?.messages.map((m,i) => <div className={`message ${m.role}`} key={i}><span className="avatar">{m.role === 'assistant' ? 'b' : 'You'}</span><div><span className="message-label">{m.role === 'assistant' ? 'Beany' : 'You'}</span><p>{m.text}</p></div></div>)}{proposal && <ProposalCard key={proposal.id} proposal={proposal} busy={busy} onDecision={(action, note) => void run(async () => {setSession(await api.decide(session!.id, proposal.id, action, note));})}/>}<div ref={bottom}/></div>
-      <form className="composer" onSubmit={e => {e.preventDefault(); void send();}}><label className="eyebrow" htmlFor="scenario">TRY A DEMO SCENARIO</label><div className="scenarios" id="scenario">{scenarios.map(s => <button type="button" aria-pressed={scenario === s.id} className={scenario === s.id ? 'selected' : ''} disabled={busy} key={s.id} onClick={() => {setScenario(s.id); setText(s.hint);}}>{s.label}</button>)}</div><div className="input-wrap"><textarea aria-label="Message Beany" placeholder="Tell me what you’re looking for…" maxLength={2000} value={text} onChange={e => setText(e.target.value)} rows={2} disabled={busy || !session}/><button className="primary" type="submit" disabled={busy || !session || !text.trim()}>{busy ? 'Working…' : 'Send ↗'}</button></div><small>Your text is recorded; the selected scenario determines the mock result.</small></form>
-    </section><div className="sidebar">{session && <PreferencesPanel key={session.id} value={session.preferences} busy={busy} onSave={async p => {await run(async () => {setSession(await api.preferences(session.id, p)); setNotice('Boundaries saved. Pending proposals rechecked.');});}}/>}<section className="panel activity"><div className="eyebrow">LIVE IN THE SANDBOX</div><h2>Shopping activity</h2>{session?.activity.length ? <ol>{(session.preferences.autonomy === 'guided' ? session.activity : [session.activity.slice(0,3).join(' · '), ...session.activity.slice(3)]).map((a,i) => <li key={i}><span>{i+1}</span>{a}</li>)}</ol> : <p className="muted">Your agent’s steps will appear here when you send a request.</p>}</section></div></main>
-    <section className="panel audit"><div className="row"><div><div className="eyebrow">A CLEAR PAPER TRAIL</div><h2>Decision history</h2></div><span className="tag">{session?.audit.length || 0} events</span></div><details><summary>View proposals, policy checks & your responses</summary><div className="audit-list">{session?.audit.slice().reverse().map(event => <div className="audit-event" key={event.id}><time>{new Date(event.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})}</time><span className="tag">{event.kind}</span><p>{event.detail}</p></div>)}</div></details></section><footer>Beany · CS3249 Conversational User Interface <span>Built around human oversight.</span></footer></div>;
+  const [session, setSession] = useState<Session | null>(null),
+    [busy, setBusy] = useState(true),
+    [error, setError] = useState(""),
+    [text, setText] = useState("");
+  const started = useRef(false);
+  const bottom = useRef<HTMLDivElement>(null);
+  function keep(s: Session) {
+    setSession(s);
+    localStorage.setItem("beany-session", s.id);
+  }
+  async function run(work: () => Promise<void>) {
+    setBusy(true);
+    setError("");
+    try {
+      await work();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Connection failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function init() {
+    const sid = localStorage.getItem("beany-session");
+    if (sid) {
+      try {
+        keep(await request<Session>(`/sessions/${sid}`));
+        return;
+      } catch {
+        localStorage.removeItem("beany-session");
+      }
+    }
+    keep(await request<Session>("/sessions", "POST"));
+  }
+  useEffect(() => {
+    if (!started.current) {
+      started.current = true;
+      void run(init);
+    }
+  }, []);
+  useEffect(() => {
+    bottom.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [session?.messages.length]);
+  async function send(message = text) {
+    if (!session || !message.trim()) return;
+    await run(async () => {
+      keep(
+        await request<Session>(`/sessions/${session.id}/messages`, "POST", {
+          text: message,
+        }),
+      );
+      setText("");
+    });
+  }
+  async function decide(a: Action, action: string) {
+    await run(async () =>
+      keep(
+        await request<Session>(
+          `/sessions/${session!.id}/proposals/${a.id}/decision`,
+          "POST",
+          { action, fingerprint: a.fingerprint },
+        ),
+      ),
+    );
+  }
+  const a = session?.proposals.at(-1);
+  return (
+    <div className="shell">
+      <header>
+        <a className="brand" href="/">
+          <span className="brand-icon">b</span>Beany
+          <span className="brand-dot">.</span>
+        </a>
+        <div className="header-right">
+          <span className="demo-badge">● SIMULATED SHOPPING</span>
+          <button
+            disabled={busy}
+            onClick={() =>
+              void run(async () => {
+                if (session) await request(`/sessions/${session.id}`, "DELETE");
+                localStorage.removeItem("beany-session");
+                keep(await request<Session>("/sessions", "POST"));
+              })
+            }
+          >
+            Fresh session
+          </button>
+        </div>
+      </header>
+      <div className="intro">
+        <div>
+          <div className="eyebrow">YOUR SHOPPING COPILOT</div>
+          <h1>
+            AI does the shopping.
+            <br />
+            <span>You stay in control.</span>
+          </h1>
+          <p>Start with an idea. Shape it together. Decide with confidence.</p>
+        </div>
+        <div className="promise">
+          <span>✓</span>
+          <div>
+            <strong>Your boundaries come first</strong>
+            <p>Change your mind, edit your brief, or stop at any time.</p>
+          </div>
+        </div>
+      </div>
+      <div className="demo-note">
+        SANDBOX{" "}
+        <span>
+          Fictional products and simulated checkout.{" "}
+          {session?.mode === "mock"
+            ? "MOCK LLM MODE — offline test responses."
+            : "Conversation powered by OpenAI when configured."}
+        </span>
+      </div>
+      {error && (
+        <div className="error" role="alert">
+          {error}
+          <button disabled={busy} onClick={() => void run(init)}>
+            Reconnect
+          </button>
+        </div>
+      )}
+      <main>
+        <section className="panel conversation">
+          <div className="panel-heading">
+            <div>
+              <h2>Let’s find your fit</h2>
+              <p className="muted">
+                You don’t need to know all the details yet.
+              </p>
+            </div>
+            <span className="online">
+              {session?.mode === "mock" ? "Mock LLM" : "Beany"}
+            </span>
+          </div>
+          <div className="messages" aria-live="polite">
+            {session?.messages.map((m, i) => (
+              <div key={i} className={`message ${m.role}`}>
+                <span className="avatar">
+                  {m.role === "user" ? "You" : "b"}
+                </span>
+                <div>
+                  <span className="message-label">
+                    {m.role === "user" ? "You" : "Beany"}
+                  </span>
+                  <p>{m.text}</p>
+                </div>
+              </div>
+            ))}
+            {(!session || session.messages.length === 1) && (
+              <div className="starter-grid">
+                {starters.map((t) => (
+                  <button
+                    key={t}
+                    disabled={busy || !session}
+                    onClick={() => void send(t)}
+                  >
+                    {t} ↗
+                  </button>
+                ))}
+              </div>
+            )}
+            {a && (
+              <article className="product-card">
+                <div className="row">
+                  <span className="tag">{a.product.category} · fictional</span>
+                  <span className="tag">{a.status}</span>
+                </div>
+                <h3>{a.product.name}</h3>
+                <p>
+                  {a.product.brand} · {a.product.merchant}
+                </p>
+                <div className="price">
+                  {a.product.currency} {a.product.price.toFixed(2)}
+                </div>
+                <div className="attributes">
+                  {a.product.attributes.map((x) => (
+                    <span key={x}>{x}</span>
+                  ))}
+                </div>
+                <p>{a.product.description}</p>
+                <small>
+                  Payment: {a.payment_method} · Data sharing:{" "}
+                  {a.shares_personal_data ? "requested" : "none"}
+                </small>
+                <div
+                  className={`review ${a.decision === "BLOCK" ? "warning" : "safe"}`}
+                >
+                  <strong>
+                    {a.decision === "BLOCK"
+                      ? "Blocked by your boundaries"
+                      : a.decision === "REVIEW"
+                        ? "Your review is needed"
+                        : "Within your permissions"}
+                  </strong>
+                  <ul>
+                    {a.rules.map((r) => (
+                      <li key={r.rule_id}>{r.explanation}</li>
+                    ))}
+                  </ul>
+                </div>
+                {a.status === "pending" && (
+                  <div className="decisions">
+                    <button
+                      className="primary"
+                      disabled={busy || a.decision === "BLOCK"}
+                      onClick={() => void decide(a, "approve")}
+                    >
+                      Approve simulated checkout
+                    </button>
+                    <button
+                      disabled={busy}
+                      onClick={() => void decide(a, "reject")}
+                    >
+                      Reject
+                    </button>
+                    <button
+                      disabled={busy}
+                      onClick={() => {
+                        setText("Change my request: ");
+                        document.getElementById("chat-input")?.focus();
+                      }}
+                    >
+                      Refine
+                    </button>
+                    <button
+                      disabled={busy}
+                      onClick={() => void send("Find an alternative")}
+                    >
+                      Alternative
+                    </button>
+                  </div>
+                )}
+              </article>
+            )}
+            {session?.receipts.map((r) => (
+              <div className="notice" key={r.id}>
+                <strong>Simulated receipt</strong>
+                <p>
+                  {r.product.name} · {r.product.currency}{" "}
+                  {r.product.price.toFixed(2)}
+                </p>
+                <small>{r.id} · No real payment or order.</small>
+              </div>
+            ))}
+            {session && session.recommendations.length > 1 && (
+              <details>
+                <summary>
+                  Compare {session.recommendations.length} matching products
+                </summary>
+                <div className="comparison">
+                  {session.recommendations.map((p) => (
+                    <div key={p.id}>
+                      <strong>{p.name}</strong>
+                      <p>
+                        {p.currency} {p.price.toFixed(2)} · {p.merchant}
+                      </p>
+                      <p>{p.attributes.join(" · ")}</p>
+                      <button
+                        disabled={busy}
+                        onClick={() =>
+                          void run(async () =>
+                            keep(
+                              await request<Session>(
+                                `/sessions/${session!.id}/products/${p.id}/propose`,
+                                "POST",
+                              ),
+                            ),
+                          )
+                        }
+                      >
+                        Choose this product
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
+            {busy && <p role="status">Beany is working…</p>}
+            <div ref={bottom} />
+          </div>
+          <form
+            className="composer"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void send();
+            }}
+          >
+            <button type="button" disabled={busy || !session} onClick={() => void run(async () => keep(await request<Session>(`/sessions/${session!.id}/cancel`, "POST")))}>Cancel shopping task</button>
+              <div className="scenarios">
+              {session?.suggestions.map((t, i) => (
+                <button
+                  type="button"
+                  disabled={busy}
+                  key={i}
+                  onClick={() => void send(t)}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            <div className="input-wrap">
+              <textarea
+                id="chat-input"
+                aria-label="Message Beany"
+                rows={2}
+                maxLength={2000}
+                disabled={busy || !session}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Tell me what you’re looking for…"
+              />
+              <button
+                className="primary"
+                disabled={busy || !session || !text.trim()}
+              >
+                Send ↗
+              </button>
+            </div>
+            <small>
+              Ask questions, revise your preferences, or say “cancel this task”.
+            </small>
+          </form>
+        </section>
+        <aside className="sidebar">
+          {session && (
+            <Brief
+              key={session.id}
+              session={session}
+              busy={busy}
+              edit={async (field, fact) =>
+                run(async () =>
+                  keep(
+                    await request<Session>(
+                      `/sessions/${session.id}/brief`,
+                      "PUT",
+                      { field, fact },
+                    ),
+                  ),
+                )
+              }
+              permissions={async (p) =>
+                run(async () =>
+                  keep(
+                    await request<Session>(
+                      `/sessions/${session.id}/permissions`,
+                      "PUT",
+                      p,
+                    ),
+                  ),
+                )
+              }
+            />
+          )}
+          <section className="panel activity">
+            <div className="eyebrow">SHOPPING OVERSIGHT</div>
+            <h2>{session?.stage.replaceAll("_", " ") || "Connecting"}</h2>
+            <ol>
+              {session?.events
+                .filter((e) =>
+                  [
+                    "search",
+                    "intervention",
+                    "approve",
+                    "reject",
+                    "simulated_checkout",
+                    "cancel",
+                    "brief_edit",
+                  ].includes(e.kind),
+                )
+                .slice(-6)
+                .map((e) => (
+                  <li key={e.id}>{({search:"Compared matching products",intervention:"Requested your review",approve:"You approved this action",reject:"You rejected this action",simulated_checkout:"Created a simulated receipt",cancel:"Shopping task cancelled",brief_edit:"Updated your shopping brief"} as Record<string,string>)[e.kind] || e.kind.replaceAll("_", " ")}</li>
+                ))}
+            </ol>
+          </section>
+        </aside>
+      </main>
+      <footer>
+        Beany · CS3249 Conversational User Interface
+        <span>All products and transactions are fictional.</span>
+      </footer>
+    </div>
+  );
 }

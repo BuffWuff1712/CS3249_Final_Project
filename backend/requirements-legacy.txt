@@ -1,0 +1,3 @@
+-r requirements.txt
+# Optional: only for the earlier LangGraph exercises and their tests.
+langgraph==1.2.15

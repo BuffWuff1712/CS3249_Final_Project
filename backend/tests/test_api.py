@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.main import app
+from app.legacy_main import app
 from app.models import Preferences, Proposal
 from app.agent import CATALOGUE
 from app.policy import evaluate

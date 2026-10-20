@@ -1,7 +1,8 @@
+import pytest
+pytest.importorskip('langgraph', reason='Optional legacy learning exercises')
 """Exercise real checkpoint/interrupt/resume behavior, without mocking policy."""
 from uuid import uuid4
 
-import pytest
 from langgraph.types import Command
 
 from app.intent import ShoppingIntent

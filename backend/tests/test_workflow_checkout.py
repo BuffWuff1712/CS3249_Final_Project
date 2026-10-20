@@ -1,8 +1,9 @@
+import pytest
+pytest.importorskip('langgraph', reason='Optional legacy learning exercises')
 """Receipt safeguards and complete approval-to-checkout graph tests."""
 from concurrent.futures import ThreadPoolExecutor
 from uuid import uuid4
 
-import pytest
 from langgraph.types import Command
 
 from app.agent import CATALOGUE

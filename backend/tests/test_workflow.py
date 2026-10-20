@@ -1,3 +1,5 @@
+import pytest
+pytest.importorskip('langgraph', reason='Optional legacy learning exercises')
 from uuid import UUID
 
 from app.intent import ShoppingIntent

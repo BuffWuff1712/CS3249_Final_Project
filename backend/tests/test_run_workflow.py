@@ -1,4 +1,5 @@
 import pytest
+pytest.importorskip('langgraph', reason='Optional legacy learning exercises')
 
 from app.run_workflow import main
 

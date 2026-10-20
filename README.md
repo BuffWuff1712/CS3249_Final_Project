@@ -1,137 +1,110 @@
-# Beany — AI does the shopping. You stay in control.
+# Beany — conversational shopping oversight
 
-A CS3249 conversational interface prototype using Next.js/React/TypeScript/Tailwind and FastAPI/Pydantic. All products, merchants, and payments are fictional. No LLM, internet product search, order creation, or financial transactions are connected.
+Beany is a blue-themed Next.js + FastAPI research prototype: **AI does the shopping. You stay in control.** OpenAI interprets conversations; Python controls permissions, product search, policy decisions and simulated checkout. Every product and merchant is fictional. No payment or real shopping service is connected.
 
-## Run locally (Windows PowerShell)
+## Requirements
 
-Prerequisites: Node.js 20.9+ and Python 3.11+. Run each server in its own terminal. Commands below start from this project directory.
+Python 3.11+, Node.js 20.9+ (Node 22 recommended), npm. Run one backend worker for local studies.
 
-Backend:
+## Windows (PowerShell)
 
 ```powershell
 cd backend
 py -3 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 Copy-Item .env.example .env
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --env-file .env --host 127.0.0.1 --port 8000
+# Edit .env locally; do not paste your key into chat or frontend files.
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
 
-If Python is available as `python` instead of `py -3`, use `python -m venv .venv`. Alternatively, with uv installed: `uv venv .venv --python 3.12`, then `uv pip install --python .venv\Scripts\python.exe -r requirements.txt`.
+If your existing virtual environment was created with uv and has no pip, use `uv pip install --python .venv/Scripts/python.exe -r requirements.txt` instead.
 
-Frontend (second terminal):
+In another terminal:
 
 ```powershell
 cd frontend
 npm install
-Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Open [localhost:3000](http://localhost:3000). Backend health: [localhost:8000/health](http://localhost:8000/health). Interactive API contracts: [localhost:8000/docs](http://localhost:8000/docs). Use `localhost` consistently for CORS. To change ports/origins, update the example environment values in your local files and restart both servers. Public frontend environment variables contain URLs only, never credentials.
+## macOS / Linux
 
-macOS/Linux equivalent: `python3 -m venv .venv`, then `.venv/bin/python -m pip install -r requirements.txt` and `.venv/bin/python -m uvicorn app.main:app --reload --env-file .env`; use `cp` for copying environment files.
-
-## Try the demonstration
-
-1. Review and save boundaries. Defaults: SGD 150, Northstar/Everyday/Market Lane allowed, Market Lane restricted, Demo Visa allowed, substitutions and data sharing disabled.
-2. Choose **Within budget**, enter a message and send. Approve records a simulated decision.
-3. Try **Over budget** (SGD 189), **Substitution** (earbuds), or **Restricted merchant** (Market Lane). Each shows the specific affected boundary and disables approval. The backend also rejects direct attempts to bypass the disabled button.
-4. Reject, or refine with a note. Refinement records your instruction and closes the old proposal; select a new scenario and send to create another selection. Alternatively, explicitly change and save a boundary to re-evaluate a pending proposal, then approve if all checks pass.
-5. Expand Decision history to inspect proposals, policy checks, permission changes, and responses. Reset deletes the current session and creates a fresh one.
-
-The selected scenario controls results. Arbitrary text is retained as conversation context but is not semantically interpreted. A new request supersedes the previous pending proposal. Guided mode displays individual activity steps; balanced groups comparison steps. Both require final review. Activity is a completed scripted trace, not streamed background execution. Currency mismatch blocks approval; currency selection does not convert prices.
-
-## Structure and contracts
-
-```text
-frontend/src/app/             Page composition, lifecycle and styling
-frontend/src/components/      PreferencesPanel and ProposalCard
-frontend/src/lib/api.ts       Typed HTTP adapter
-frontend/src/lib/contracts.ts Frontend DTO types
-backend/app/main.py          API routes/session workflow
-backend/app/models.py        Pydantic request/response contracts
-backend/app/agent.py         ShoppingAgent protocol + fictional mock catalogue
-backend/app/policy.py        Deterministic boundary evaluation
-backend/app/explanations.py  Human-readable decision explanations
-backend/app/store.py         In-memory sessions and timestamped audit events
-backend/tests/test_api.py    Policy and API workflow tests
+```sh
+cd backend
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+cp .env.example .env
+# Edit .env before launching.
+.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+# Separate terminal:
+cd frontend
+npm install
+npm run dev
 ```
 
-The canonical machine-readable contract is `GET /openapi.json`. Session responses contain `id`, `preferences`, `messages`, `proposals`, `activity`, and `audit`. Proposals include product details, payment/data intentions, status, violations, and explanation. All successful mutation routes return the full updated Session, except deletion (204).
+Open http://localhost:3000. Backend API docs: http://localhost:8000/docs.
 
-| Route | Request | Purpose |
-| --- | --- | --- |
-| POST /sessions | none | Create independent session |
-| GET /sessions/{id} | none | Read state |
-| PUT /sessions/{id}/preferences | Preferences | Replace and recheck boundaries |
-| POST /sessions/{id}/messages | `{ "text": "Find headphones", "scenario": "normal" }` | Add turn and proposal |
-| POST /sessions/{id}/proposals/{pid}/decision | `{ "action": "approve", "note": "" }` | Record decision |
-| DELETE /sessions/{id} | none | Delete session and audit |
+## OpenAI configuration
 
-For the decision body choose one action string: `approve`, `reject`, or `refine`. Invalid input returns 422; unknown session/proposal 404; blocked approval or already-resolved proposal 409. Frontend errors are shown with retry available on initial connection failure.
+Create an API key in your OpenAI platform project at https://platform.openai.com/api-keys and configure billing/model access as needed. Put the key only in `backend/.env`:
 
-Implemented: multi-turn UI, editable saved permissions, product cards, deterministic checks, approval/rejection/refinement lifecycle, audit history, reset, loading/error states, responsive layout. Mocked: agent reasoning/search/comparison, catalogue, payments, and checkout. Data-sharing permission is policy-checked, but current catalogue proposals never request sharing. Payment selection in mock proposals is always Demo Visa; removing it blocks approval. No external data is shared.
+```dotenv
+OPENAI_API_KEY=your-key-here
+OPENAI_MODEL=gpt-5.6-luna
+OPENAI_REASONING_EFFORT=low
+BEANY_LLM_MODE=openai
+BEANY_RESEARCH_KEY=choose-a-local-researcher-secret
+```
 
-Sessions are process-local and are lost on backend restart, browser refresh starts a new session, and there is no authentication. Run a single local worker; this is a local testing prototype, not a hosted service. Audit is prototype history, not tamper-proof compliance storage. Approvals refer to the boundary snapshot at the time of decision; later preference changes recheck pending proposals only.
+`OPENAI_MODEL` may be changed to `gpt-5.6-terra` or another model supporting Responses Structured Outputs and the configured reasoning effort. Account access varies; API errors are shown as recoverable errors. There is no automatic model substitution. Missing keys never silently activate mock responses.
 
-## Checks
+For explicit offline testing set `BEANY_LLM_MODE=mock`. The interface labels this mode; its intentionally limited parser is **not suitable for evaluating conversational intelligence**. Automated tests use this mode or injected structured responses and never need paid API calls.
+
+The SDK uses `client.responses.parse(..., text_format=PydanticModel)` and `output_parsed`, verified against [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) and the [requested model documentation](https://developers.openai.com/api/docs/models/gpt-5.6-luna). Conversation state is held in SQLite; requests use `store=False`. Recent conversation and structured preferences are sent to OpenAI; avoid entering personal data.
+
+## Using Beany
+
+Start with a prompt or free text. Vague requests can trigger a clarification; specific requests search immediately. The brief records confirmed, suggested and unspecified values. Edit/remove preferences directly. Currency accepts SGD/USD; category accepts Running shoes, Headphones, Backpacks; list fields use commas. A hard budget is never bypassed by approval.
+
+Permissions are changed explicitly through their own form. Guided mode always asks for approval. Balanced mode can perform simulated checkout automatically only when approval is disabled and every policy rule returns ALLOW. Missing budgets and unverified fictional merchants require review by default.
+
+Any brief/permission edit supersedes pending proposals. Ask for options again to search with the new state. Approvals bind to a proposal ID and a hash of its complete product/payment/data-sharing details. Reject, request an alternative, refine through chat, or cancel. Receipts and state survive refresh/restart. Fresh session deletes the current session; export study logs first.
+
+## Tests
 
 ```powershell
 cd backend
 .\.venv\Scripts\python.exe -m pytest -q
-cd ..\frontend
+cd ../frontend
 npm run typecheck
 npm run build
+npx playwright install chromium
+npm run test:e2e
 ```
 
-Manual UI checks: run all four scenarios; save a lower budget while a proposal is pending; reject and refine; use reset; stop the backend and confirm a visible error; test narrow/mobile viewport and keyboard focus. Production frontend can be run with `npm run start` after build.
+On macOS/Linux use `.venv/bin/python`. Playwright starts isolated servers at 3100/8100 with an explicit mock LLM and test SQLite file. It exercises desktop and mobile layouts, approval/receipt persistence, cancellation, hard blocking and exports.
 
-Verified during initial implementation: 8 backend tests passed; frontend TypeScript checking and production build passed. Browser checks confirmed the budget warning with disabled approval, a normal proposal with successful simulated approval, and a stacked layout at 390px width. The test stack emits a Starlette warning about a future HTTP test-client migration; tests still pass. Other manual checks above remain a recommended user-testing checklist.
+Your original learning modules (`workflow.py`, `review.py`, `checkout.py`, `shopping_service.py`, etc.) remain intact as optional exercises. The integrated `app.main` does **not** import LangGraph. `legacy_main.py` preserves the earlier scripted API for regression tests only. To run LangGraph exercises/tests, install `requirements-legacy.txt`; those tests skip when LangGraph is absent. Do not expose the legacy app as the participant backend.
 
-## Owner-led LangGraph integration sequence
+## Study sessions
 
-The standalone graph is now consolidated into these modules:
+Open http://localhost:3000/research and enter the backend researcher key. Start a fresh scenario participant, open the participant interface, and trigger a predefined condition if applicable. Triggering a condition proposes a fixture product; it does not script the conversation. Refresh study results and export anonymous CSV. See `docs/evaluation-guide.md`.
 
-| Module | Responsibility |
-| --- | --- |
-| `backend/app/shopping_nodes.py` | Shopping state, search, proposal, policy and summary nodes |
-| `backend/app/review.py` | Review state/decision, fingerprint, interrupt and approval validation |
-| `backend/app/checkout.py` | Checkout state, simulated receipts, shared in-memory receipt store and checkout guard |
-| `backend/app/workflow.py` | The single `build_workflow(store)` graph builder |
-| `backend/app/run_workflow.py` | Interactive terminal runner |
+## Editing and architecture
 
-Run from `backend/`:
+- Conversation instructions: `backend/config/prompts/dialogue.txt`
+- Policy thresholds: `backend/config/policy.json`; rule logic: `backend/app/runtime/policy.py`
+- Products: `backend/data/products/catalogue.json`
+- Scenarios: `backend/data/scenarios/scenarios.json`
+- UI: `frontend/src/app/page.tsx`, `frontend/src/components/Brief.tsx`, `frontend/src/app/globals.css`
+- Backend state/orchestration: `backend/app/runtime/`
 
-```powershell
-# Default preferences: cheapest headphone merchant is restricted, so no prompt.
-.\.venv\Scripts\python.exe -m app.run_workflow
+See `docs/architecture.md` and `docs/editing-guide.md` for details.
 
-# Explicit demo permission: inspect the proposal, then type approve or reject.
-.\.venv\Scripts\python.exe -m app.run_workflow --allow-market-lane
+## Limits
 
-# No-match example.
-.\.venv\Scripts\python.exe -m app.run_workflow --maximum-price 50
-```
+This is a local, single-worker study application, not an internet deployment. Session UUIDs act as local access tokens; there is no participant account authentication. The researcher key protects study controls, not a production research-data security perimeter. SQLite stores raw conversation and model interpretations locally; anonymous CSV deliberately omits that free text. Researchers must manage consent, retention and local database access. Do not use real personal/payment data.
 
-The runner uses structured inputs (`--category`, `--maximum-price`, `--currency`),
-not LLM intent extraction. Approval resumes the same graph/thread and creates a
-simulated receipt only after independent approval, fingerprint, policy, and intent
-checks. Rejection creates no receipt. Repeated checkout calls share a receipt
-store keyed by proposal ID; lookup and insertion use one lock. Receipt storage
-and graph checkpoints are in memory and do not survive process restart. Saved
-preferences are graph-state snapshots; integration must supply current server-side
-permissions before consequential execution. The fixed catalogue substitution flag
-remains a mock limitation. Beany's HTTP routes/frontend still use the original
-mock flow and are not connected to this graph yet.
+LLM extraction remains probabilistic. Confirmed changes need a supporting quote and pass deterministic field validation; quote matching cannot prove semantic correctness. The editable brief and receipts make interpretation inspectable. Unknown free-text requirements require review. Search uses deterministic keyword/brand matching, not semantic retrieval. USD requests may have no matches because the seeded catalogue uses SGD. Prices use fixed catalogue decimals; no real financial processing occurs.
 
-After consolidation, all 48 backend tests passed, including the original safety
-checks, concurrent receipt retries, and terminal approve/reject/cancellation paths.
-The older `workflow_review.py` and `workflow_checkout.py` modules were removed;
-use the new module paths above. Earlier shopping-stage tests now exercise extracted
-nodes directly; review and checkout tests use the one complete graph.
-
-1. Study the DTOs, workflow, and policy tests; keep the deterministic policy authoritative.
-2. Implement a LangGraph adapter behind `ShoppingAgent`, starting with the same fictional catalogue. Extend its input to include intent, conversation, and saved boundaries explicitly; keep the mock adapter for repeatable tests.
-3. Map graph progress/events into the activity and audit contracts, add cancellation and an approval interrupt, and recheck policy immediately before any consequential action. Preserve HTTP DTOs or version them deliberately.
-4. Introduce SQLite behind the store boundary, session ownership/authentication, and concurrency safeguards before multi-user hosting.
-5. Add permitted real product retrieval only after defining source, privacy, and tool permissions. Keep checkout simulated until separately scoped and authorized.
+Live model quality and account access require the human-review evaluation run with a valid key. Automated tests validate the integration contract, not real model behaviour. LangGraph, MCP, RAG, website automation and real checkout are absent from the runtime.

@@ -1,0 +1,161 @@
+"""Authoritative contracts for the integrated Beany application."""
+
+from datetime import datetime, timezone
+from typing import Literal
+from uuid import uuid4
+from pydantic import BaseModel, ConfigDict, Field
+
+
+def uid():
+    return str(uuid4())
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+class Model(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class Fact(Model):
+    value: str
+    source: Literal["confirmed", "suggested", "unspecified"] = "confirmed"
+    hard: bool = False
+
+
+class Permissions(Model):
+    require_approval: bool = True
+    substitutions: bool = False
+    share_personal_data: bool = False
+    payment_methods: list[Literal["Demo Visa", "Demo Wallet"]] = Field(
+        default_factory=lambda: ["Demo Visa"]
+    )
+    restricted_merchants: list[str] = Field(default_factory=list)
+    autonomy: Literal["guided", "balanced"] = "guided"
+
+
+class Product(Model):
+    id: str
+    name: str
+    category: str
+    brand: str
+    price: float = Field(gt=0, allow_inf_nan=False)
+    currency: Literal["SGD", "USD"] = "SGD"
+    merchant: str
+    attributes: list[str]
+    sizes: list[str] = Field(default_factory=list)
+    stock: bool = True
+    description: str
+    trust: Literal["established", "unverified"] = "established"
+
+
+class Rule(Model):
+    triggering_action: str
+    rule_id: str
+    decision: Literal["ALLOW", "REVIEW", "BLOCK"]
+    constraint: str
+    explanation: str
+    intervention: bool
+
+
+class Action(Model):
+    id: str = Field(default_factory=uid)
+    product: Product
+    payment_method: str = "Demo Visa"
+    shares_personal_data: bool = False
+    substitute: bool = False
+    fingerprint: str = ""
+    status: Literal["pending", "approved", "rejected", "superseded"] = "pending"
+    rules: list[Rule] = Field(default_factory=list)
+    decision: Literal["ALLOW", "REVIEW", "BLOCK"] = "REVIEW"
+
+
+class Event(Model):
+    id: str = Field(default_factory=uid)
+    timestamp: str = Field(default_factory=now)
+    kind: str
+    detail: str
+
+
+class Message(Model):
+    role: Literal["user", "assistant"]
+    text: str
+
+
+class Receipt(Model):
+    id: str = Field(default_factory=uid)
+    proposal_id: str
+    fingerprint: str
+    product: Product
+    timestamp: str = Field(default_factory=now)
+    status: Literal["simulated"] = "simulated"
+
+
+class Approval(Model):
+    proposal_id: str
+    fingerprint: str
+    action: Literal["approve", "reject"]
+    timestamp: str = Field(default_factory=now)
+
+
+class Session(Model):
+    id: str = Field(default_factory=uid)
+    participant: str = Field(default_factory=lambda: "P-" + uid()[:8])
+    created_at: str = Field(default_factory=now)
+    brief: dict[str, Fact] = Field(default_factory=dict)
+    permissions: Permissions = Field(default_factory=Permissions)
+    messages: list[Message] = Field(default_factory=list)
+    recommendations: list[Product] = Field(default_factory=list)
+    proposals: list[Action] = Field(default_factory=list)
+    approvals: list[Approval] = Field(default_factory=list)
+    receipts: list[Receipt] = Field(default_factory=list)
+    events: list[Event] = Field(default_factory=list)
+    stage: str = "ready"
+    suggestions: list[str] = Field(default_factory=list)
+    scenario_id: str | None = None
+    rejected_products: list[str] = Field(default_factory=list)
+    clarification_count: int = 0
+    intervention_count: int = 0
+    mode: str = "openai"
+
+
+class Change(Model):
+    field: Literal[
+        "category",
+        "usage",
+        "budget",
+        "currency",
+        "preferred_brands",
+        "excluded_brands",
+        "size",
+        "features",
+        "merchants",
+        "other",
+    ]
+    value: str | None
+    source: Literal["confirmed", "suggested"]
+    hard: bool
+    evidence: str
+
+
+class Interpretation(Model):
+    reply: str
+    changes: list[Change]
+    intent: Literal["search", "clarify", "explain", "cancel", "new_task", "alternative"]
+    question: str | None
+    suggestions: list[str]
+
+
+class Chat(Model):
+    text: str = Field(min_length=1, max_length=2000)
+
+
+class Decision(Model):
+    action: Literal["approve", "reject"]
+    fingerprint: str
+
+
+class Edit(Model):
+    field: str
+    fact: Fact | None

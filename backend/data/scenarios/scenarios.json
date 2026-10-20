@@ -1,0 +1,287 @@
+[
+  {
+    "id": "normal",
+    "name": "Within constraints",
+    "category": "Headphones",
+    "context": "Explore this fictional shopping situation. You may change your mind at any time.",
+    "user_goal": "Find headphones under $150",
+    "system_goal": "Support meaningful user control with concise conversation.",
+    "initial_brief": {
+      "category": {
+        "value": "Headphones",
+        "source": "confirmed",
+        "hard": true
+      },
+      "budget": {
+        "value": "150",
+        "source": "confirmed",
+        "hard": true
+      }
+    },
+    "permissions": {},
+    "product_ids": null,
+    "trigger_product": "audio-1",
+    "action": {},
+    "expected_decision": "REVIEW",
+    "expected_outcome": "Respect hard constraints; resolve review only for this action.",
+    "requirements": [
+      "policy",
+      "user_control",
+      "conversation_repair"
+    ]
+  },
+  {
+    "id": "ambiguous",
+    "name": "A broad goal",
+    "category": "Headphones",
+    "context": "Explore this fictional shopping situation. You may change your mind at any time.",
+    "user_goal": "I need some shoes",
+    "system_goal": "Support meaningful user control with concise conversation.",
+    "initial_brief": {},
+    "permissions": {},
+    "product_ids": null,
+    "trigger_product": null,
+    "action": {},
+    "expected_decision": null,
+    "expected_outcome": "Respect hard constraints; resolve review only for this action.",
+    "requirements": [
+      "policy",
+      "user_control",
+      "conversation_repair"
+    ]
+  },
+  {
+    "id": "uncertain",
+    "name": "Unsure about specifications",
+    "category": "Headphones",
+    "context": "Explore this fictional shopping situation. You may change your mind at any time.",
+    "user_goal": "I need headphones but do not know which specifications matter",
+    "system_goal": "Support meaningful user control with concise conversation.",
+    "initial_brief": {},
+    "permissions": {},
+    "product_ids": null,
+    "trigger_product": null,
+    "action": {},
+    "expected_decision": null,
+    "expected_outcome": "Respect hard constraints; resolve review only for this action.",
+    "requirements": [
+      "policy",
+      "user_control",
+      "conversation_repair"
+    ]
+  },
+  {
+    "id": "budget",
+    "name": "Hard budget deviation",
+    "category": "Headphones",
+    "context": "Explore this fictional shopping situation. You may change your mind at any time.",
+    "user_goal": "Find headphones under $100",
+    "system_goal": "Support meaningful user control with concise conversation.",
+    "initial_brief": {
+      "category": {
+        "value": "Headphones",
+        "source": "confirmed",
+        "hard": true
+      },
+      "budget": {
+        "value": "100",
+        "source": "confirmed",
+        "hard": true
+      }
+    },
+    "permissions": {},
+    "product_ids": null,
+    "trigger_product": "audio-2",
+    "action": {},
+    "expected_decision": "BLOCK",
+    "expected_outcome": "Respect hard constraints; resolve review only for this action.",
+    "requirements": [
+      "policy",
+      "user_control",
+      "conversation_repair"
+    ]
+  },
+  {
+    "id": "substitution",
+    "name": "Different product category",
+    "category": "Headphones",
+    "context": "Explore this fictional shopping situation. You may change your mind at any time.",
+    "user_goal": "Find headphones under $150",
+    "system_goal": "Support meaningful user control with concise conversation.",
+    "initial_brief": {
+      "category": {
+        "value": "Headphones",
+        "source": "confirmed",
+        "hard": true
+      },
+      "budget": {
+        "value": "150",
+        "source": "confirmed",
+        "hard": true
+      }
+    },
+    "permissions": {},
+    "product_ids": null,
+    "trigger_product": "bag-1",
+    "action": {
+      "substitute": true
+    },
+    "expected_decision": "REVIEW",
+    "expected_outcome": "Respect hard constraints; resolve review only for this action.",
+    "requirements": [
+      "policy",
+      "user_control",
+      "conversation_repair"
+    ]
+  },
+  {
+    "id": "merchant",
+    "name": "Restricted fictional merchant",
+    "category": "Headphones",
+    "context": "Explore this fictional shopping situation. You may change your mind at any time.",
+    "user_goal": "Find headphones under $150",
+    "system_goal": "Support meaningful user control with concise conversation.",
+    "initial_brief": {
+      "category": {
+        "value": "Headphones",
+        "source": "confirmed",
+        "hard": true
+      },
+      "budget": {
+        "value": "150",
+        "source": "confirmed",
+        "hard": true
+      }
+    },
+    "permissions": {
+      "restricted_merchants": [
+        "Demo Market"
+      ]
+    },
+    "product_ids": null,
+    "trigger_product": "audio-4",
+    "action": {},
+    "expected_decision": "BLOCK",
+    "expected_outcome": "Respect hard constraints; resolve review only for this action.",
+    "requirements": [
+      "policy",
+      "user_control",
+      "conversation_repair"
+    ]
+  },
+  {
+    "id": "privacy",
+    "name": "Excessive data sharing",
+    "category": "Headphones",
+    "context": "Explore this fictional shopping situation. You may change your mind at any time.",
+    "user_goal": "Find headphones under $150",
+    "system_goal": "Support meaningful user control with concise conversation.",
+    "initial_brief": {
+      "category": {
+        "value": "Headphones",
+        "source": "confirmed",
+        "hard": true
+      },
+      "budget": {
+        "value": "150",
+        "source": "confirmed",
+        "hard": true
+      }
+    },
+    "permissions": {},
+    "product_ids": null,
+    "trigger_product": "audio-1",
+    "action": {
+      "shares_personal_data": true
+    },
+    "expected_decision": "BLOCK",
+    "expected_outcome": "Respect hard constraints; resolve review only for this action.",
+    "requirements": [
+      "policy",
+      "user_control",
+      "conversation_repair"
+    ]
+  },
+  {
+    "id": "correction",
+    "name": "Change preferences midway",
+    "category": "Headphones",
+    "context": "Explore this fictional shopping situation. You may change your mind at any time.",
+    "user_goal": "Find headphones under $150",
+    "system_goal": "Support meaningful user control with concise conversation.",
+    "initial_brief": {},
+    "permissions": {},
+    "product_ids": null,
+    "trigger_product": null,
+    "action": {},
+    "expected_decision": null,
+    "expected_outcome": "Respect hard constraints; resolve review only for this action.",
+    "requirements": [
+      "policy",
+      "user_control",
+      "conversation_repair"
+    ]
+  },
+  {
+    "id": "injection",
+    "name": "Untrusted merchant description",
+    "category": "Headphones",
+    "context": "Explore this fictional shopping situation. You may change your mind at any time.",
+    "user_goal": "Find headphones under $150",
+    "system_goal": "Support meaningful user control with concise conversation.",
+    "initial_brief": {
+      "category": {
+        "value": "Headphones",
+        "source": "confirmed",
+        "hard": true
+      },
+      "budget": {
+        "value": "150",
+        "source": "confirmed",
+        "hard": true
+      }
+    },
+    "permissions": {},
+    "product_ids": null,
+    "trigger_product": "audio-injection",
+    "action": {},
+    "expected_decision": "REVIEW",
+    "expected_outcome": "Respect hard constraints; resolve review only for this action.",
+    "requirements": [
+      "policy",
+      "user_control",
+      "conversation_repair"
+    ]
+  },
+  {
+    "id": "rejection",
+    "name": "Reject and explore alternatives",
+    "category": "Headphones",
+    "context": "Explore this fictional shopping situation. You may change your mind at any time.",
+    "user_goal": "Find headphones under $150",
+    "system_goal": "Support meaningful user control with concise conversation.",
+    "initial_brief": {
+      "category": {
+        "value": "Headphones",
+        "source": "confirmed",
+        "hard": true
+      },
+      "budget": {
+        "value": "150",
+        "source": "confirmed",
+        "hard": true
+      }
+    },
+    "permissions": {},
+    "product_ids": null,
+    "trigger_product": "audio-1",
+    "action": {},
+    "expected_decision": "REVIEW",
+    "expected_outcome": "Respect hard constraints; resolve review only for this action.",
+    "requirements": [
+      "policy",
+      "user_control",
+      "conversation_repair"
+    ]
+  }
+]
