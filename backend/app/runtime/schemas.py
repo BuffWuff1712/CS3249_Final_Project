@@ -35,6 +35,42 @@ class Permissions(Model):
     autonomy: Literal["guided", "balanced"] = "guided"
 
 
+class Merchant(Model):
+    id: str
+    name: str
+    website: str
+    description: str
+    payment_methods: list[str]
+    return_policy: str
+    contact: str
+    review_count: int = Field(ge=0)
+    review_rating: float | None = Field(default=None, ge=0, le=5)
+    verified_business: bool
+    requested_information: list[str]
+    external_payment: bool = False
+    misleading_returns: bool = False
+    lookalike_identity: bool = False
+    pressure_tactics: bool = False
+    inconsistent_information: bool = False
+
+
+class RiskEvidence(Model):
+    rule_id: str
+    evidence: str
+    weight: float
+
+
+class RiskAssessment(Model):
+    merchant_id: str
+    level: Literal["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+    score: float
+    evidence: list[RiskEvidence]
+    recommended_decision: Literal["ALLOW", "REVIEW", "BLOCK"]
+    explanation: str
+    config_version: str
+    config_hash: str
+
+
 class Product(Model):
     id: str
     name: str
@@ -43,6 +79,8 @@ class Product(Model):
     price: float = Field(gt=0, allow_inf_nan=False)
     currency: Literal["SGD", "USD"] = "SGD"
     merchant: str
+    merchant_id: str = ""
+    specifications: dict[str, str] = Field(default_factory=dict)
     attributes: list[str]
     sizes: list[str] = Field(default_factory=list)
     stock: bool = True
@@ -62,6 +100,8 @@ class Rule(Model):
 class Action(Model):
     id: str = Field(default_factory=uid)
     product: Product
+    merchant_details: Merchant | None = None
+    risk: RiskAssessment | None = None
     payment_method: str = "Demo Visa"
     shares_personal_data: bool = False
     substitute: bool = False
@@ -114,6 +154,8 @@ class Session(Model):
     stage: str = "ready"
     suggestions: list[str] = Field(default_factory=list)
     scenario_id: str | None = None
+    experiment: dict = Field(default_factory=dict)
+    rejected_merchants: list[str] = Field(default_factory=list)
     rejected_products: list[str] = Field(default_factory=list)
     clarification_count: int = 0
     intervention_count: int = 0
@@ -140,10 +182,12 @@ class Change(Model):
 
 
 class Interpretation(Model):
-    reply: str
+    reply: str = Field(
+        min_length=1,
+        description="Complete user-facing message, including one question when intent is clarify.",
+    )
     changes: list[Change]
     intent: Literal["search", "clarify", "explain", "cancel", "new_task", "alternative"]
-    question: str | None
     suggestions: list[str]
 
 
@@ -159,3 +203,8 @@ class Decision(Model):
 class Edit(Model):
     field: str
     fact: Fact | None
+
+
+class SessionView(Session):
+    # Internal profile/config snapshots are persisted but never returned to participants.
+    experiment: dict = Field(default_factory=dict, exclude=True)

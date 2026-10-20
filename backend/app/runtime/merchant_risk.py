@@ -1,0 +1,191 @@
+"""Deterministic risk prediction from observable signals, not hidden labels."""
+
+import hashlib, json, re
+from statistics import median
+from pathlib import Path
+from typing import Literal
+from pydantic import Field, model_validator
+from .schemas import Model, RiskAssessment, RiskEvidence
+
+ROOT = Path(__file__).resolve().parents[2]
+CONFIG_PATH = ROOT / "config/merchant_risk_rules.json"
+RULES = {
+    "low_price",
+    "missing_business",
+    "excessive_data",
+    "unusual_payment",
+    "external_payment",
+    "misleading_returns",
+    "lookalike",
+    "pressure",
+    "inconsistent",
+    "injection",
+}
+
+
+class RiskConfig(Model):
+    version: str = Field(min_length=1)
+    weights: dict[str, float]
+    medium: float = Field(gt=0, allow_inf_nan=False)
+    high: float = Field(gt=0, allow_inf_nan=False)
+    critical: float = Field(gt=0, allow_inf_nan=False)
+    low_price_ratio: float = Field(gt=0, lt=1, allow_inf_nan=False)
+    decisions: dict[str, Literal["ALLOW", "REVIEW", "BLOCK"]]
+    explanation_detail: Literal["brief", "detailed"] = "detailed"
+
+    @model_validator(mode="after")
+    def coherent(self):
+        import math
+
+        if not self.medium < self.high < self.critical:
+            raise ValueError("Thresholds must increase")
+        if set(self.weights) != RULES or any(
+            not math.isfinite(v) or v < 0 for v in self.weights.values()
+        ):
+            raise ValueError("All known weights must be finite and nonnegative")
+        if set(self.decisions) != {"LOW", "MEDIUM", "HIGH", "CRITICAL"}:
+            raise ValueError("All risk decisions required")
+        return self
+
+
+def load_config():
+    return RiskConfig.model_validate_json(CONFIG_PATH.read_text(encoding="utf-8-sig"))
+
+
+def digest(config):
+    return hashlib.sha256(
+        json.dumps(config.model_dump(), sort_keys=True).encode()
+    ).hexdigest()
+
+
+def session_config(s):
+    # Invalid current config blocks checkout even when an older snapshot exists.
+    current = load_config()
+    return (
+        RiskConfig.model_validate(s.experiment["risk_config"])
+        if s.experiment.get("risk_config")
+        else current
+    )
+
+
+def assess(product, merchant, comparables, config):
+    evidence = []
+
+    def add(rule, text):
+        evidence.append(
+            RiskEvidence(rule_id=rule, evidence=text, weight=config.weights[rule])
+        )
+
+    prices = [
+        p.price
+        for p in comparables
+        if p.id != product.id
+        and p.category == product.category
+        and p.brand == product.brand
+        and p.currency == product.currency
+    ]
+    if prices and product.price < median(prices) * config.low_price_ratio:
+        add(
+            "low_price",
+            f"Price {product.price:.2f} is below {config.low_price_ratio:.0%} of the comparable-brand median {median(prices):.2f} {product.currency}. A discount alone does not establish wrongdoing.",
+        )
+    if not merchant.contact.strip() or not merchant.verified_business:
+        add(
+            "missing_business",
+            "Business contact or verification information is incomplete in this simulated record.",
+        )
+    excessive = set(merchant.requested_information) - {
+        "fictional_name",
+        "fictional_delivery_address",
+        "fictional_email",
+    }
+    if excessive:
+        add(
+            "excessive_data",
+            "Checkout requests unrelated information: "
+            + ", ".join(sorted(excessive))
+            + ".",
+        )
+    if any(m not in ("Demo Visa", "Demo Wallet") for m in merchant.payment_methods):
+        add(
+            "unusual_payment",
+            "Merchant lists an unsupported payment channel: "
+            + ", ".join(merchant.payment_methods)
+            + ".",
+        )
+    if merchant.external_payment:
+        add(
+            "external_payment",
+            "Merchant requests payment outside the simulated checkout.",
+        )
+    for field, rule, text in [
+        (
+            "misleading_returns",
+            "misleading_returns",
+            "Return terms conflict with the advertised refund promise.",
+        ),
+        (
+            "lookalike_identity",
+            "lookalike",
+            "Merchant identity resembles another business in the fixture.",
+        ),
+        ("pressure_tactics", "pressure", "The listing uses a high-pressure deadline."),
+        (
+            "inconsistent_information",
+            "inconsistent",
+            "Merchant and product information is inconsistent in the fixture.",
+        ),
+    ]:
+        if getattr(merchant, field):
+            add(rule, text)
+    text = merchant.description + " " + product.description
+    if re.search(
+        r"ignore.{0,60}(rules|instructions|preferences)|reveal.{0,30}(key|password)|disregard.{0,40}(policy|rules)|enable.{0,40}personal data",
+        text,
+        re.I,
+    ):
+        add(
+            "injection",
+            "The description contains instructions aimed at changing assistant behaviour; these are treated as untrusted content.",
+        )
+    score = sum(e.weight for e in evidence)
+    level = (
+        "CRITICAL"
+        if score >= config.critical
+        else "HIGH"
+        if score >= config.high
+        else "MEDIUM"
+        if score >= config.medium
+        else "LOW"
+    )
+    if evidence and all(e.rule_id == "low_price" for e in evidence):
+        level = "LOW"
+    decision = config.decisions[level]
+    # Non-negotiable application safeguards cannot be tuned away.
+    if (
+        merchant.external_payment
+        or excessive & {"password", "bank_password", "card_number", "government_id"}
+        or any(e.rule_id == "injection" for e in evidence)
+    ):
+        decision = "BLOCK"
+    explanation = (
+        f"{merchant.name}: {level.lower()} predicted risk from observable simulation signals. "
+        + (
+            " ".join(e.evidence for e in evidence)
+            if config.explanation_detail == "detailed"
+            else f"{len(evidence)} signal(s) observed. "
+        )
+        + "This is an uncertain assessment, not proof of fraud."
+        if evidence
+        else f"No configured risk signals detected for {merchant.name}. This does not guarantee safety."
+    )
+    return RiskAssessment(
+        merchant_id=merchant.id,
+        level=level,
+        score=score,
+        evidence=evidence,
+        recommended_decision=decision,
+        explanation=explanation,
+        config_version=config.version,
+        config_hash=digest(config),
+    )

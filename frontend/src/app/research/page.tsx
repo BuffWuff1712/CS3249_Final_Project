@@ -1,4 +1,5 @@
 "use client";
+import { RiskResearch } from "@/components/RiskResearch";
 import { useState } from "react";
 import { base, request, Session } from "@/lib/beany";
 type Scenario = {
@@ -86,6 +87,12 @@ export default function Research() {
       {session && (
         <section className="panel">
           <h2>{session.participant}</h2>
+          <RiskResearch
+            key={session.id}
+            session={session}
+            researchKey={key}
+            onUpdated={setSession}
+          />
           <p>
             Open the participant interface in another tab. Refresh this
             workspace’s session after the task.

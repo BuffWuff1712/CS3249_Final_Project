@@ -1,6 +1,6 @@
 # Beany — conversational shopping oversight
 
-Beany is a blue-themed Next.js + FastAPI research prototype: **AI does the shopping. You stay in control.** OpenAI interprets conversations; Python controls permissions, product search, policy decisions and simulated checkout. Every product and merchant is fictional. No payment or real shopping service is connected.
+Beany is a blue-themed Next.js + FastAPI research prototype: **AI does the shopping. You stay in control.** An OpenAI-compatible NUS SoCLaaS model interprets conversations; Python controls permissions, product search, policy decisions and simulated checkout. Every product and merchant is fictional. No payment or real shopping service is connected.
 
 ## Requirements
 
@@ -44,23 +44,13 @@ npm run dev
 
 Open http://localhost:3000. Backend API docs: http://localhost:8000/docs.
 
-## OpenAI configuration
+## NUS SoCLaaS configuration
 
-Create an API key in your OpenAI platform project at https://platform.openai.com/api-keys and configure billing/model access as needed. Put the key only in `backend/.env`:
+Configure `backend/.env` using `backend/.env.example`. Obtain your NUS SoCLaaS API credentials through your course/project access; keep them on the backend. Set `OPENAI_API_KEY`, `OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1`, and an available `OPENAI_MODEL`. The project owner's selected model is `qwen3.6:35b`. No model or provider is hardcoded in application logic.
 
-```dotenv
-OPENAI_API_KEY=your-key-here
-OPENAI_MODEL=gpt-5.6-luna
-OPENAI_REASONING_EFFORT=low
-BEANY_LLM_MODE=openai
-BEANY_RESEARCH_KEY=choose-a-local-researcher-secret
-```
+Responses is the default API mode; Chat Completions is an explicit compatible adapter. The selected NUS model passed endpoint probes, but full-schema responses require explicit JSON instructions plus Pydantic validation; accepting a schema parameter does not prove constrained decoding. See [configuration guide](docs/configuration-guide.md) for exact settings, empirical compatibility results, model listing and connectivity commands.
 
-`OPENAI_MODEL` may be changed to `gpt-5.6-terra` or another model supporting Responses Structured Outputs and the configured reasoning effort. Account access varies; API errors are shown as recoverable errors. There is no automatic model substitution. Missing keys never silently activate mock responses.
-
-For explicit offline testing set `BEANY_LLM_MODE=mock`. The interface labels this mode; its intentionally limited parser is **not suitable for evaluating conversational intelligence**. Automated tests use this mode or injected structured responses and never need paid API calls.
-
-The SDK uses `client.responses.parse(..., text_format=PydanticModel)` and `output_parsed`, verified against [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) and the [requested model documentation](https://developers.openai.com/api/docs/models/gpt-5.6-luna). Conversation state is held in SQLite; requests use `store=False`. Recent conversation and structured preferences are sent to OpenAI; avoid entering personal data.
+For offline testing set `BEANY_LLM_MODE=mock`. This mode is visibly labelled and is not a substitute for real conversational evaluation. Missing credentials never silently activate it. The API key must never appear in frontend variables or Git. Only recent conversation and observable catalogue/merchant/risk data are sent to the configured model; hidden ground truth is never included.
 
 ## Using Beany
 
@@ -107,4 +97,10 @@ This is a local, single-worker study application, not an internet deployment. Se
 
 LLM extraction remains probabilistic. Confirmed changes need a supporting quote and pass deterministic field validation; quote matching cannot prove semantic correctness. The editable brief and receipts make interpretation inspectable. Unknown free-text requirements require review. Search uses deterministic keyword/brand matching, not semantic retrieval. USD requests may have no matches because the seeded catalogue uses SGD. Prices use fixed catalogue decimals; no real financial processing occurs.
 
-Live model quality and account access require the human-review evaluation run with a valid key. Automated tests validate the integration contract, not real model behaviour. LangGraph, MCP, RAG, website automation and real checkout are absent from the runtime.
+Live endpoint probes and synthetic shopping turns were exercised against the selected NUS model. Broader conversational quality still requires human-reviewed evaluations. Automated tests validate deterministic behaviour and gateway contracts. LangGraph, MCP, RAG, website automation and real checkout are absent from the runtime.
+
+## Merchant-risk extension
+
+Separate product and merchant databases support fictional multi-merchant offers. Risk is predicted from observable signals; hidden labels are joined only in authenticated researcher reports. Configure thresholds, warning profiles, scenarios and evaluation using [docs/configuration-guide.md](docs/configuration-guide.md). The participant UI offers merchant details and a deterministic “Find another merchant” control. Every checkout still passes policy rechecks and action-specific approval checks.
+
+After this upgrade, start a fresh shopping request/session before approving: older proposals do not contain merchant snapshots and must not inherit approval across the schema change.

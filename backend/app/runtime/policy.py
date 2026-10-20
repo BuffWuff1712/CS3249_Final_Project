@@ -1,6 +1,8 @@
 import hashlib, json
 from pathlib import Path
 from .schemas import Product, Rule
+from .merchants import merchant_for
+from .merchant_risk import assess, session_config
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = json.loads((ROOT / "config/policy.json").read_text(encoding="utf-8-sig"))
@@ -38,11 +40,17 @@ def catalogue(s):
             (ROOT / "data/products/catalogue.json").read_text(encoding="utf-8-sig")
         )
     ]
+    for p in products:
+        m = merchant_for(p)
+        p.merchant = m.name
+        p.trust = "established" if m.verified_business else "unverified"
     if s.scenario_id:
         scenario = json.loads(
             (ROOT / "data/scenarios/scenarios.json").read_text(encoding="utf-8-sig")
         )
         spec = next(x for x in scenario if x["id"] == s.scenario_id)
+        if spec.get("merchant_ids"):
+            products = [p for p in products if p.merchant_id in spec["merchant_ids"]]
         if spec.get("product_ids"):
             products = [p for p in products if p.id in spec["product_ids"]]
     return products
@@ -51,7 +59,11 @@ def catalogue(s):
 def search(s):
     products = []
     for p in catalogue(s):
-        if not p.stock or p.id in s.rejected_products:
+        if (
+            not p.stock
+            or p.id in s.rejected_products
+            or p.merchant_id in s.rejected_merchants
+        ):
             continue
         if (
             value(s, "category")
@@ -117,6 +129,8 @@ def search(s):
 def fingerprint(a):
     payload = {
         "product": a.product.model_dump(),
+        "merchant": a.merchant_details.model_dump() if a.merchant_details else None,
+        "risk_config": a.risk.config_hash if a.risk else None,
         "payment": a.payment_method,
         "sharing": a.shares_personal_data,
         "substitute": a.substitute,
@@ -142,6 +156,47 @@ def evaluate(s, a):
         )
 
     p = a.product
+    try:
+        merchant = merchant_for(p)
+        if a.merchant_details is None or merchant != a.merchant_details:
+            rule(
+                "merchant_changed",
+                "BLOCK",
+                "merchant",
+                "Merchant terms changed or are missing. Request a new proposal.",
+            )
+        a.risk = assess(p, merchant, catalogue(s), session_config(s))
+        if a.risk.recommended_decision != "ALLOW":
+            rule(
+                "merchant_risk",
+                a.risk.recommended_decision,
+                "merchant_risk",
+                a.risk.explanation,
+            )
+        if a.payment_method not in merchant.payment_methods:
+            rule(
+                "merchant_payment",
+                "BLOCK",
+                "payment",
+                "This payment method is not accepted by the simulated merchant.",
+            )
+        if merchant.requested_information and not s.permissions.share_personal_data:
+            rule(
+                "merchant_privacy",
+                "BLOCK",
+                "share_personal_data",
+                "This merchant requests information you have not permitted sharing: "
+                + ", ".join(merchant.requested_information)
+                + ".",
+            )
+    except (ValueError, OSError, KeyError, TypeError):
+        a.risk = None
+        rule(
+            "risk_configuration",
+            "BLOCK",
+            "configuration",
+            "Merchant risk data or configuration is invalid. Checkout is blocked until the researcher repairs it.",
+        )
     if not p.stock:
         rule(
             "stock", "BLOCK", "availability", "This fictional product is out of stock."

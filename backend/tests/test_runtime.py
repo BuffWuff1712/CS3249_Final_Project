@@ -11,6 +11,10 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setenv("BEANY_DB", str(tmp_path / "study.sqlite3"))
     monkeypatch.setenv("BEANY_LLM_MODE", "mock")
     monkeypatch.setenv("BEANY_RESEARCH_KEY", "test-key")
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://gateway.test/v1")
+    monkeypatch.setenv("OPENAI_MODEL", "test-model")
+    monkeypatch.setenv("OPENAI_API_MODE", "responses")
+    monkeypatch.setenv("OPENAI_STRUCTURED_MODE", "schema")
     return TestClient(app)
 
 
@@ -85,6 +89,32 @@ def test_clarification(client):
         and s["clarification_count"] == 1
         and not s["proposals"]
     )
+    assert [m["text"] for m in s["messages"][1:]] == [
+        "I need some shoes",
+        "Will you use them for running or everyday wear?",
+    ]
+
+
+def test_unsupported_category_has_one_complete_clarification(client, monkeypatch):
+    reply = (
+        "Smartphones aren't in my current shopping categories. "
+        "Would you like to explore running shoes, headphones, or backpacks instead?"
+    )
+    monkeypatch.setattr(
+        service.llm,
+        "interpret",
+        lambda *_: Interpretation(
+            reply=reply, changes=[], intent="clarify", suggestions=[]
+        ),
+    )
+    s = start(client, "I want to find a smartphone for $2000")
+    assert [m["text"] for m in s["messages"][1:]] == [
+        "I want to find a smartphone for $2000",
+        reply,
+    ]
+    assert s["stage"] == "clarifying" and s["clarification_count"] == 1
+    assert not s["proposals"] and not s["receipts"]
+    assert client.get(f"/sessions/{s['id']}").json()["messages"] == s["messages"]
 
 
 def test_no_key_is_explicit(client, monkeypatch):
@@ -123,7 +153,6 @@ def test_search_and_inferred_constraint_protection(client, monkeypatch):
                 )
             ],
             intent="explain",
-            question=None,
             suggestions=[],
         ),
     )
@@ -152,7 +181,7 @@ def test_explicit_correction(client):
         ("substitution", "REVIEW"),
         ("merchant", "BLOCK"),
         ("privacy", "BLOCK"),
-        ("injection", "REVIEW"),
+        ("injection", "BLOCK"),
         ("rejection", "REVIEW"),
     ],
 )
@@ -255,10 +284,9 @@ def test_sdk_structured_contract(client, monkeypatch):
         captured.update(kwargs)
         return SimpleNamespace(
             output_parsed=Interpretation(
-                reply="What usage?",
+                reply="Will you use them for running or everyday wear?",
                 changes=[],
                 intent="clarify",
-                question="Running or everyday?",
                 suggestions=[],
             )
         )
@@ -268,7 +296,9 @@ def test_sdk_structured_contract(client, monkeypatch):
     monkeypatch.setattr(
         openai,
         "OpenAI",
-        lambda **kwargs: SimpleNamespace(responses=SimpleNamespace(parse=parse)),
+        lambda **kwargs: SimpleNamespace(
+            responses=SimpleNamespace(parse=parse), close=lambda: None
+        ),
     )
     result = OpenAIConversation().interpret(Session(), "shoes")
     assert result.intent == "clarify" and captured["text_format"] is Interpretation
@@ -301,15 +331,18 @@ def test_select_alternative_is_new_action(client):
         == 409
     )
 
-def test_wallet_only_permission(client):
-    s=Session(permissions=Permissions(payment_methods=['Demo Wallet']))
-    service.propose(s,next(p for p in catalogue(s) if p.id=='audio-1'))
-    assert s.proposals[-1].payment_method=='Demo Wallet'
-    assert not any(r.rule_id=='payment' for r in s.proposals[-1].rules)
 
-def test_explicit_cancel_does_not_require_llm(client,monkeypatch):
-    s=start(client)
-    monkeypatch.setenv('BEANY_LLM_MODE','openai');monkeypatch.delenv('OPENAI_API_KEY',raising=False)
-    r=client.post(f'/sessions/{s["id"]}/cancel')
-    assert r.status_code==200 and r.json()['stage']=='cancelled'
-    assert decision(client,s).status_code==409
+def test_wallet_only_permission(client):
+    s = Session(permissions=Permissions(payment_methods=["Demo Wallet"]))
+    service.propose(s, next(p for p in catalogue(s) if p.id == "audio-1"))
+    assert s.proposals[-1].payment_method == "Demo Wallet"
+    assert not any(r.rule_id == "payment" for r in s.proposals[-1].rules)
+
+
+def test_explicit_cancel_does_not_require_llm(client, monkeypatch):
+    s = start(client)
+    monkeypatch.setenv("BEANY_LLM_MODE", "openai")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    r = client.post(f"/sessions/{s['id']}/cancel")
+    assert r.status_code == 200 and r.json()["stage"] == "cancelled"
+    assert decision(client, s).status_code == 409

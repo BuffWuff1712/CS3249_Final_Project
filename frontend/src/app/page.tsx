@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { request, Session, Action } from "@/lib/beany";
+import { MerchantDetails } from "@/components/MerchantDetails";
 import { Brief } from "@/components/Brief";
 const starters = [
   "Find me running shoes under $200.",
@@ -121,7 +122,7 @@ export default function Home() {
           Fictional products and simulated checkout.{" "}
           {session?.mode === "mock"
             ? "MOCK LLM MODE — offline test responses."
-            : "Conversation powered by OpenAI when configured."}
+            : "Conversation via your configured NUS model."}
         </span>
       </div>
       {error && (
@@ -191,6 +192,7 @@ export default function Home() {
                   ))}
                 </div>
                 <p>{a.product.description}</p>
+                <MerchantDetails action={a} />
                 <small>
                   Payment: {a.payment_method} · Data sharing:{" "}
                   {a.shares_personal_data ? "requested" : "none"}
@@ -237,9 +239,18 @@ export default function Home() {
                     </button>
                     <button
                       disabled={busy}
-                      onClick={() => void send("Find an alternative")}
+                      onClick={() =>
+                        void run(async () =>
+                          keep(
+                            await request<Session>(
+                              `/sessions/${session!.id}/alternative`,
+                              "POST",
+                            ),
+                          ),
+                        )
+                      }
                     >
-                      Alternative
+                      Find another merchant
                     </button>
                   </div>
                 )}
@@ -298,8 +309,23 @@ export default function Home() {
               void send();
             }}
           >
-            <button type="button" disabled={busy || !session} onClick={() => void run(async () => keep(await request<Session>(`/sessions/${session!.id}/cancel`, "POST")))}>Cancel shopping task</button>
-              <div className="scenarios">
+            <button
+              type="button"
+              disabled={busy || !session}
+              onClick={() =>
+                void run(async () =>
+                  keep(
+                    await request<Session>(
+                      `/sessions/${session!.id}/cancel`,
+                      "POST",
+                    ),
+                  ),
+                )
+              }
+            >
+              Cancel shopping task
+            </button>
+            <div className="scenarios">
               {session?.suggestions.map((t, i) => (
                 <button
                   type="button"
@@ -382,7 +408,19 @@ export default function Home() {
                 )
                 .slice(-6)
                 .map((e) => (
-                  <li key={e.id}>{({search:"Compared matching products",intervention:"Requested your review",approve:"You approved this action",reject:"You rejected this action",simulated_checkout:"Created a simulated receipt",cancel:"Shopping task cancelled",brief_edit:"Updated your shopping brief"} as Record<string,string>)[e.kind] || e.kind.replaceAll("_", " ")}</li>
+                  <li key={e.id}>
+                    {(
+                      {
+                        search: "Compared matching products",
+                        intervention: "Requested your review",
+                        approve: "You approved this action",
+                        reject: "You rejected this action",
+                        simulated_checkout: "Created a simulated receipt",
+                        cancel: "Shopping task cancelled",
+                        brief_edit: "Updated your shopping brief",
+                      } as Record<string, string>
+                    )[e.kind] || e.kind.replaceAll("_", " ")}
+                  </li>
                 ))}
             </ol>
           </section>

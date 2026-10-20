@@ -45,3 +45,6 @@ backend/data/exports/
 backend/data/research-logs/
 beany-events*.csv
 *.log
+
+beany-risk-results*.csv
+backend/data/gateway-probe*.json

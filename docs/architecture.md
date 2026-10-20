@@ -24,3 +24,11 @@ State transitions: ready â†’ clarifying or no_match or waiting_review/blocked â†
 Permissions cannot be written by the extraction schema. Hard restrictions yield BLOCK. Review rules require approval tied to the exact action. Checkout rechecks policy regardless of route. A catalogue edit between proposal and approval requires a fresh proposal. The model cannot choose arbitrary prices or create receipts. Merchant descriptions remain untrusted; they are never executed or treated as application instructions.
 
 Earlier modules outside runtime are preserved learning examples, not dependencies of the integrated app. `frontend/src/lib/beany.ts` mirrors the runtime contracts; older contracts/components remain for the earlier prototype.
+
+## NUS and merchant-risk extension
+
+`runtime/gateway.py` is the only SDK client factory. `llm.py` uses its explicit Responses/Chat adapter for both interpretation and explanation. The configured endpoint/model never change on error.
+
+`runtime/merchants.py` validates and resolves observable merchant records. `merchant_risk.py` predicts risks without importing research labels. `policy.py` combines those assessments with original hard constraints and permissions. Actions snapshot merchant terms and risk configuration hashes into their fingerprints. Changed terms or experiment settings invalidate old approvals.
+
+`runtime/research.py` alone joins hidden labels and predictions. Research endpoints require the researcher key. Internal experiment configuration/history/observations persist in the Session but are removed by the SessionView response model on all participant routes; the LLM payload is explicitly selected and excludes them. Ground-truth labels are never stored in participant state. Profiles and risk configs are snapshotted for repeatability, while invalid current global config fails closed.

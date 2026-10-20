@@ -18,3 +18,5 @@
 Product prices and permission changes never come from LLM-written executable code. Add payment options only as fictional literals. Do not relax hard-block checks to make a scenario pass: edit the scenario's underlying explicit constraints and propose again.
 
 Current runtime is intentionally grouped under `app/runtime` to avoid confusing it with the student's earlier modules. If reorganizing into separate packages later, preserve the public schemas and policy boundary. The unfinished TODOs in the old shopping_service.py are retained historical exercises, not missing work in the integrated app.
+
+For NUS transport settings, separate merchant records, observable risk rules, hidden ground truth, experimental profiles and reports, see [configuration-guide.md](configuration-guide.md). Core additions: `runtime/gateway.py`, `runtime/merchants.py`, `runtime/merchant_risk.py`, and researcher-only `runtime/research.py`. Product offers now reference `merchant_id`. Never put ground-truth fields into observable records or frontend schemas.

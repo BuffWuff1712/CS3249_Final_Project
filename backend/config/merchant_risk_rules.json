@@ -1,0 +1,26 @@
+{
+  "version": "risk-v1",
+  "weights": {
+    "low_price": 1,
+    "missing_business": 2,
+    "excessive_data": 3,
+    "unusual_payment": 3,
+    "external_payment": 5,
+    "misleading_returns": 2,
+    "lookalike": 4,
+    "pressure": 1,
+    "inconsistent": 3,
+    "injection": 6
+  },
+  "medium": 2,
+  "high": 5,
+  "critical": 8,
+  "low_price_ratio": 0.5,
+  "decisions": {
+    "LOW": "ALLOW",
+    "MEDIUM": "REVIEW",
+    "HIGH": "REVIEW",
+    "CRITICAL": "BLOCK"
+  },
+  "explanation_detail": "detailed"
+}

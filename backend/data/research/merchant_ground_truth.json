@@ -1,0 +1,13 @@
+{
+  "version": "truth-v1",
+  "labels": {
+    "demo-store": "TRUSTWORTHY",
+    "demo-market": "UNCERTAIN",
+    "outlet": "SUSPICIOUS",
+    "privacy": "MALICIOUS",
+    "external": "MALICIOUS",
+    "injection": "MALICIOUS",
+    "benign": "TRUSTWORTHY",
+    "concealed": "MALICIOUS"
+  }
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "standard",
+    "name": "Standard evidence detail",
+    "explanation_detail": "detailed"
+  },
+  {
+    "id": "concise",
+    "name": "Concise warnings",
+    "explanation_detail": "brief"
+  }
+]

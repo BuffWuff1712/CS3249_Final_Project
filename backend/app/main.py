@@ -9,7 +9,15 @@ from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from .runtime import service, storage
-from .runtime.schemas import Chat, Decision, Edit, Permissions, Fact, Session
+from .runtime.schemas import (
+    Chat,
+    Decision,
+    Edit,
+    Permissions,
+    Fact,
+    Session,
+    SessionView,
+)
 from .runtime.llm import LLMError
 from .runtime.policy import ROOT, catalogue
 
@@ -57,12 +65,14 @@ def health():
     return {
         "status": "ok",
         "mode": os.getenv("BEANY_LLM_MODE", "openai"),
-        "configured": bool(os.getenv("OPENAI_API_KEY"))
+        "configured": all(
+            os.getenv(k) for k in ("OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_MODEL")
+        )
         or os.getenv("BEANY_LLM_MODE") == "mock",
     }
 
 
-@app.post("/sessions", response_model=Session)
+@app.post("/sessions", response_model=SessionView)
 def create():
     with storage.lock:
         s = service.create()
@@ -70,7 +80,7 @@ def create():
         return s
 
 
-@app.get("/sessions/{sid}", response_model=Session)
+@app.get("/sessions/{sid}", response_model=SessionView)
 def read(sid: str):
     return storage.load(sid)
 
@@ -82,27 +92,28 @@ def delete(sid: str):
         storage.delete(sid)
 
 
-@app.post("/sessions/{sid}/messages", response_model=Session)
+@app.post("/sessions/{sid}/messages", response_model=SessionView)
 def chat(sid: str, body: Chat):
     return mutate(sid, lambda s: service.chat(s, body.text))
 
 
-@app.post("/sessions/{sid}/cancel", response_model=Session)
+@app.post("/sessions/{sid}/cancel", response_model=SessionView)
 def cancel(sid: str):
     def stop(s):
         service.invalidate(s)
         s.stage = "cancelled"
         service.event(s, "cancel", "Cancelled through explicit control")
         service.message(s, "Cancelled. No pending proposal can be approved.")
+
     return mutate(sid, stop)
 
 
-@app.put("/sessions/{sid}/brief", response_model=Session)
+@app.put("/sessions/{sid}/brief", response_model=SessionView)
 def brief(sid: str, body: Edit):
     return mutate(sid, lambda s: service.edit(s, body.field, body.fact))
 
 
-@app.put("/sessions/{sid}/permissions", response_model=Session)
+@app.put("/sessions/{sid}/permissions", response_model=SessionView)
 def permissions(sid: str, body: Permissions):
     def update(s):
         service.invalidate(s)
@@ -115,7 +126,7 @@ def permissions(sid: str, body: Permissions):
     return mutate(sid, update)
 
 
-@app.post("/sessions/{sid}/products/{product_id}/propose", response_model=Session)
+@app.post("/sessions/{sid}/products/{product_id}/propose", response_model=SessionView)
 def choose(sid: str, product_id: str):
     def select(s):
         if product_id not in {p.id for p in s.recommendations}:
@@ -128,7 +139,7 @@ def choose(sid: str, product_id: str):
     return mutate(sid, select)
 
 
-@app.post("/sessions/{sid}/proposals/{pid}/decision", response_model=Session)
+@app.post("/sessions/{sid}/proposals/{pid}/decision", response_model=SessionView)
 def decide(sid: str, pid: str, body: Decision):
     return mutate(sid, lambda s: service.decide(s, pid, body))
 
@@ -154,7 +165,7 @@ def list_scenarios():
 
 @app.post(
     "/research/scenarios/{scenario_id}/sessions",
-    response_model=Session,
+    response_model=SessionView,
     dependencies=[Depends(researcher)],
 )
 def study(scenario_id: str):
@@ -174,7 +185,7 @@ def study(scenario_id: str):
 
 @app.post(
     "/research/sessions/{sid}/trigger",
-    response_model=Session,
+    response_model=SessionView,
     dependencies=[Depends(researcher)],
 )
 def trigger(sid: str):
@@ -231,3 +242,71 @@ def export(sid: str):
         media_type="text/csv",
         headers={"Content-Disposition": 'attachment; filename="beany-events.csv"'},
     )
+
+
+# All ground-truth access lives behind this dependency. Participant routes never join it.
+from .runtime import research
+
+
+@app.get("/research/profiles", dependencies=[Depends(researcher)])
+def research_profiles():
+    return {
+        "profiles": research.profiles(),
+        "risk_config": research.load_config().model_dump(),
+    }
+
+
+@app.put(
+    "/research/sessions/{sid}/configuration",
+    response_model=SessionView,
+    dependencies=[Depends(researcher)],
+)
+def configure_study(sid: str, body: research.ExperimentUpdate):
+    return mutate(sid, lambda s: research.configure(s, body))
+
+
+@app.put(
+    "/research/sessions/{sid}/observation",
+    response_model=SessionView,
+    dependencies=[Depends(researcher)],
+)
+def observation(sid: str, body: research.Observation):
+    def save(s):
+        if body.proposal_id not in {a.id for a in s.proposals}:
+            raise LookupError("Proposal not found")
+        s.experiment.setdefault("observations", {})[body.proposal_id] = (
+            body.model_dump()
+        )
+
+    return mutate(sid, save)
+
+
+@app.get("/research/sessions/{sid}/risk-report", dependencies=[Depends(researcher)])
+def risk_report(sid: str):
+    return research.report(storage.load(sid))
+
+
+@app.get("/research/sessions/{sid}/risk-export", dependencies=[Depends(researcher)])
+def risk_export(sid: str):
+    return Response(
+        research.export_csv(storage.load(sid)),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": 'attachment; filename="beany-risk-results.csv"'
+        },
+    )
+
+
+@app.post("/sessions/{sid}/alternative", response_model=SessionView)
+def another_merchant(sid: str):
+    def alternative(s):
+        if s.proposals:
+            previous = s.proposals[-1]
+            if previous.status == "pending":
+                previous.status = "rejected"
+            s.rejected_products.append(previous.product.id)
+            s.rejected_merchants.append(previous.product.merchant_id)
+            service.event(s, "alternative", previous.id)
+        service.propose(s)
+
+    return mutate(sid, alternative)

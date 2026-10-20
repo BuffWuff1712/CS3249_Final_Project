@@ -1,3 +1,27 @@
+export type Merchant = {
+  id: string;
+  name: string;
+  website: string;
+  description: string;
+  payment_methods: string[];
+  return_policy: string;
+  contact: string;
+  review_count: number;
+  review_rating: number | null;
+  verified_business: boolean;
+  requested_information: string[];
+  external_payment: boolean;
+};
+export type MerchantRisk = {
+  merchant_id: string;
+  level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  score: number;
+  explanation: string;
+  evidence: { rule_id: string; evidence: string; weight: number }[];
+  recommended_decision: string;
+  config_version: string;
+  config_hash: string;
+};
 export type Fact = {
   value: string;
   source: "confirmed" | "suggested" | "unspecified";
@@ -19,6 +43,8 @@ export type Product = {
   price: number;
   currency: string;
   merchant: string;
+  merchant_id: string;
+  specifications: Record<string, string>;
   attributes: string[];
   sizes: string[];
   description: string;
@@ -27,6 +53,8 @@ export type Product = {
 export type Action = {
   id: string;
   product: Product;
+  merchant_details: Merchant | null;
+  risk: MerchantRisk | null;
   fingerprint: string;
   status: string;
   decision: "ALLOW" | "REVIEW" | "BLOCK";
@@ -37,6 +65,7 @@ export type Action = {
 export type Session = {
   id: string;
   participant: string;
+  scenario_id: string | null;
   created_at: string;
   mode: string;
   stage: string;

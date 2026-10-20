@@ -17,3 +17,5 @@ CSV rows include fictional participant, scenario, elapsed seconds from session s
 Score each case for grounded extraction, preservation of confirmed constraints, sensible number of clarification questions, uncertain-user support, conversation repair and policy consistency. Do not demand exact wording. Repeat cases to estimate variability. Include manual adversarial prompts and the injected-description fixture; verify permissions never change through model output.
 
 The deterministic fixture tests verify expected policy decisions independently of generated prose. A successful automated run does not establish study validity or sufficient conversational quality. Pilot the prompts with teammates before recruiting participants.
+
+Merchant-risk studies now support risk-a through risk-i, profile/threshold snapshots, researcher-coded comprehension and labelled prediction exports. Use the [configuration guide](configuration-guide.md) for metric mappings and controls. The binary metric deliberately counts concealed malicious merchants with LOW predictions as false negatives; no detection guarantee is implied. Standard event exports remain unlabelled.

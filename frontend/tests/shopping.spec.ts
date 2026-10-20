@@ -79,22 +79,129 @@ test("study hard block and CSV export", async ({ page, request }) => {
   expect(await csv.text()).toContain("intervention");
 });
 
-test('keyboard submission and recoverable network errors', async ({page}, testInfo) => {
-  await page.goto('/');
-  const input=page.getByRole('textbox',{name:'Message Beany'});
+test("keyboard submission and recoverable network errors", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  const input = page.getByRole("textbox", { name: "Message Beany" });
   await expect(input).toBeEnabled();
-  await page.route('**/sessions/*/messages',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'OpenAI temporarily unavailable. Retry your message.'})}));
-  await input.fill('Find headphones under $150');
-  await input.press('Tab');
-  await expect(page.getByRole('button',{name:'Send ↗',exact:true})).toBeFocused();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('alert').filter({hasText:'OpenAI temporarily unavailable'})).toContainText('OpenAI temporarily unavailable');
-  await expect(input).toHaveValue('Find headphones under $150');
-  await page.unroute('**/sessions/*/messages');
-  await page.getByRole('button',{name:'Send ↗',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Approve simulated checkout'})).toBeEnabled();
-  await page.screenshot({path:testInfo.outputPath('beany-review.png'),fullPage:true});
-  await page.getByRole('button',{name:'Cancel shopping task',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Approve simulated checkout'})).toHaveCount(0);
+  await page.route("**/sessions/*/messages", (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({
+        detail: "OpenAI temporarily unavailable. Retry your message.",
+      }),
+    }),
+  );
+  await input.fill("Find headphones under $150");
+  await input.press("Tab");
+  await expect(
+    page.getByRole("button", { name: "Send ↗", exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(
+    page
+      .getByRole("alert")
+      .filter({ hasText: "OpenAI temporarily unavailable" }),
+  ).toContainText("OpenAI temporarily unavailable");
+  await expect(input).toHaveValue("Find headphones under $150");
+  await page.unroute("**/sessions/*/messages");
+  await page.getByRole("button", { name: "Send ↗", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Approve simulated checkout" }),
+  ).toBeEnabled();
+  await page.screenshot({
+    path: testInfo.outputPath("beany-review.png"),
+    fullPage: true,
+  });
+  await page
+    .getByRole("button", { name: "Cancel shopping task", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Approve simulated checkout" }),
+  ).toHaveCount(0);
 });
 
+test("merchant evidence is public but hidden truth is research-only", async ({
+  page,
+  request,
+}) => {
+  const headers = { "X-Research-Key": "e2e-key" };
+  const created = await request.post(
+    "http://localhost:8100/research/scenarios/risk-h/sessions",
+    { headers },
+  );
+  const session = await created.json();
+  await request.post(
+    `http://localhost:8100/research/sessions/${session.id}/trigger`,
+    { headers },
+  );
+  const publicResponse = await request.get(
+    `http://localhost:8100/sessions/${session.id}`,
+  );
+  const state = await publicResponse.json();
+  expect(state.experiment).toBeUndefined();
+  expect(JSON.stringify(state)).not.toContain("MALICIOUS");
+  await page.goto("/");
+  await expect(
+    page.getByRole("textbox", { name: "Message Beany" }),
+  ).toBeEnabled();
+  await page.evaluate(
+    (id) => localStorage.setItem("beany-session", id),
+    session.id,
+  );
+  await page.reload();
+  await page
+    .getByText("Review merchant details: City Goods", { exact: true })
+    .click();
+  await expect(
+    page.getByText("https://city-goods.test", { exact: false }),
+  ).toBeVisible();
+  await expect(page.getByText("MALICIOUS", { exact: true })).toHaveCount(0);
+  const denied = await request.get(
+    `http://localhost:8100/research/sessions/${session.id}/risk-report`,
+  );
+  expect(denied.status()).toBe(403);
+  const report = await request.get(
+    `http://localhost:8100/research/sessions/${session.id}/risk-report`,
+    { headers },
+  );
+  expect((await report.json()).metrics.fn).toBe(1);
+});
+
+test("risky offer can be replaced with another merchant without losing brief", async ({
+  page,
+  request,
+}) => {
+  const headers = { "X-Research-Key": "e2e-key" };
+  const created = await request.post(
+    "http://localhost:8100/research/scenarios/risk-i/sessions",
+    { headers },
+  );
+  const s = await created.json();
+  await request.post(
+    `http://localhost:8100/research/sessions/${s.id}/trigger`,
+    { headers },
+  );
+  await page.goto("/");
+  await expect(
+    page.getByRole("textbox", { name: "Message Beany" }),
+  ).toBeEnabled();
+  await page.evaluate((id) => localStorage.setItem("beany-session", id), s.id);
+  await page.reload();
+  await expect(
+    page.getByText("Merchant assessment · high predicted risk", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Find another merchant", exact: true })
+    .click();
+  await expect(
+    page.getByText("Review merchant details: Demo Store", { exact: true }),
+  ).toBeVisible();
+  const response = await request.get(`http://localhost:8100/sessions/${s.id}`);
+  const result = await response.json();
+  expect(result.brief.budget.value).toBe("150");
+});

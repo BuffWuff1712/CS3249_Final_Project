@@ -1,9 +1,13 @@
-import json, os
+import json, os, re
+from pathlib import Path
 from .schemas import Session, Message, Event, Fact, Action, Receipt, Approval
 from .policy import FIELDS, search, catalogue, evaluate, fingerprint
 from .llm import OpenAIConversation, explain_outcome
+from .merchants import merchant_for
+from .merchant_risk import load_config, digest
 
 llm = OpenAIConversation()
+ELICITATION_PATH = Path(__file__).resolve().parents[2] / "config/elicitation.json"
 
 
 def event(s, kind, detail):
@@ -61,6 +65,15 @@ def edit(s, field, fact):
 
 def create():
     s = Session(mode=os.getenv("BEANY_LLM_MODE", "openai"))
+    config = load_config()
+    s.experiment = {
+        "profile": "standard",
+        "risk_config": config.model_dump(),
+        "config_hash": digest(config),
+        "configuration_history": {
+            digest(config): {"profile": "standard", "risk_config": config.model_dump()}
+        },
+    }
     message(
         s,
         "Hi, I’m Beany. Tell me what you’re shopping for, even if you’re unsure. We can compare fictional running shoes, headphones and backpacks. All purchases are simulated. You control the brief and permissions.",
@@ -120,13 +133,36 @@ def propose(s, product=None, **kwargs):
             event(s, "no_match", "No matching products")
             return
         product = s.recommendations[0]
-    kwargs.setdefault("payment_method", s.permissions.payment_methods[0] if s.permissions.payment_methods else "Demo Visa")
-    a = Action(product=product.model_copy(deep=True), **kwargs)
-    a.fingerprint = fingerprint(a)
+    merchant = merchant_for(product)
+    allowed = [
+        m for m in s.permissions.payment_methods if m in merchant.payment_methods
+    ]
+    kwargs.setdefault("payment_method", allowed[0] if allowed else "Demo Visa")
+    kwargs.setdefault("shares_personal_data", bool(merchant.requested_information))
+    a = Action(
+        product=product.model_copy(deep=True),
+        merchant_details=merchant.model_copy(deep=True),
+        **kwargs,
+    )
     evaluate(s, a)
+    a.fingerprint = fingerprint(a)
     s.proposals.append(a)
     event(s, "search", f"Compared {len(s.recommendations)} matches")
     event(s, "policy", json.dumps([r.model_dump() for r in a.rules]))
+    event(
+        s,
+        "merchant_assessment",
+        json.dumps(
+            {
+                "proposal_id": a.id,
+                "product_id": a.product.id,
+                "merchant_id": a.product.merchant_id,
+                "risk": a.risk.model_dump() if a.risk else None,
+                "decision": a.decision,
+                "warning": " ".join(r.explanation for r in a.rules),
+            }
+        ),
+    )
     s.stage = "blocked" if a.decision == "BLOCK" else "waiting_review"
     message(
         s,
@@ -144,6 +180,7 @@ def chat(s, text):
     text = text.strip()
     if not text:
         raise ValueError("Please enter a message")
+    elicitation = json.loads(ELICITATION_PATH.read_text(encoding="utf-8-sig"))
     result = llm.interpret(s, text)  # Failure leaves persisted state unchanged.
     s.messages.append(Message(role="user", text=text))
     event(s, "user_message", "Message received")
@@ -151,7 +188,16 @@ def chat(s, text):
         invalidate(s)
         s.brief = {}
         s.rejected_products = []
+        s.rejected_merchants = []
     for change in result.changes:
+        if change.field == "currency" and change.source == "confirmed" and change.value:
+            aliases = {
+                "USD": r"\bUSD\b|US\$|US dollars",
+                "SGD": r"\bSGD\b|S\$|Singapore dollars",
+            }
+            if not re.search(aliases.get(change.value, r"(?!)"), text, re.I):
+                change.source = "suggested"
+                change.value = elicitation["default_currency"]
         old = s.brief.get(change.field)
         grounded = (
             bool(change.evidence.strip())
@@ -173,6 +219,16 @@ def chat(s, text):
         edit(s, change.field, fact)
         if old:
             event(s, "refine", change.field)
+    if (
+        result.intent == "clarify"
+        and elicitation["skip_optional_questions_when_ready"]
+        and all(
+            k in s.brief and s.brief[k].source == "confirmed"
+            for k in elicitation["ready_fields"]
+        )
+    ):
+        result.intent = "search"
+        result.reply = "I have enough information to compare catalogue options. You can refine your brief at any time."
     s.suggestions = result.suggestions[:4]
     message(s, result.reply)
     event(s, "interpretation", result.model_dump_json())
@@ -182,10 +238,9 @@ def chat(s, text):
         event(s, "cancel", "Task cancelled")
         message(s, "Cancelled. No pending proposal can be approved.")
         return s
-    if result.question and result.intent == "clarify":
+    if result.intent == "clarify":
         s.clarification_count += 1
         s.stage = "clarifying"
-        message(s, result.question)
         event(s, "clarification", "Question asked")
         return s
     if result.intent == "explain":
@@ -193,7 +248,13 @@ def chat(s, text):
             message(s, " ".join(r.explanation for r in s.proposals[-1].rules))
         return s
     if result.intent == "alternative" and s.proposals:
-        s.rejected_products.append(s.proposals[-1].product.id)
+        previous = s.proposals[-1]
+        previous.status = (
+            "rejected" if previous.status == "pending" else previous.status
+        )
+        s.rejected_products.append(previous.product.id)
+        s.rejected_merchants.append(previous.product.merchant_id)
+        event(s, "alternative", previous.id)
     if "category" in s.brief:
         propose(s)
         explanation = explain_outcome(s)
@@ -224,6 +285,10 @@ def decide(s, pid, request):
     if current is None or current != a.product:
         raise ValueError("Catalogue changed. Request a fresh proposal.")
     evaluate(s, a)
+    if fingerprint(a) != a.fingerprint:
+        raise ValueError(
+            "Risk configuration or merchant terms changed. Request a new proposal."
+        )
     if request.action == "approve" and a.decision == "BLOCK":
         raise ValueError(
             "Hard-blocked action. Explicitly change the relevant constraint and request a new proposal."
@@ -237,6 +302,7 @@ def decide(s, pid, request):
     else:
         a.status = "rejected"
         s.rejected_products.append(a.product.id)
+        s.rejected_merchants.append(a.product.merchant_id)
         s.stage = "rejected"
         message(s, "Rejected. Ask for an alternative or refine your brief.")
         s.suggestions = ["Find an alternative", "Cancel this task"]

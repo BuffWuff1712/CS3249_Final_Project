@@ -35,7 +35,7 @@ def main():
         results.append(
             {
                 "case": case,
-                "model": os.getenv("OPENAI_MODEL", "gpt-5.6-luna"),
+                "model": os.getenv("OPENAI_MODEL"),
                 "reasoning_effort": os.getenv("OPENAI_REASONING_EFFORT", "low"),
                 "session": s.model_dump(),
                 "error": error,
