@@ -1,6 +1,8 @@
-# Beany — conversational shopping oversight
+# Beany — Conversational Shopping User Interface
 
-Beany is a blue-themed Next.js + FastAPI research prototype: **AI does the shopping. You stay in control.** An OpenAI-compatible NUS SoCLaaS model interprets conversations; Python controls permissions, product search, policy decisions and simulated checkout. Every product and merchant is fictional. No payment or real shopping service is connected.
+Beany is a Conversational User Interface designed for agentic shopping and commerce built with Next.js and FastAPI.
+
+An LLM model interprets conversations; Python controls permissions, product search, policy decisions and simulated checkout. Every product and merchant is fictional. No payment or real shopping service is connected.
 
 ## Requirements
 
