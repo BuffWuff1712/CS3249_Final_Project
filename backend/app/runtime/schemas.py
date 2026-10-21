@@ -35,6 +35,13 @@ class Permissions(Model):
     autonomy: Literal["guided", "balanced"] = "guided"
 
 
+class Review(Model):
+    rating: int = Field(ge=1, le=5)
+    title: str
+    text: str
+    date: str  # ISO date, fictional
+
+
 class Merchant(Model):
     id: str
     name: str
@@ -52,6 +59,8 @@ class Merchant(Model):
     lookalike_identity: bool = False
     pressure_tactics: bool = False
     inconsistent_information: bool = False
+    merchant_reviews: list[Review] = Field(default_factory=list)
+    checkout_note: str = ""
 
 
 class RiskEvidence(Model):
@@ -86,6 +95,9 @@ class Product(Model):
     stock: bool = True
     description: str
     trust: Literal["established", "unverified"] = "established"
+    rating: float | None = Field(default=None, ge=0, le=5)
+    rating_count: int = Field(default=0, ge=0)
+    reviews: list[Review] = Field(default_factory=list)
 
 
 class Rule(Model):
