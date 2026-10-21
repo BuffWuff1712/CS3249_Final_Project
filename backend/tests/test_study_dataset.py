@@ -108,6 +108,9 @@ BRAND_DENYLIST = [
     "Anker", "Soundcore", "Nike", "Adidas", "Asics", "Brooks", "Hoka",
     "New Balance", "Saucony", "Puma", "Under Armour", "Reebok", "JanSport",
     "Herschel", "North Face", "Osprey", "Samsonite", "Amazon",
+    # Source product lines and model numbers (spec §3: remove model numbers).
+    "Soundcore", "Life Q", "Q35", "N700", "XBT", "MT3", "Recon", "Lone Peak",
+    "Peregrine", "Revel", "BioMoGo", "Phantom", "HOVR", "520", "Prime", "Dynamo",
 ]
 
 ALL_MERCHANT_KEYS = ["trusted", "neutral", *VARIANTS]
@@ -297,3 +300,70 @@ def test_manifest_complete():
     entries = manifest()
     assert len(entries) == 39
     assert {e["category"] for e in entries.values()} == {"Headphones", "Running shoes", "Backpacks"}
+
+
+OLD_FIXTURE_PREFIXES = ("shoe-", "audio-", "bag-", "offer-")
+
+
+@pytest.mark.parametrize("cat", STUDY_CATEGORIES)
+def test_study_brands_absent_from_old_fixtures(cat):
+    # Shared brands would mix old and study prices in each other's low_price comparables.
+    ps = products()
+    old = {p.brand for i, p in ps.items() if i.startswith(OLD_FIXTURE_PREFIXES) and p.category == PINNED[cat]["category"]}
+    ours = {p.brand for i, p in ps.items() if i.startswith(f"study-{cat}-")}
+    assert ours and not ours & old
+
+
+@pytest.mark.parametrize("cat", STUDY_CATEGORIES)
+def test_candidates_fire_no_signals(cat):
+    ps, scope = products(), list(products().values())
+    for p in candidates(cat):
+        r = assess(p, merchants()[p.merchant_id], scope, load_config())
+        assert r.evidence == [], (p.id, [e.rule_id for e in r.evidence])
+
+
+def fired(product_id, scope):
+    ps = products()
+    p = ps[product_id]
+    r = assess(p, merchants()[p.merchant_id], scope, load_config())
+    return {e.rule_id for e in r.evidence}
+
+
+def assert_scenario_matches_manifest(product_ids):
+    """Spec §6.3: re-check every study offer's signals against the scenario's actual product set."""
+    ps, entries = products(), manifest()
+    scope = [ps[i] for i in product_ids]
+    for i in product_ids:
+        if i in entries:
+            assert fired(i, scope) == set(entries[i]["signals"]), i
+
+
+@pytest.mark.parametrize("cat", STUDY_CATEGORIES)
+@pytest.mark.parametrize("v", VARIANTS)
+@pytest.mark.parametrize("width", ["category", "catalogue"])
+def test_signals_hold_in_wider_scopes(cat, v, width):
+    ps = products()
+    if width == "category":
+        ids = [i for i in ps if i.startswith(f"study-{cat}-")]
+    else:
+        ids = list(ps)
+    assert offer(cat, v) in ids
+    assert fired(offer(cat, v), [ps[i] for i in ids]) == set(EXPECTED[v]["signals"])
+
+
+def study_scenarios():
+    specs = json.loads((ROOT / "data/scenarios/scenarios.json").read_text(encoding="utf-8-sig"))
+    return [s for s in specs if any(i.startswith("study-") for i in s.get("product_ids") or [])]
+
+
+@pytest.mark.parametrize("spec", study_scenarios(), ids=lambda s: s["id"])
+def test_study_scenarios_match_manifest(spec):
+    assert_scenario_matches_manifest(spec["product_ids"])
+
+
+def test_scenario_validator_catches_a_flipped_signal():
+    ids = [offer("hp", k) for k in ("trusted", "neutral", "benign")]
+    assert_scenario_matches_manifest(ids)
+    # A scope where benign is the only same-brand offer has no comparables, so low_price cannot fire.
+    with pytest.raises(AssertionError):
+        assert_scenario_matches_manifest([offer("hp", "benign")])

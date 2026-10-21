@@ -60,7 +60,13 @@ Each category has four fictional brands spread across three reputation tiers:
 | Mid-range | Rating 4.0–4.4 with 200–1,500 ratings, standard descriptions |
 | No-name | Rating 3.6–4.1 with fewer than 200 ratings, sparse specifications |
 
-Existing fictional brand names (Stride, Pace, Echo, Wave, Trail, Orbit) can be reused. A new brand is added where a category needs a fourth.
+Study brands must not appear in the old fixtures of the same category. `assess()` compares prices within a brand, so a shared brand would mix old and study prices in each other's `low_price` comparables. Current study brands:
+
+- Headphones: Lumen (target), Corvo, Kestrel, Brio.
+- Running shoes: Vela (target), Arro, Summit, Tread.
+- Backpacks: Atlas (target), Nomad, Carta, Fennec.
+
+Product names are invented as well. Source product-line names and model numbers are never kept.
 
 ## 5. Task Structure
 
@@ -148,7 +154,9 @@ Manifest expectations are computed against a **reference set**: the trusted offe
 
 Putting `lowprice` and `benign` in the same scenario lowers the median further. Avoid it, or re-check the result.
 
-Scenario assembly must re-run the validation test (Section 9) with the actual product set.
+Scenario assembly must re-run the validation with the actual product set. `test_study_scenarios_match_manifest` does this automatically for every scenario whose `product_ids` include `study-*` records.
+
+**Ranking caveat for scenario assembly.** Search ranks by literal substring matches against `attributes`, then by price (`policy.py:114`). The target only ranks first when the brief's `features` contain the target's attribute spellings (`wireless, noise-cancelling` / `cushioned, road` / `laptop, water-resistant`). Other phrasings, such as "noise cancelling" without the hyphen, or a brief with no features, fall back to the cheapest candidate. Study scenarios should therefore seed these features in `initial_brief`, or rely on `trigger_product`. Attributes are shown to participants as tags, so adding synonym tags is not an option.
 
 ### 6.4 Ground truth labels
 
