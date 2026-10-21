@@ -53,7 +53,7 @@ EXPECTED = {
     },
 }
 
-STUDY_CATEGORIES: list[str] = ["hp", "rs"]
+STUDY_CATEGORIES: list[str] = ["hp", "rs", "bp"]
 
 PINNED = {
     "hp": {
@@ -67,6 +67,12 @@ PINNED = {
         "P": 159,
         "budget": 180,
         "features": "cushioned, road",
+    },
+    "bp": {
+        "category": "Backpacks",
+        "P": 99,
+        "budget": 120,
+        "features": "laptop, water-resistant",
     },
 }
 
@@ -285,3 +291,9 @@ def test_no_real_brands_or_placeholder_text():
         if brands.search(t) or placeholder.search(t)
     ]
     assert leaks == []
+
+
+def test_manifest_complete():
+    entries = manifest()
+    assert len(entries) == 39
+    assert {e["category"] for e in entries.values()} == {"Headphones", "Running shoes", "Backpacks"}

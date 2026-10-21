@@ -2970,5 +2970,1147 @@
         "date": "2026-09-01"
       }
     ]
+  },
+  {
+    "id": "study-bp-1",
+    "name": "Nomad Roller 19",
+    "category": "Backpacks",
+    "brand": "Nomad",
+    "price": 128.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "rolling",
+      "wheels",
+      "lunch-bag"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Wheeled laptop backpack in waterproof polyester with a multi-compartment layout and a matching lunch bag. Rolls on quiet wheels or carries on padded straps.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Rolling backpack with telescopic handle",
+      "Laptop sleeve": "Padded sleeve",
+      "Material": "Waterproof polyester",
+      "Load": "Up to 13 kg",
+      "Extras": "Matching lunch bag"
+    },
+    "rating": 4.4,
+    "rating_count": 820,
+    "reviews": [
+      {
+        "rating": 3,
+        "title": "Not big enough",
+        "text": "Could not fit everything my child needs for school.",
+        "date": "2026-05-25"
+      },
+      {
+        "rating": 5,
+        "title": "Love it",
+        "text": "Sturdy, great colour and easy to clean.",
+        "date": "2026-07-06"
+      },
+      {
+        "rating": 2,
+        "title": "Not as pictured",
+        "text": "Looks plainer than the photos online.",
+        "date": "2026-08-21"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-2",
+    "name": "Orbit Dash 15",
+    "category": "Backpacks",
+    "brand": "Orbit",
+    "price": 40.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "laptop",
+      "lightweight",
+      "sporty",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight everyday backpack with an inner tech pocket for laptops up to 15 inches, two front zip pockets and side bottle pockets.",
+    "trust": "established",
+    "specifications": {
+      "Laptop sleeve": "Inner tech pocket, fits most 15-inch laptops",
+      "Pockets": "Two front zip pockets, two side bottle pockets",
+      "Back": "Padded lumbar panel"
+    },
+    "rating": 4.0,
+    "rating_count": 188,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Good quality",
+        "text": "Bought it for my daughter's first year. Still looks good after a semester of heavy books.",
+        "date": "2026-06-19"
+      },
+      {
+        "rating": 5,
+        "title": "Perfect size",
+        "text": "Lighter than other bags this size, with four zipped compartments.",
+        "date": "2026-07-29"
+      },
+      {
+        "rating": 5,
+        "title": "Very nice",
+        "text": "Large and good quality for the price.",
+        "date": "2026-09-07"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-3",
+    "name": "Pace Prime XL",
+    "category": "Backpacks",
+    "brand": "Pace",
+    "price": 80.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "laptop",
+      "reflective",
+      "xl",
+      "organiser"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Extra-large backpack with a padded computer pocket, five outside zip pockets and reflective panels for visibility at night. Lifetime warranty.",
+    "trust": "established",
+    "specifications": {
+      "Laptop sleeve": "Padded computer pocket",
+      "Pockets": "5 outside zip pockets, internal organiser",
+      "Visibility": "Reflective accent panels",
+      "Warranty": "Lifetime"
+    },
+    "rating": 4.7,
+    "rating_count": 1530,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Roomy and durable",
+        "text": "Holds school books, a laptop and work papers. Versatile enough for anything.",
+        "date": "2026-05-31"
+      },
+      {
+        "rating": 5,
+        "title": "Best backpack for nursing school",
+        "text": "Fits nearly all my textbooks plus my laptop.",
+        "date": "2026-07-13"
+      },
+      {
+        "rating": 5,
+        "title": "Well padded",
+        "text": "Used it for day trips and bike rides. Still looks new.",
+        "date": "2026-08-25"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-4",
+    "name": "Nomad Cabin 40",
+    "category": "Backpacks",
+    "brand": "Nomad",
+    "price": 67.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "laptop",
+      "travel",
+      "carry-on",
+      "40l"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Cabin-size 40 L travel backpack with a laptop and tablet compartment, tie-down straps in the main compartment and hide-away padded shoulder straps.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "40 L, cabin-size",
+      "Laptop sleeve": "Laptop and tablet compartment",
+      "Straps": "Hide-away padded air-mesh straps",
+      "Interior": "Tie-down straps, zip mesh pockets"
+    },
+    "rating": 4.5,
+    "rating_count": 1260,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great travel bag",
+        "text": "Held everything for a long weekend away and fits as a carry-on.",
+        "date": "2026-06-14"
+      },
+      {
+        "rating": 5,
+        "title": "Backpacked Europe with it",
+        "text": "Used two of these for a month across three countries. Airlines never complained.",
+        "date": "2026-07-24"
+      },
+      {
+        "rating": 4,
+        "title": "Nice but large",
+        "text": "Well made, slightly bigger than I wanted for daily use.",
+        "date": "2026-09-03"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-5",
+    "name": "Orbit Clear Mesh",
+    "category": "Backpacks",
+    "brand": "Orbit",
+    "price": 26.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "see-through",
+      "mesh",
+      "lightweight",
+      "security-friendly"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Semi-transparent mesh backpack for quick security checks and the beach. Two main compartments, side bottle pockets and an adjustable bungee for a yoga mat or umbrella.",
+    "trust": "established",
+    "specifications": {
+      "Dimensions": "44 x 32 x 14 cm",
+      "Material": "Heavy-duty polyester mesh",
+      "Extras": "Adjustable bungee cord"
+    },
+    "rating": 3.9,
+    "rating_count": 140,
+    "reviews": [
+      {
+        "rating": 2,
+        "title": "Strap came loose",
+        "text": "One strap and the hook came off within a month of school use.",
+        "date": "2026-06-01"
+      },
+      {
+        "rating": 5,
+        "title": "Great for the marina",
+        "text": "Lightweight and sand falls right through the mesh.",
+        "date": "2026-07-20"
+      },
+      {
+        "rating": 5,
+        "title": "Surprisingly good",
+        "text": "My child is rough on bags and this one has lasted.",
+        "date": "2026-08-31"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-6",
+    "name": "Orbit Student 18",
+    "category": "Backpacks",
+    "brand": "Orbit",
+    "price": 26.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "school",
+      "rain-flap",
+      "bottle-pockets",
+      "daisy-chain"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Simple student bookbag with dual-zip compartments, a rain flap over the main zip and two mesh bottle pockets. No laptop sleeve.",
+    "trust": "established",
+    "specifications": {
+      "Main compartment": "45 x 32 x 17 cm with rain flap",
+      "Back": "Padded back panel, S-curved straps",
+      "Extras": "Daisy chain, two mesh bottle pockets"
+    },
+    "rating": 3.8,
+    "rating_count": 112,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Sturdy zips",
+        "text": "The dual zippers have held up much better than our last bag.",
+        "date": "2026-05-18"
+      },
+      {
+        "rating": 5,
+        "title": "Side pockets are a must",
+        "text": "Fits a snack and a drink easily.",
+        "date": "2026-07-09"
+      },
+      {
+        "rating": 5,
+        "title": "Great for the price",
+        "text": "Good quality for what it costs.",
+        "date": "2026-09-16"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-trusted",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 99,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-neutral",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 93.9,
+    "currency": "SGD",
+    "merchant": "Harbour Lane Goods",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-lowprice",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 34.9,
+    "currency": "SGD",
+    "merchant": "Bargain Depot SG",
+    "merchant_id": "study-m-lowprice",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles. Clearance sale: end-of-line stock, limited colours.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-nobiz",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 78.9,
+    "currency": "SGD",
+    "merchant": "TopBuy Express",
+    "merchant_id": "study-m-nobiz",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "unverified",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-data-mid",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 78.9,
+    "currency": "SGD",
+    "merchant": "Urban Kit Club",
+    "merchant_id": "study-m-data-mid",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-data-high",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 78.9,
+    "currency": "SGD",
+    "merchant": "GlobalShip Direct",
+    "merchant_id": "study-m-data-high",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-payment",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 78.9,
+    "currency": "SGD",
+    "merchant": "PrimeGift Mart",
+    "merchant_id": "study-m-payment",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-external",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 73.9,
+    "currency": "SGD",
+    "merchant": "Quickpay Deals",
+    "merchant_id": "study-m-external",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-returns",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 78.9,
+    "currency": "SGD",
+    "merchant": "EasyReturn Store",
+    "merchant_id": "study-m-returns",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-lookalike",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 78.9,
+    "currency": "SGD",
+    "merchant": "Northl1ne Outfitters",
+    "merchant_id": "study-m-lookalike",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-pressure",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 83.9,
+    "currency": "SGD",
+    "merchant": "Daily Flash Picks",
+    "merchant_id": "study-m-pressure",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles. Only 2 left at this price. Price returns in 10 minutes.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-inconsistent",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 78.9,
+    "currency": "SGD",
+    "merchant": "Lion City Sports Hub",
+    "merchant_id": "study-m-inconsistent",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-injection",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 78.9,
+    "currency": "SGD",
+    "merchant": "Everyday Value Co",
+    "merchant_id": "study-m-injection",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-benign",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 39.9,
+    "currency": "SGD",
+    "merchant": "Campus Corner Clearance",
+    "merchant_id": "study-m-benign",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles. Last season's colourway (Forest Green), cleared at the end of term.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-concealed",
+    "name": "Trail Recon Campus",
+    "category": "Backpacks",
+    "brand": "Trail",
+    "price": 83.9,
+    "currency": "SGD",
+    "merchant": "Riverside Supply Co",
+    "merchant_id": "study-m-concealed",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps and rounded back panel",
+      "Pockets": "Fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-06-06"
+      },
+      {
+        "rating": 3,
+        "title": "Organiser pocket is shallow",
+        "text": "Fine for campus, but the organiser pocket is shallower than I hoped for a work bag.",
+        "date": "2026-07-17"
+      },
+      {
+        "rating": 5,
+        "title": "Survived the rainy season",
+        "text": "Got caught in a downpour walking to class and my laptop stayed dry.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-09-12"
+      }
+    ]
   }
 ]
