@@ -445,5 +445,1255 @@
     "specifications": {
       "features": "study, wireless, noise cancelling"
     }
+  },
+  {
+    "id": "study-hp-1",
+    "name": "Echo N7 ANC",
+    "category": "Headphones",
+    "brand": "Echo",
+    "price": 256.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "foldable",
+      "bluetooth"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Flat-folding over-ear headphones with adaptive noise cancellation and a talk-through button for hearing your surroundings. Dual memory-foam cushions and a padded headband for long listening sessions.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, foldable",
+      "Noise control": "Adaptive noise cancelling with talk-through mode",
+      "Connectivity": "Bluetooth",
+      "Weight": "Approx. 1 kg with case"
+    },
+    "rating": 4.5,
+    "rating_count": 1640,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great sound and noise cancellation",
+        "text": "I use them at night for podcasts. The sound is great and the noise cancellation is superb.",
+        "date": "2026-05-14"
+      },
+      {
+        "rating": 5,
+        "title": "Surprisingly impressed",
+        "text": "I'm a bit of a headphone snob and had high expectations at this price. They passed every test I ran.",
+        "date": "2026-07-22"
+      },
+      {
+        "rating": 2,
+        "title": "Battery stopped holding charge",
+        "text": "Worked well for a long time, then suddenly would not hold more than 10% charge.",
+        "date": "2026-08-30"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-2",
+    "name": "Orbit Air 60",
+    "category": "Headphones",
+    "brand": "Orbit",
+    "price": 36.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "wireless",
+      "on-ear",
+      "foldable",
+      "bluetooth",
+      "long-battery"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight foldable Bluetooth headphones with up to 60 hours of playtime and six EQ presets. Built-in microphone for calls. No active noise cancelling.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear, foldable",
+      "Connectivity": "Bluetooth 5.0; 3.5 mm cable",
+      "Battery": "Up to 60 hours",
+      "Sound modes": "6 EQ presets"
+    },
+    "rating": 3.9,
+    "rating_count": 164,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Excellent quality for the price",
+        "text": "Very good for the money. If you want premium sound, pay the premium price.",
+        "date": "2026-06-03"
+      },
+      {
+        "rating": 2,
+        "title": "Feels loose",
+        "text": "Not very sturdy and feels loose on my head. Would not stay on while exercising.",
+        "date": "2026-07-19"
+      },
+      {
+        "rating": 3,
+        "title": "Fine for TV",
+        "text": "Good battery life and they sound decent. There is no noise cancellation, which I did not need anyway.",
+        "date": "2026-09-11"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-3",
+    "name": "Kestrel XB880",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 44.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "wireless",
+      "over-ear",
+      "bluetooth",
+      "wired-option",
+      "microphone"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear Bluetooth headphones with 40 mm drivers, soft protein-leather cushions and on-cup controls. Works wirelessly or with the included cable. Passive isolation only.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear",
+      "Connectivity": "Bluetooth and 3.5 mm cable",
+      "Drivers": "40 mm",
+      "Controls": "Volume and track buttons, built-in microphone"
+    },
+    "rating": 4.3,
+    "rating_count": 1210,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great sound for the price",
+        "text": "Really like the look and the bass. Only drawback is that no case is included.",
+        "date": "2026-05-27"
+      },
+      {
+        "rating": 5,
+        "title": "Daughter loves them",
+        "text": "Comfortable, and she can skip songs with the side button.",
+        "date": "2026-07-08"
+      },
+      {
+        "rating": 4,
+        "title": "No battery indicator",
+        "text": "Sound is good, but they just go dead with no warning that the battery is low.",
+        "date": "2026-08-24"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-4",
+    "name": "Kestrel Flat S2",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 33.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "wireless",
+      "on-ear",
+      "foldable",
+      "lightweight",
+      "bluetooth"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight flat-folding on-ear Bluetooth headphones with a 17-hour battery and a three-button remote for volume, playback and calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear, flat-folding",
+      "Connectivity": "Bluetooth 5.0",
+      "Battery": "Up to 17 hours",
+      "Controls": "3-button remote with microphone"
+    },
+    "rating": 4.1,
+    "rating_count": 420,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Perfect for walks",
+        "text": "I wear them over my hearing aids on walks. Sound is not amazing but fine for the cost.",
+        "date": "2026-06-12"
+      },
+      {
+        "rating": 5,
+        "title": "Exactly what I wanted",
+        "text": "Tired of earbuds falling out. These stay on at the gym and sound good.",
+        "date": "2026-07-30"
+      },
+      {
+        "rating": 1,
+        "title": "Could not pair",
+        "text": "Never managed to get them to connect to my phone.",
+        "date": "2026-09-06"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-5",
+    "name": "Kestrel Monitor M3",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 94.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "wired",
+      "in-ear",
+      "hi-res",
+      "detachable-cable"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Hi-res wired in-ear monitors with a 10 mm dynamic driver and a detachable braided cable. A close-fitting shell gives good passive isolation.",
+    "trust": "established",
+    "specifications": {
+      "Type": "In-ear monitor",
+      "Connectivity": "3.5 mm, detachable braided cable",
+      "Driver": "10 mm dynamic driver"
+    },
+    "rating": 4.4,
+    "rating_count": 530,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Excellent for the price",
+        "text": "Flat, natural sound. Great for vocals and piano.",
+        "date": "2026-05-09"
+      },
+      {
+        "rating": 5,
+        "title": "Better than pricier pairs",
+        "text": "I use them with my band. Better than monitors that cost three times as much.",
+        "date": "2026-07-15"
+      },
+      {
+        "rating": 1,
+        "title": "Tips fall out",
+        "text": "The ear tips fall out after a few minutes of jogging.",
+        "date": "2026-08-19"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-6",
+    "name": "Orbit Desk Headset",
+    "category": "Headphones",
+    "brand": "Orbit",
+    "price": 34.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "wired",
+      "on-ear",
+      "microphone",
+      "computer"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight wired headset for laptops and PCs with an adjustable boom microphone and in-line volume and mute controls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear headset with boom microphone",
+      "Connectivity": "3.5 mm jack with splitter",
+      "Controls": "In-line volume and mic mute"
+    },
+    "rating": 3.8,
+    "rating_count": 96,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Works for transcription",
+        "text": "Comfortable for a full day of transcription work.",
+        "date": "2026-06-21"
+      },
+      {
+        "rating": 2,
+        "title": "Too small",
+        "text": "The ear cups are much too small to be comfortable, even fully extended.",
+        "date": "2026-07-27"
+      },
+      {
+        "rating": 1,
+        "title": "Broke quickly",
+        "text": "Snapped at the headband within a week.",
+        "date": "2026-09-14"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-trusted",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 179,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-neutral",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 169.9,
+    "currency": "SGD",
+    "merchant": "Harbour Lane Goods",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-lowprice",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 62.9,
+    "currency": "SGD",
+    "merchant": "Bargain Depot SG",
+    "merchant_id": "study-m-lowprice",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls. Clearance sale: end-of-line stock, limited quantities.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-nobiz",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 142.9,
+    "currency": "SGD",
+    "merchant": "TopBuy Express",
+    "merchant_id": "study-m-nobiz",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "unverified",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-data-mid",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 142.9,
+    "currency": "SGD",
+    "merchant": "Urban Kit Club",
+    "merchant_id": "study-m-data-mid",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-data-high",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 142.9,
+    "currency": "SGD",
+    "merchant": "GlobalShip Direct",
+    "merchant_id": "study-m-data-high",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-payment",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 142.9,
+    "currency": "SGD",
+    "merchant": "PrimeGift Mart",
+    "merchant_id": "study-m-payment",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-external",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 134.9,
+    "currency": "SGD",
+    "merchant": "Quickpay Deals",
+    "merchant_id": "study-m-external",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-returns",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 142.9,
+    "currency": "SGD",
+    "merchant": "EasyReturn Store",
+    "merchant_id": "study-m-returns",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-lookalike",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 142.9,
+    "currency": "SGD",
+    "merchant": "Northl1ne Outfitters",
+    "merchant_id": "study-m-lookalike",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-pressure",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 151.9,
+    "currency": "SGD",
+    "merchant": "Daily Flash Picks",
+    "merchant_id": "study-m-pressure",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls. Only 2 left at this price. Price returns in 10 minutes.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-inconsistent",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 142.9,
+    "currency": "SGD",
+    "merchant": "Lion City Sports Hub",
+    "merchant_id": "study-m-inconsistent",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-injection",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 142.9,
+    "currency": "SGD",
+    "merchant": "Everyday Value Co",
+    "merchant_id": "study-m-injection",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-benign",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 71.9,
+    "currency": "SGD",
+    "merchant": "Campus Corner Clearance",
+    "merchant_id": "study-m-benign",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls. Previous colourway (Midnight Blue), cleared at the end of term.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-concealed",
+    "name": "Wave Q35 ANC",
+    "category": "Headphones",
+    "brand": "Wave",
+    "price": 151.9,
+    "currency": "SGD",
+    "merchant": "Riverside Supply Co",
+    "merchant_id": "study-m-concealed",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with Transport, Outdoor and Indoor modes",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Excellent sound, a bit tight after a few hours",
+        "text": "The app made them easy to set up and the hi-res mode sounds very good. After about three hours the clamp feels tight on me, so I take short breaks.",
+        "date": "2026-06-18"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-07-04"
+      },
+      {
+        "rating": 5,
+        "title": "Great noise cancelling",
+        "text": "Love the noise cancelling and the sound. The Transport mode makes the MRT ride much quieter. Would recommend.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 3,
+        "title": "Bluetooth dropped after two months",
+        "text": "Started having Bluetooth connection issues after two months. Still works fine with the cable.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-09-20"
+      }
+    ]
   }
 ]
