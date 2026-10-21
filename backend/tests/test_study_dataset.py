@@ -53,7 +53,7 @@ EXPECTED = {
     },
 }
 
-STUDY_CATEGORIES: list[str] = ["hp"]
+STUDY_CATEGORIES: list[str] = ["hp", "rs"]
 
 PINNED = {
     "hp": {
@@ -61,6 +61,12 @@ PINNED = {
         "P": 179,
         "budget": 200,
         "features": "wireless, noise-cancelling",
+    },
+    "rs": {
+        "category": "Running shoes",
+        "P": 159,
+        "budget": 180,
+        "features": "cushioned, road",
     },
 }
 

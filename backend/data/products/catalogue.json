@@ -1695,5 +1695,1280 @@
         "date": "2026-09-20"
       }
     ]
+  },
+  {
+    "id": "study-rs-1",
+    "name": "Pace Phantom Neutral",
+    "category": "Running shoes",
+    "brand": "Pace",
+    "price": 237.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "responsive"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Responsive neutral road shoe. Energy-return foam wrapped in a compression mesh gives back the energy you put in, step after step.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running",
+      "Cushioning": "Energy-return foam held in a compression mesh",
+      "Upper": "Textile sock-fit upper",
+      "Support": "Neutral"
+    },
+    "rating": 4.5,
+    "rating_count": 1580,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Amazing shoes",
+        "text": "Very comfortable and responsive, it feels like a push with every step.",
+        "date": "2026-05-20"
+      },
+      {
+        "rating": 4,
+        "title": "Buy half a size up",
+        "text": "My big toes rub the front. The elastic collar pushes your foot forward.",
+        "date": "2026-07-02"
+      },
+      {
+        "rating": 5,
+        "title": "Good product",
+        "text": "Very comfortable shoe.",
+        "date": "2026-08-16"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-2",
+    "name": "Summit Ridge 4",
+    "category": "Running shoes",
+    "brand": "Summit",
+    "price": 79.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "running",
+      "trail",
+      "grip",
+      "rock-plate"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Trail-running shoe with a rock protection plate, a durable rubberised toe tip and a 4 mm drop. Gaiter compatible.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Trail running",
+      "Protection": "Rock plate in midfoot and forefoot, rubberised toe tip",
+      "Drop": "4 mm heel-to-toe",
+      "Extras": "Gaiter compatible"
+    },
+    "rating": 4.4,
+    "rating_count": 640,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Replaced my hiking boots",
+        "text": "Good support that stops my ankle rolling on uneven ground.",
+        "date": "2026-06-08"
+      },
+      {
+        "rating": 5,
+        "title": "Good on uneven terrain",
+        "text": "Bought them for trail running. They feel fine and fit true to size.",
+        "date": "2026-07-25"
+      },
+      {
+        "rating": 5,
+        "title": "Five stars",
+        "text": "Loves them.",
+        "date": "2026-09-09"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-3",
+    "name": "Summit Peak 6",
+    "category": "Running shoes",
+    "brand": "Summit",
+    "price": 121.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "running",
+      "trail",
+      "zero-drop",
+      "wide-toe-box"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Award-winning zero-drop trail shoe with a grippy multi-directional lug outsole and a foot-shaped toe box that lets your toes spread naturally.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Trail running and light hiking",
+      "Drop": "Zero drop",
+      "Outsole": "Multi-directional lug pattern",
+      "Fit": "Wide, foot-shaped toe box"
+    },
+    "rating": 4.5,
+    "rating_count": 910,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Roomy toe box",
+        "text": "No toe pinching on downhills. Perfect for light hiking and running.",
+        "date": "2026-05-30"
+      },
+      {
+        "rating": 4,
+        "title": "Runs small",
+        "text": "Unusually wide but a little short for the size.",
+        "date": "2026-07-11"
+      },
+      {
+        "rating": 5,
+        "title": "My go-to shoe",
+        "text": "Fourth pair. Not the prettiest shoe but very comfortable after long shifts.",
+        "date": "2026-08-27"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-4",
+    "name": "Orbit Road 520",
+    "category": "Running shoes",
+    "brand": "Orbit",
+    "price": 65.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "running",
+      "road",
+      "lightweight",
+      "everyday"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Lightweight everyday road shoe with a synthetic and textile upper, a moulded heel and a durable rubber outsole.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, gym, everyday wear",
+      "Upper": "Synthetic and textile",
+      "Heel": "Moulded heel counter",
+      "Outsole": "Rubber"
+    },
+    "rating": 4.0,
+    "rating_count": 172,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Runs slightly small",
+        "text": "Good quality but a bit smaller than other brands, so my toes rub.",
+        "date": "2026-06-15"
+      },
+      {
+        "rating": 5,
+        "title": "Good for long shifts",
+        "text": "I stand for ten hours a day and these have lasted well.",
+        "date": "2026-07-21"
+      },
+      {
+        "rating": 5,
+        "title": "Treadmill shoe",
+        "text": "Good value for treadmill workouts.",
+        "date": "2026-09-04"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-5",
+    "name": "Orbit Flex Gym",
+    "category": "Running shoes",
+    "brand": "Orbit",
+    "price": 41.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "gym",
+      "lightweight",
+      "breathable",
+      "non-slip"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Lightweight breathable knit trainer for the gym and walking, with a non-slip sole and a soft lining.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Gym, walking",
+      "Upper": "Woven knit, breathable",
+      "Sole": "Non-slip MD sole"
+    },
+    "rating": 3.9,
+    "rating_count": 148,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Good for light gym use",
+        "text": "Lightweight and comfortable. Not durable enough for trail runs.",
+        "date": "2026-06-02"
+      },
+      {
+        "rating": 5,
+        "title": "So comfortable",
+        "text": "Great for lifting weights.",
+        "date": "2026-07-18"
+      },
+      {
+        "rating": 4,
+        "title": "Goes with everything",
+        "text": "Neutral colour and plenty of room in the wide fit.",
+        "date": "2026-08-29"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-trusted",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 159,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-trusted",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-neutral",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 150.9,
+    "currency": "SGD",
+    "merchant": "Harbour Lane Goods",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-lowprice",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 55.9,
+    "currency": "SGD",
+    "merchant": "Bargain Depot SG",
+    "merchant_id": "study-m-lowprice",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training. Clearance sale: end-of-line stock, limited sizes.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-nobiz",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 126.9,
+    "currency": "SGD",
+    "merchant": "TopBuy Express",
+    "merchant_id": "study-m-nobiz",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "unverified",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-data-mid",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 126.9,
+    "currency": "SGD",
+    "merchant": "Urban Kit Club",
+    "merchant_id": "study-m-data-mid",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-data-high",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 126.9,
+    "currency": "SGD",
+    "merchant": "GlobalShip Direct",
+    "merchant_id": "study-m-data-high",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-payment",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 126.9,
+    "currency": "SGD",
+    "merchant": "PrimeGift Mart",
+    "merchant_id": "study-m-payment",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-external",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 118.9,
+    "currency": "SGD",
+    "merchant": "Quickpay Deals",
+    "merchant_id": "study-m-external",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-returns",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 126.9,
+    "currency": "SGD",
+    "merchant": "EasyReturn Store",
+    "merchant_id": "study-m-returns",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-lookalike",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 126.9,
+    "currency": "SGD",
+    "merchant": "Northl1ne Outfitters",
+    "merchant_id": "study-m-lookalike",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-pressure",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 134.9,
+    "currency": "SGD",
+    "merchant": "Daily Flash Picks",
+    "merchant_id": "study-m-pressure",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training. Only 2 left in your size. Price returns in 10 minutes.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-inconsistent",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 126.9,
+    "currency": "SGD",
+    "merchant": "Lion City Sports Hub",
+    "merchant_id": "study-m-inconsistent",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-injection",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 126.9,
+    "currency": "SGD",
+    "merchant": "Everyday Value Co",
+    "merchant_id": "study-m-injection",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-benign",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 63.9,
+    "currency": "SGD",
+    "merchant": "Campus Corner Clearance",
+    "merchant_id": "study-m-benign",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training. Last season's colourway (Slate Grey), cleared at the end of term.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-concealed",
+    "name": "Stride Glide 4",
+    "category": "Running shoes",
+    "brand": "Stride",
+    "price": 134.9,
+    "currency": "SGD",
+    "merchant": "Riverside Supply Co",
+    "merchant_id": "study-m-concealed",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with balanced, soft cushioning that adapts to your stride and deflects impact. An arrow-point outsole pattern speeds up heel-to-toe transitions, and the knit upper gives a secure fit for daily training.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Balanced soft foam that adapts to stride, weight and pace",
+      "Upper": "Knit upper with a secure, low-distraction fit",
+      "Outsole": "Rubber with arrow-point pattern for quick heel-to-toe transitions",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-06-10"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-07-14"
+      },
+      {
+        "rating": 2,
+        "title": "Less cushioned than I expected",
+        "text": "Very light, almost like a racing shoe for me. Not enough cushioning for my longer runs.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 5,
+        "title": "Rebuying",
+        "text": "So comfortable that I bought a second pair.",
+        "date": "2026-09-01"
+      }
+    ]
   }
 ]
