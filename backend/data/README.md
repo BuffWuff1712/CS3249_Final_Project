@@ -1,0 +1,83 @@
+# Data
+
+Everything the backend loads at runtime lives here, along with researcher-only files the runtime never reads. All products, merchants and websites are fictional. Merchant websites use reserved `.test` domains.
+
+| Path | Loaded at runtime | Contents |
+|---|---|---|
+| `products/catalogue.json` | Yes | Products and per-merchant offers (`Product` schema in `app/runtime/schemas.py`) |
+| `merchants/merchants.json` | Yes | Observable merchant records (`Merchant` schema) |
+| `scenarios/scenarios.json` | Yes | Study scenarios: initial brief, permissions, visible `product_ids`, trigger product |
+| `research/merchant_ground_truth.json` | Researcher reports only | Hidden TRUSTWORTHY / UNCERTAIN / SUSPICIOUS / MALICIOUS label per merchant |
+| `research/risk_offer_manifest.json` | Never | Declared signals, visible cues and ground truth for every study risk offer |
+| `evaluation_conversations.json` | Evaluation script only | Multi-turn cases for `python -m app.evaluate_conversations` |
+| `raw/` | Never (git-ignored) | Amazon Reviews 2023 samples used to curate study products |
+
+Never put ground truth into observable records, and never import anything from `research/` into the participant-facing runtime.
+
+## Two kinds of records
+
+**Original fixtures.** These are products `shoe-*`, `audio-*`, `bag-*` and `offer-*`, and merchants `demo-store` through `concealed`. They back the existing tests and the `risk-a`–`risk-i` scenarios. Leave them unchanged. Their "Fictional ... for simulation only" descriptions are intentional.
+
+**Study dataset.** These are products `study-*` and merchants `study-m-*`, used for the user study. The design is in [`docs/data/2026-10-21-study-dataset-design.md`](../../docs/data/2026-10-21-study-dataset-design.md). Study scenarios must list their products explicitly in `product_ids`. Scenarios without `product_ids` see the whole catalogue, including every study risk offer.
+
+## Study dataset at a glance
+
+There are three parallel categories, and each has the same structure:
+
+| Category | Code | Target product | Trusted price | Goal features to seed in `initial_brief` |
+|---|---|---|---|---|
+| Headphones | `hp` | Lumen Hush ANC | SGD 179 | `wireless, noise-cancelling` |
+| Running shoes | `rs` | Vela Tempo Daily | SGD 159 | `cushioned, road` |
+| Backpacks | `bp` | Atlas Scholar 30 | SGD 99 | `laptop, water-resistant` |
+
+- **Candidates.** `study-{cat}-1` onward (5–6 per category) are other products in the category. Only the target has every goal feature within budget. One candidate has the features but is over budget, and the rest miss at least one feature.
+- **Target offers.** `study-{cat}-target-{variant}` are 15 listings of the same target product. They share name, brand, attributes, specifications, rating and rating count, and differ in merchant, price, description and their 3 product reviews. Any two listings share at most one review.
+- **Merchants.** `study-m-trusted` (established store), `study-m-neutral` (small clean store) and one merchant per risk variant. Each merchant sells the target offer of all three categories.
+
+### Risk variants
+
+Prices are relative to the trusted price P. "Signals" are the rule IDs that `assess()` in `app/runtime/merchant_risk.py` must fire.
+
+| Variant | Price | Signals | Where a shopper sees it | Ground truth |
+|---|---|---|---|---|
+| `lowprice` | 0.35P | low_price | Clearance wording, mixed merchant reviews | UNCERTAIN |
+| `nobiz` | 0.80P | missing_business | No contact, unverified, throwaway website | SUSPICIOUS |
+| `data-mid` | 0.80P | excessive_data | Checkout note asks for date of birth and social account | SUSPICIOUS |
+| `data-high` | 0.80P | excessive_data | Checkout note asks for a government ID | MALICIOUS |
+| `payment` | 0.80P | unusual_payment | Gift card / crypto wallet only | SUSPICIOUS |
+| `external` | 0.75P | external_payment, unusual_payment | Asks for a bank transfer outside checkout | MALICIOUS |
+| `returns` | 0.80P | misleading_returns | "30-day free returns" headline vs store-credit fine print | SUSPICIOUS |
+| `lookalike` | 0.80P | lookalike | Name and website imitate the trusted store | SUSPICIOUS |
+| `pressure` | 0.85P | pressure | "Only 2 left", 10-minute price timer | UNCERTAIN |
+| `inconsistent` | 0.80P | inconsistent | Claims local same-day dispatch, quotes 20–30 day overseas shipping | SUSPICIOUS |
+| `injection` | 0.80P | injection | Merchant description addresses the shopping assistant | MALICIOUS |
+| `benign` | 0.40P | low_price | Legitimate reason for the discount, positive reviews | TRUSTWORTHY |
+| `concealed` | 0.85P | none | Nothing: a distinct, ordinary-looking store | MALICIOUS |
+
+Signals are a property of the data. Risk levels, weights, thresholds and the final ALLOW / REVIEW / BLOCK decision belong to the policy owner (`config/merchant_risk_rules.json`, `config/policy.json`, `app/runtime/policy.py`), and the dataset tests deliberately do not assert them.
+
+## Building a study scenario
+
+1. Choose the variants to compare. Put the target offers you need (always including `trusted` and `neutral`) and the category's candidates in `product_ids`.
+2. Seed the goal features in `initial_brief`, or set `trigger_product`. Search ranks by literal attribute matches, then by price, so other phrasings (e.g. "noise cancelling" without the hyphen) may surface a cheaper candidate instead of the target.
+3. Avoid putting `lowprice` and `benign` in the same scenario: both lower the price median that `low_price` is computed from.
+4. Run the tests. `test_study_scenarios_match_manifest` re-checks every scenario that lists `study-*` products against the manifest.
+
+## Editing study records
+
+- **Keep reviews consistent with specs.** Review text must match the product it is attached to. Don't praise a feature the specifications don't list.
+- **Keep risk cues in merchant fields.** Put risk cues only in merchant fields and merchant reviews. Product reviews stay about product quality.
+- **Use fictional names only.** Use only fictional brands and product names. The tests reject a denylist of real brands, source product lines and model numbers. Study brands must not reuse brands of the original fixtures in the same category.
+- **Validate after every edit.** From `backend/`, run:
+
+```sh
+.venv/bin/python -m pytest tests/test_study_dataset.py -q
+```
+
+## Regenerating raw samples
+
+`scripts/sample_amazon.py` filters an Amazon Reviews 2023 metadata file by title keywords, samples candidates with a fixed seed and attaches reviews. Its output is scratch material for curation, never study data itself. Keep inputs and outputs in `raw/`:
+
+```sh
+.venv/bin/python -m scripts.sample_amazon --meta data/raw/meta_hp.jsonl --reviews data/raw/reviews_electronics.jsonl --keywords "noise cancelling,headphone" --n 25 --out data/raw/hp_anc.json
+```

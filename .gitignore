@@ -48,3 +48,6 @@ beany-events*.csv
 
 beany-risk-results*.csv
 backend/data/gateway-probe*.json
+
+# Raw Amazon Reviews 2023 dumps and sampling scratch output.
+backend/data/raw/

@@ -8,6 +8,21 @@
     "external": "MALICIOUS",
     "injection": "MALICIOUS",
     "benign": "TRUSTWORTHY",
-    "concealed": "MALICIOUS"
+    "concealed": "MALICIOUS",
+    "study-m-trusted": "TRUSTWORTHY",
+    "study-m-neutral": "TRUSTWORTHY",
+    "study-m-benign": "TRUSTWORTHY",
+    "study-m-lowprice": "UNCERTAIN",
+    "study-m-pressure": "UNCERTAIN",
+    "study-m-nobiz": "SUSPICIOUS",
+    "study-m-returns": "SUSPICIOUS",
+    "study-m-inconsistent": "SUSPICIOUS",
+    "study-m-lookalike": "SUSPICIOUS",
+    "study-m-data-mid": "SUSPICIOUS",
+    "study-m-payment": "SUSPICIOUS",
+    "study-m-data-high": "MALICIOUS",
+    "study-m-external": "MALICIOUS",
+    "study-m-injection": "MALICIOUS",
+    "study-m-concealed": "MALICIOUS"
   }
 }
