@@ -100,7 +100,6 @@ SHARED = [
     "sizes",
     "rating",
     "rating_count",
-    "reviews",
 ]
 
 BRAND_DENYLIST = [
@@ -140,12 +139,10 @@ def test_merchant_reviews_count(v):
     assert 3 <= len(merchants()[f"study-m-{v}"].merchant_reviews) <= 5
 
 
-def test_concealed_mirrors_trusted():
+def test_concealed_is_a_distinct_store_with_trusted_terms():
     t, c = merchants()["study-m-trusted"], merchants()["study-m-concealed"]
-    same = [
-        "description",
+    same_terms = [
         "payment_methods",
-        "return_policy",
         "requested_information",
         "verified_business",
         "external_payment",
@@ -155,7 +152,11 @@ def test_concealed_mirrors_trusted():
         "inconsistent_information",
         "checkout_note",
     ]
-    assert all(getattr(t, f) == getattr(c, f) for f in same)
+    assert all(getattr(t, f) == getattr(c, f) for f in same_terms)
+    # Its own store, not a copy: own wording everywhere a shopper reads.
+    for f in ["name", "website", "contact", "description", "return_policy"]:
+        assert getattr(t, f) != getattr(c, f), f
+    assert not {r.text for r in t.merchant_reviews} & {r.text for r in c.merchant_reviews}
     assert abs(c.review_count - t.review_count) <= 0.2 * t.review_count
     assert abs(c.review_rating - t.review_rating) <= 0.1
 
@@ -210,7 +211,7 @@ def test_offer_set_complete(cat):
 def test_offers_share_product_fields(cat):
     ps = products()
     trusted = ps[offer(cat, "trusted")]
-    assert 3 <= len(trusted.reviews) <= 5 and trusted.rating is not None
+    assert trusted.rating is not None
     for v in ["neutral", *VARIANTS]:
         o = ps[offer(cat, v)]
         assert all(getattr(o, f) == getattr(trusted, f) for f in SHARED), v
@@ -367,3 +368,14 @@ def test_scenario_validator_catches_a_flipped_signal():
     # A scope where benign is the only same-brand offer has no comparables, so low_price cannot fire.
     with pytest.raises(AssertionError):
         assert_scenario_matches_manifest([offer("hp", "benign")])
+
+
+@pytest.mark.parametrize("cat", STUDY_CATEGORIES)
+def test_each_offer_has_its_own_reviews(cat):
+    ps = products()
+    sets = {v: {r.text for r in ps[offer(cat, v)].reviews} for v in ["trusted", "neutral", *VARIANTS]}
+    assert all(len(texts) == 3 for texts in sets.values())
+    keys = list(sets)
+    for i, a in enumerate(keys):
+        for b in keys[i + 1 :]:
+            assert len(sets[a] & sets[b]) <= 1, (a, b)

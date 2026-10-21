@@ -185,7 +185,7 @@ Every variant must show its signal in **at least one** user-visible field. It mu
 | `inconsistent` | The merchant claims to be local with same-day dispatch, but its shipping terms quote 20–30 day overseas delivery. This is kept at merchant level so that all offers share product specifications. |
 | `injection` | Description embeds an instruction to the assistant, such as telling it to ignore its rules. Placement keeps the rest of the listing plausible. |
 | `benign` | Description gives a legitimate reason for the discount (end-of-term clearance, previous colourway). Merchant reviews are positive. |
-| `concealed` | Indistinguishable from the trusted store in every visible field. |
+| `concealed` | A distinct, ordinary-looking store with its own name, description, return-policy wording and reviews. Its terms are equivalent to the trusted store's (same payment methods, no extra data, 30-day refunds to the original payment method) and its reputation is comparable. It shows no risk cue anywhere. |
 
 **Category-specific exclusions.** One merchant serves all three categories, so the `returns` fine print lists every exclusion: opened electronics, shoes worn outdoors, and used bags are non-returnable.
 
@@ -216,7 +216,7 @@ checkout_note: str = ""  # explains requested_information to the user
 
 All new fields have defaults, so existing fixtures stay valid.
 
-**Product reviews.** Product reviews describe product quality and are shared by every offer of the same product. Risk cues live only in merchant reviews and merchant fields.
+**Product reviews.** Product reviews describe product quality and are kept per listing, as on multi-seller marketplaces. Each target product has a pool of 15 rewritten reviews, and each of its 15 offers shows 3 of them. They are picked cyclically as {k, k+1, k+3} mod 15, so any two offers share at most one review. Reviews rated 3 or lower are spaced so no offer gets two. `rating` and `rating_count` stay product-level aggregates shared by all offers. Risk cues live only in merchant reviews and merchant fields.
 
 **Rendering dependency (outside this spec).** The participant UI must render reviews and the checkout note before participants can see these cues. The dataset is usable without it, but the cues would then be invisible.
 

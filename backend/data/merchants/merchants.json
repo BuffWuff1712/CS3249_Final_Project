@@ -778,12 +778,12 @@
     "id": "study-m-concealed",
     "name": "Riverside Supply Co",
     "website": "https://riverside-supply-co.test",
-    "description": "Authorised retailer of headphones, running shoes and bags since 2014. Orders placed before 3pm are dispatched the same day from our Singapore warehouse. Every item is brand-new and covered by the manufacturer's warranty.",
+    "description": "Family-run audio, running and travel gear store, trading online since 2012 with a small showroom in the east. Orders received by 2pm ship the same day. All stock is brand-new and comes with the full manufacturer's warranty.",
     "payment_methods": [
       "Demo Visa",
       "Demo Wallet"
     ],
-    "return_policy": "30-day free returns, refunded to original payment method.",
+    "return_policy": "Free returns within 30 days of delivery. Refunds go back to the card or wallet you paid with.",
     "contact": "support@riverside-supply-co.test",
     "review_count": 1985,
     "review_rating": 4.7,
