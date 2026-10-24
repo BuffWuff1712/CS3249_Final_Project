@@ -81,6 +81,9 @@ class RiskAssessment(Model):
 
 
 class Product(Model):
+    source: Literal["catalogue", "browser_use"] = "catalogue"
+    source_url: str = ""
+    observed_at: str = ""
     id: str
     name: str
     category: str
@@ -151,7 +154,25 @@ class Approval(Model):
     timestamp: str = Field(default_factory=now)
 
 
+class CartItem(Model):
+    action: Action
+    brief: dict[str, Fact]
+    added_at: str = Field(default_factory=now)
+
+
+class CartSelection(Model):
+    proposal_id: str
+    fingerprint: str
+
+
+class CartCheckout(Model):
+    items: list[CartSelection] = Field(min_length=1, max_length=100)
+
+
 class Session(Model):
+    search_provider: Literal["catalogue", "browser_use"] = "catalogue"
+    live_products: dict[str, Product] = Field(default_factory=dict)
+    live_merchants: dict[str, Merchant] = Field(default_factory=dict)
     id: str = Field(default_factory=uid)
     participant: str = Field(default_factory=lambda: "P-" + uid()[:8])
     created_at: str = Field(default_factory=now)
@@ -172,6 +193,7 @@ class Session(Model):
     clarification_count: int = 0
     intervention_count: int = 0
     mode: str = "openai"
+    cart: list[CartItem] = Field(default_factory=list)
 
 
 class Change(Model):
@@ -199,7 +221,7 @@ class Interpretation(Model):
         description="Complete user-facing message, including one question when intent is clarify.",
     )
     changes: list[Change]
-    intent: Literal["search", "clarify", "explain", "cancel", "new_task", "alternative"]
+    intent: Literal["search", "clarify", "explain", "cancel", "new_task", "alternative", "checkout"]
     suggestions: list[str]
 
 

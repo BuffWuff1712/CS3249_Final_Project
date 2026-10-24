@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Fact, Permissions, Session } from "@/lib/beany";
+import { Fact, Session } from "@/lib/beany";
 const fields = [
   "category",
   "usage",
@@ -17,17 +17,14 @@ export function Brief({
   session,
   busy,
   edit,
-  permissions,
 }: {
   session: Session;
   busy: boolean;
   edit: (field: string, fact: Fact | null) => Promise<void>;
-  permissions: (p: Permissions) => Promise<void>;
 }) {
   const [field, setField] = useState("category"),
     [value, setValue] = useState(""),
     [hard, setHard] = useState(false);
-  const [p, setP] = useState(session.permissions);
   return (
     <>
       <section className="panel boundaries">
@@ -120,84 +117,7 @@ export function Brief({
           </fieldset>
         </form>
       </section>
-      <section className="panel boundaries">
-        <h2>Permissions</h2>
-        <p className="muted">
-          Only these controls can grant authority. All checkout is simulated.
-        </p>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void permissions(p);
-          }}
-        >
-          <fieldset disabled={busy}>
-            {(
-              [
-                "require_approval",
-                "substitutions",
-                "share_personal_data",
-              ] as const
-            ).map((k) => (
-              <label className="check" key={k}>
-                <input
-                  type="checkbox"
-                  checked={p[k]}
-                  onChange={(e) => setP({ ...p, [k]: e.target.checked })}
-                />
-                {k.replaceAll("_", " ")}
-              </label>
-            ))}
-            <label>
-              Autonomy
-              <select
-                value={p.autonomy}
-                onChange={(e) =>
-                  setP({
-                    ...p,
-                    autonomy: e.target.value as Permissions["autonomy"],
-                  })
-                }
-              >
-                <option value="guided">Guided · always review</option>
-                <option value="balanced">Balanced · follow permissions</option>
-              </select>
-            </label>
-            <label>
-              Restricted merchants (comma separated)
-              <input
-                value={p.restricted_merchants.join(", ")}
-                onChange={(e) =>
-                  setP({
-                    ...p,
-                    restricted_merchants: e.target.value
-                      .split(",")
-                      .map((x) => x.trim()),
-                  })
-                }
-              />
-            </label>
-            {["Demo Visa", "Demo Wallet"].map((m) => (
-              <label className="check" key={m}>
-                <input
-                  type="checkbox"
-                  checked={p.payment_methods.includes(m)}
-                  onChange={(e) =>
-                    setP({
-                      ...p,
-                      payment_methods: e.target.checked
-                        ? [...p.payment_methods, m]
-                        : p.payment_methods.filter((x) => x !== m),
-                    })
-                  }
-                />
-                {m} (fictional)
-              </label>
-            ))}
-            <button>Save permissions</button>
-          </fieldset>
-        </form>
-      </section>
+
     </>
   );
 }

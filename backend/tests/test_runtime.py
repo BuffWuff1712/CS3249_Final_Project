@@ -215,7 +215,7 @@ def test_payment_and_auto_checkout(client):
     a = Action(product=p, payment_method="Real card")
     assert evaluate(s, a).decision == "BLOCK"
     service.propose(s, p)
-    assert len(s.receipts) == 1
+    assert not s.receipts  # Even ALLOW proposals now wait for the checkout review UI.
 
 
 def test_catalogue_tampering(client, monkeypatch):

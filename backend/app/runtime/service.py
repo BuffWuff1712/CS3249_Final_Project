@@ -5,6 +5,7 @@ from .policy import FIELDS, search, catalogue, evaluate, fingerprint
 from .llm import OpenAIConversation, explain_outcome
 from .merchants import merchant_for
 from .merchant_risk import load_config, digest
+from .shopping_workflow import run_shopping
 
 llm = OpenAIConversation()
 ELICITATION_PATH = Path(__file__).resolve().parents[2] / "config/elicitation.json"
@@ -43,12 +44,13 @@ def validate_fact(field, fact):
             raise ValueError("Budget must be a positive number")
     if field == "currency" and fact.value not in ("SGD", "USD"):
         raise ValueError("Currency must be SGD or USD")
-    if field == "category" and fact.value not in (
-        "Running shoes",
-        "Headphones",
-        "Backpacks",
-    ):
-        raise ValueError("Choose Running shoes, Headphones or Backpacks")
+    if field == "category":
+        category = fact.value.strip()
+
+        if not category:
+            raise ValueError("Please enter a product category")
+
+        fact.value = category
 
 
 def edit(s, field, fact):
@@ -63,8 +65,9 @@ def edit(s, field, fact):
     return s
 
 
-def create():
-    s = Session(mode=os.getenv("BEANY_LLM_MODE", "openai"))
+def create(*, search_provider=None):
+    from .browser_search import configured_provider
+    s = Session(mode=os.getenv("BEANY_LLM_MODE", "openai"), search_provider=search_provider or configured_provider())
     config = load_config()
     s.experiment = {
         "profile": "standard",
@@ -78,7 +81,9 @@ def create():
         s,
         "Hi, I’m Beany. Tell me what you’re shopping for, even if you’re unsure. We can compare fictional running shoes, headphones and backpacks. All purchases are simulated. You control the brief and permissions.",
     )
-    event(s, "session_started", "Fresh fictional participant session")
+    if s.search_provider == "browser_use":
+        s.messages[-1].text = "Hi, I’m Beany. Tell me what you’re shopping for. I can search public product listings using Browser Use. Prices and merchant details need review; checkout here is always simulated."
+    event(s, "session_started", "Fresh shopping session")
     return s
 
 
@@ -120,20 +125,20 @@ def checkout(s, a):
     message(s, "Simulated checkout complete. No real order or payment was created.")
 
 
-def propose(s, product=None, **kwargs):
+def propose(s, product=None, *, recommendations=None, **kwargs):
     invalidate(s)
-    s.recommendations = search(s)
+    s.recommendations = search(s) if recommendations is None else recommendations
     if product is None:
         if not s.recommendations:
             s.stage = "no_match"
             message(
                 s,
-                "No fictional products match these constraints. You can edit your brief or ask to explore alternatives; I have not relaxed your limits.",
+                "No products match these constraints. You can edit your brief or ask to explore alternatives; I have not relaxed your limits.",
             )
             event(s, "no_match", "No matching products")
             return
         product = s.recommendations[0]
-    merchant = merchant_for(product)
+    merchant = merchant_for(product, s)
     allowed = [
         m for m in s.permissions.payment_methods if m in merchant.payment_methods
     ]
@@ -169,9 +174,9 @@ def propose(s, product=None, **kwargs):
         f"{product.name} costs {product.currency} {product.price:.2f}. "
         + " ".join(r.explanation for r in a.rules),
     )
-    if a.decision == "ALLOW":
-        checkout(s, a)
-    else:
+    if a.decision != "BLOCK":
+        message(s, "Would you like to add this to your cart or proceed to checkout? You can review your items before confirming simulated checkout.")
+    if a.decision != "ALLOW":
         s.intervention_count += 1
         event(s, "intervention", a.decision)
 
@@ -184,6 +189,13 @@ def chat(s, text):
     result = llm.interpret(s, text)  # Failure leaves persisted state unchanged.
     s.messages.append(Message(role="user", text=text))
     event(s, "user_message", "Message received")
+    if result.intent == "checkout":
+        s.stage = "cart_review" if s.cart else "ready"
+        s.suggestions = []
+        message(s, "Ready when you are. Select Review cart and checkout below to check your items before confirming. Nothing has been purchased yet."
+                if s.cart else "Your cart is empty. Tell me what you'd like to find first.")
+        event(s, "cart_review_requested", "User requested checkout review; no purchase authorized")
+        return s
     if result.intent == "new_task":
         invalidate(s)
         s.brief = {}
@@ -230,7 +242,6 @@ def chat(s, text):
         result.intent = "search"
         result.reply = "I have enough information to compare catalogue options. You can refine your brief at any time."
     s.suggestions = result.suggestions[:4]
-    message(s, result.reply)
     event(s, "interpretation", result.model_dump_json())
     if result.intent == "cancel":
         invalidate(s)
@@ -239,6 +250,7 @@ def chat(s, text):
         message(s, "Cancelled. No pending proposal can be approved.")
         return s
     if result.intent == "clarify":
+        message(s, result.reply)
         s.clarification_count += 1
         s.stage = "clarifying"
         event(s, "clarification", "Question asked")
@@ -246,6 +258,8 @@ def chat(s, text):
     if result.intent == "explain":
         if s.proposals:
             message(s, " ".join(r.explanation for r in s.proposals[-1].rules))
+        else:
+            message(s, result.reply)
         return s
     if result.intent == "alternative" and s.proposals:
         previous = s.proposals[-1]
@@ -256,14 +270,32 @@ def chat(s, text):
         s.rejected_merchants.append(previous.product.merchant_id)
         event(s, "alternative", previous.id)
     if "category" in s.brief:
-        propose(s)
+        invalidate(s)
+        outcome = run_shopping(s)
+        event(s, "shopping_result", outcome.model_dump_json())
+        if outcome.status != "proposed":
+            s.stage = "no_match" if outcome.status == "no_match" else "ready"
+            message(s, (
+                "No products match these constraints. You can refine your brief; I have not relaxed your limits."
+                if outcome.status == "no_match" else
+                "I couldn't complete the product comparison. No new proposal or checkout was created. You can retry or refine your brief."
+            ))
+            return s
+        first_message = len(s.messages)
+        propose(s, outcome.product, recommendations=outcome.candidates)
         explanation = explain_outcome(s)
+        # One response per shopping turn, including the deterministic fallback.
+        fallback = " ".join(m.text for m in s.messages[first_message:])
+        del s.messages[first_message:]
+        message(s, explanation or fallback)
         if explanation:
-            message(s, explanation)
+            event(s, "outcome_explanation", "Explained verified shopping result")
         elif s.mode != "mock":
             event(
                 s, "explanation_fallback", "Displayed deterministic policy explanation"
             )
+    else:
+        message(s, result.reply)
     return s
 
 

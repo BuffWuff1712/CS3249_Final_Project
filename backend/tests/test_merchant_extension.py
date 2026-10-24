@@ -354,7 +354,7 @@ def test_thresholds_can_change_actual_review_to_allow(client, tmp_path, monkeypa
         ),
     )
     service.propose(s, product)
-    assert s.proposals[-1].decision == "ALLOW" and len(s.receipts) == 1
+    assert s.proposals[-1].decision == "ALLOW" and not s.receipts
 
 
 def test_ambiguous_dollar_does_not_confirm_usd(client, monkeypatch):

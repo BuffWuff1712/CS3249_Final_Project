@@ -34,6 +34,8 @@ def confirmed(s, key):
 
 
 def catalogue(s):
+    if s.search_provider == "browser_use" and not s.scenario_id:
+        return list(s.live_products.values())
     products = [
         Product.model_validate(p)
         for p in json.loads(
@@ -56,7 +58,7 @@ def catalogue(s):
     return products
 
 
-def search(s):
+def search(s, *, limit=CONFIG["recommendation_limit"]):
     products = []
     for p in catalogue(s):
         if (
@@ -123,7 +125,8 @@ def search(s):
         )
         return (-score, p.price, p.id)
 
-    return sorted(products, key=rank)[: CONFIG["recommendation_limit"]]
+    ranked = sorted(products, key=rank)
+    return ranked if limit is None else ranked[:limit]
 
 
 def fingerprint(a):
@@ -157,7 +160,7 @@ def evaluate(s, a):
 
     p = a.product
     try:
-        merchant = merchant_for(p)
+        merchant = merchant_for(p, s)
         if a.merchant_details is None or merchant != a.merchant_details:
             rule(
                 "merchant_changed",
@@ -165,8 +168,19 @@ def evaluate(s, a):
                 "merchant",
                 "Merchant terms changed or are missing. Request a new proposal.",
             )
-        a.risk = assess(p, merchant, catalogue(s), session_config(s))
-        if a.risk.recommended_decision != "ALLOW":
+        if p.source == "browser_use":
+            import re
+            from datetime import datetime, timezone
+            session_config(s)  # Invalid policy configuration still blocks.
+            a.risk = None
+            age = (datetime.now(timezone.utc) - datetime.fromisoformat(p.observed_at)).total_seconds()
+            rule("live_snapshot", "BLOCK" if age > 1800 or age < 0 else "REVIEW", "source",
+                 "This is an unverified web snapshot, not a merchant safety assessment. Prices and stock may change. Refresh searches older than 30 minutes. Checkout is simulated only.")
+            if re.search(r"ignore.{0,60}(rules|instructions|preferences)|reveal.{0,30}(key|password)|disregard.{0,40}(policy|rules)|enable.{0,40}personal data", p.description, re.I):
+                rule("injection", "BLOCK", "source", "The listing contains instructions aimed at changing assistant behaviour. Choose another listing.")
+        else:
+            a.risk = assess(p, merchant, catalogue(s), session_config(s))
+        if a.risk and a.risk.recommended_decision != "ALLOW":
             rule(
                 "merchant_risk",
                 a.risk.recommended_decision,

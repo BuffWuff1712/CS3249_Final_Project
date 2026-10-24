@@ -3,3 +3,20 @@
 .starter-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}.starter-grid button{text-align:left;line-height:1.6;padding:16px;background:#f5f8ff}.brief-row{border-bottom:1px solid var(--line);padding:12px 0}.brief-row dt{text-transform:capitalize;font-size:11px;color:var(--muted)}.brief-row dd{margin:6px 0;line-height:1.8;overflow-wrap:anywhere}.brief-row .tag{margin-left:4px}.brief-row button{font-size:10px;padding:4px 8px;margin-top:6px}.product-card{border:1px solid var(--line);border-radius:12px;padding:20px;margin:20px 0;background:linear-gradient(135deg,#f4f8ff,white)}.product-card>p{font-size:12px;line-height:1.6}.product-card .review{margin:15px -5px 0;border-radius:8px}.comparison{display:grid;gap:12px;margin:16px 0}.comparison>div{border:1px solid var(--line);border-radius:8px;padding:14px}.research{max-width:900px;margin:40px auto;padding:24px}.research .panel{padding:24px;margin:20px 0}@media(max-width:480px){.starter-grid{grid-template-columns:1fr}.header-right{flex-wrap:wrap;justify-content:flex-end}.demo-badge{font-size:7px}.product-card{padding:14px}}
 .sidebar>.activity{order:-1}
 .merchant-details{margin:16px 0;font-size:12px;line-height:1.65}.merchant-details summary{cursor:pointer;color:#2457a6;font-weight:600}.merchant-details dt{font-weight:600;margin-top:8px}.merchant-details dd{margin:0;overflow-wrap:anywhere}.risk-research{border-block:1px solid var(--line);padding:20px 0;margin:16px 0}.risk-research label{margin-top:16px}
+.header-actions {
+  flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.header-action{display:inline-flex;align-items:center;justify-content:center;border:1px solid;border-radius:8px;padding:10px 14px;font-weight:600;text-decoration:none;white-space:nowrap;transition:background .15s}
+.cart-action{background:#2563eb;border-color:#2563eb;color:#fff}
+.cart-action:hover{background:#1d4ed8;border-color:#1d4ed8}
+.history-action{background:#e0f2fe;border-color:#7dd3fc;color:#075985}
+.history-action:hover{background:#bae6fd;border-color:#38bdf8}
+@media(max-width:760px){.header-action{font-size:10px}}
+@media(max-width:480px){header{height:auto;min-height:74px;gap:12px;padding:12px 0}.header-actions{justify-content:flex-end}.header-right{min-width:0}.header-action{padding:10px}}
+.receipt-id{overflow-wrap:anywhere}nav{line-height:1.8}a:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}
+.settings-page{display:grid;grid-template-columns:minmax(0,1fr);max-width:620px;margin:32px auto;gap:20px;padding-bottom:32px}
+.settings-page h1{font-size:32px;letter-spacing:-1px}
+.settings-page .notice,.settings-page .error{margin-bottom:0}

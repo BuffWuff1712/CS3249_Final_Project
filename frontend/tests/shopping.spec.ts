@@ -9,11 +9,13 @@ test("conversation, specific approval and simulated receipt", async ({
     .fill("Find headphones under $150");
   await page.getByRole("button", { name: "Send ↗", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Approve simulated checkout" }),
+    page.getByRole("button", { name: "Proceed to checkout" }),
   ).toBeEnabled();
   await page
-    .getByRole("button", { name: "Approve simulated checkout" })
+    .getByRole("button", { name: "Proceed to checkout" })
     .click();
+  await page.getByRole("button", { name: "Confirm simulated checkout" }).click();
+  await page.getByRole("link", { name: "View receipts", exact: true }).click();
   await expect(
     page.getByText("Simulated receipt", { exact: true }),
   ).toBeVisible();
@@ -41,12 +43,12 @@ test("vague request, repair and cancellation", async ({ page }) => {
   await input.fill("Find running shoes under $150");
   await page.getByRole("button", { name: "Send ↗", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Approve simulated checkout" }),
+    page.getByRole("button", { name: "Proceed to checkout" }),
   ).toBeVisible();
   await input.fill("cancel");
   await page.getByRole("button", { name: "Send ↗", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Approve simulated checkout" }),
+    page.getByRole("button", { name: "Proceed to checkout" }),
   ).toHaveCount(0);
 });
 test("study hard block and CSV export", async ({ page, request }) => {
@@ -67,7 +69,7 @@ test("study hard block and CSV export", async ({ page, request }) => {
   );
   await page.reload();
   await expect(
-    page.getByRole("button", { name: "Approve simulated checkout" }),
+    page.getByRole("button", { name: "Proceed to checkout" }),
   ).toBeDisabled();
   await expect(
     page.getByText("Blocked by your boundaries", { exact: true }),
@@ -109,7 +111,7 @@ test("keyboard submission and recoverable network errors", async ({
   await page.unroute("**/sessions/*/messages");
   await page.getByRole("button", { name: "Send ↗", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Approve simulated checkout" }),
+    page.getByRole("button", { name: "Proceed to checkout" }),
   ).toBeEnabled();
   await page.screenshot({
     path: testInfo.outputPath("beany-review.png"),
@@ -119,7 +121,7 @@ test("keyboard submission and recoverable network errors", async ({
     .getByRole("button", { name: "Cancel shopping task", exact: true })
     .click();
   await expect(
-    page.getByRole("button", { name: "Approve simulated checkout" }),
+    page.getByRole("button", { name: "Proceed to checkout" }),
   ).toHaveCount(0);
 });
 

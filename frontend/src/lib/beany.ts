@@ -36,6 +36,9 @@ export type Permissions = {
   autonomy: "guided" | "balanced";
 };
 export type Product = {
+  source?: "catalogue" | "browser_use";
+  source_url?: string;
+  observed_at?: string;
   id: string;
   name: string;
   category: string;
@@ -63,6 +66,7 @@ export type Action = {
   shares_personal_data: boolean;
 };
 export type Session = {
+  search_provider: "catalogue" | "browser_use";
   id: string;
   participant: string;
   scenario_id: string | null;
@@ -74,7 +78,8 @@ export type Session = {
   messages: { role: string; text: string }[];
   recommendations: Product[];
   proposals: Action[];
-  receipts: { id: string; product: Product; status: string }[];
+  cart: { action: Action; brief: Record<string, Fact>; added_at: string }[];
+  receipts: { id: string; proposal_id: string; timestamp: string; product: Product; status: string }[];
   events: { id: string; timestamp: string; kind: string; detail: string }[];
   suggestions: string[];
   clarification_count: number;

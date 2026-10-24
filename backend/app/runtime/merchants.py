@@ -24,7 +24,11 @@ def merchants():
     return {m.id: m for m in records}
 
 
-def merchant_for(product):
+def merchant_for(product, session=None):
+    if product.source == "browser_use":
+        if session is None or product.merchant_id not in session.live_merchants:
+            raise ValueError("Missing live listing source")
+        return session.live_merchants[product.merchant_id]
     record = merchants().get(product.merchant_id)
     if record is None:
         raise ValueError("Unknown merchant: request a fresh catalogue proposal")

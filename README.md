@@ -103,6 +103,25 @@ Live endpoint probes and synthetic shopping turns were exercised against the sel
 
 ## Merchant-risk extension
 
+Optional live product discovery is now available through Browser Use Cloud V4, disabled by default.
+See [Browser Use setup and switching guide](docs/browser-use-search.md). Catalogue/research records
+remain fictional; Browser Use listings are clearly labelled unverified web snapshots. All checkout
+and receipts remain simulated. No Browser Use live call was made during implementation.
+
+The participant UI supports a persistent session cart, `/checkout` review, and `/receipts` history.
+Adding an item is not approval. Final checkout submits specific proposal IDs and fingerprints,
+rechecks catalogue/merchant data and current permissions, and commits all selected receipts together.
+Cart lines retain their original briefs so later searches can target different categories. Budgets
+are per item; there is no aggregate basket budget or quantity editing (one unit per proposal).
+Even ALLOW proposals now wait for explicit checkout. Fresh session retains prior server sessions;
+receipt history uses session IDs stored in this browser, not a user account. Clearing browser storage
+loses access to that history. No real payment, tax, shipping or order processing is performed.
+
+Chat requests now use a bounded search-and-inspect workflow over the fictional catalogue before
+policy evaluation. See [the shopping workflow guide](docs/shopping-workflow.md) for tool contracts,
+limits, audit events and offline testing. The new planner has offline regression coverage; its
+multi-step behaviour has not yet been verified against the live NUS model.
+
 Separate product and merchant databases support fictional multi-merchant offers. Risk is predicted from observable signals; hidden labels are joined only in authenticated researcher reports. Configure thresholds, warning profiles, scenarios and evaluation using [docs/configuration-guide.md](docs/configuration-guide.md). The participant UI offers merchant details and a deterministic “Find another merchant” control. Every checkout still passes policy rechecks and action-specific approval checks.
 
 After this upgrade, start a fresh shopping request/session before approving: older proposals do not contain merchant snapshots and must not inherit approval across the schema change.

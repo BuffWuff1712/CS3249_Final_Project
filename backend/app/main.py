@@ -9,6 +9,8 @@ from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from .runtime import service, storage
+from .runtime import cart
+from .runtime.schemas import CartSelection, CartCheckout
 from .runtime.schemas import (
     Chat,
     Decision,
@@ -70,6 +72,30 @@ def health():
         )
         or os.getenv("BEANY_LLM_MODE") == "mock",
     }
+
+
+@app.post("/sessions/{sid}/cart", response_model=SessionView)
+def add_cart(sid: str, body: CartSelection):
+    return mutate(sid, lambda s: cart.add(s, body))
+
+
+@app.delete("/sessions/{sid}/cart/{pid}", response_model=SessionView)
+def remove_cart(sid: str, pid: str):
+    def remove(s):
+        s.cart = [i for i in s.cart if i.action.id != pid]
+        service.event(s, "cart_removed", pid)
+    return mutate(sid, remove)
+
+
+@app.get("/sessions/{sid}/cart/review")
+def review_cart(sid: str):
+    with storage.lock:
+        return cart.review(storage.load(sid))
+
+
+@app.post("/sessions/{sid}/cart/checkout", response_model=SessionView)
+def checkout_cart(sid: str, body: CartCheckout):
+    return mutate(sid, lambda s: cart.checkout(s, body))
 
 
 @app.post("/sessions", response_model=SessionView)
@@ -173,7 +199,7 @@ def study(scenario_id: str):
     if spec is None:
         raise LookupError("Scenario not found")
     with storage.lock:
-        s = service.create()
+        s = service.create(search_provider="catalogue")
         s.scenario_id = scenario_id
         s.brief = {k: Fact.model_validate(v) for k, v in spec["initial_brief"].items()}
         s.permissions = Permissions.model_validate(spec["permissions"])
