@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from typing import Literal
 from uuid import uuid4
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 def uid():
@@ -80,10 +80,76 @@ class RiskAssessment(Model):
     config_hash: str
 
 
+class Observed(Model):
+    # Overlong or null optional observations are clipped/blanked instead of failing a paid search run.
+    @model_validator(mode="before")
+    @classmethod
+    def clip(cls, data):
+        if not isinstance(data, dict):
+            return data
+        out = {k: v for k, v in data.items() if v is not None}
+        for name, info in cls.model_fields.items():
+            limit = next((m.max_length for m in info.metadata if hasattr(m, "max_length")), None)
+            value = out.get(name)
+            if limit is None:
+                continue
+            if isinstance(value, str):
+                out[name] = value[:limit]
+            elif isinstance(value, list):
+                out[name] = [x[:300] if isinstance(x, str) else x for x in value if x is not None][:limit]
+        return out
+
+
+class SellerEvidence(Observed):
+    # Empty means "not visible on the page", never "absent" or "safe".
+    name: str = Field(default="", max_length=200)
+    page_url: str = Field(default="", max_length=2000)
+    about: str = Field(default="", max_length=1000)
+    badges: list[str] = Field(default_factory=list, max_length=10)
+    rating: str = Field(default="", max_length=200)
+    business_name: str = Field(default="", max_length=200)
+    registration_number: str = Field(default="", max_length=100)
+    address: str = Field(default="", max_length=400)
+    email: str = Field(default="", max_length=200)
+    phone: str = Field(default="", max_length=100)
+    ships_from: str = Field(default="", max_length=200)
+
+
+class WebEvidence(Observed):
+    """Merchant and policy details observed by Browser Use; blank when not visible."""
+
+    seller: SellerEvidence = Field(default_factory=SellerEvidence)
+    return_policy: str = Field(default="", max_length=1000)
+    return_policy_url: str = Field(default="", max_length=2000)
+    refund_claims: list[str] = Field(default_factory=list, max_length=10)
+    warranty: str = Field(default="", max_length=400)
+    payment_methods: list[str] = Field(default_factory=list, max_length=20)
+    off_platform_payment: list[str] = Field(default_factory=list, max_length=10)
+    personal_data_requests: list[str] = Field(default_factory=list, max_length=10)
+    urgency_claims: list[str] = Field(default_factory=list, max_length=10)
+    agent_directed_text: list[str] = Field(default_factory=list, max_length=10)
+    shipping: str = Field(default="", max_length=400)
+    notices: list[str] = Field(default_factory=list, max_length=10)
+
+
+class RiskFinding(Model):
+    rule_id: str
+    quote: str = Field(max_length=300)
+    reason: str = Field(max_length=300)
+
+
+class LiveRiskReview(Model):
+    # Cached once per listing snapshot so repeated policy checks stay deterministic.
+    snapshot: str
+    findings: list[RiskFinding] = Field(default_factory=list)
+    discarded: int = 0
+
+
 class Product(Model):
     source: Literal["catalogue", "browser_use"] = "catalogue"
     source_url: str = ""
     observed_at: str = ""
+    web_evidence: WebEvidence | None = None
     id: str
     name: str
     category: str
@@ -173,6 +239,7 @@ class Session(Model):
     search_provider: Literal["catalogue", "browser_use"] = "catalogue"
     live_products: dict[str, Product] = Field(default_factory=dict)
     live_merchants: dict[str, Merchant] = Field(default_factory=dict)
+    live_risk: dict[str, LiveRiskReview] = Field(default_factory=dict)
     id: str = Field(default_factory=uid)
     participant: str = Field(default_factory=lambda: "P-" + uid()[:8])
     created_at: str = Field(default_factory=now)
@@ -194,6 +261,8 @@ class Session(Model):
     intervention_count: int = 0
     mode: str = "openai"
     cart: list[CartItem] = Field(default_factory=list)
+    # Fixture file replayed instead of Browser Use for this session; empty for live search.
+    search_replay: str = ""
 
 
 class Change(Model):

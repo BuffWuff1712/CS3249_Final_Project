@@ -2,7 +2,8 @@ import hashlib, json
 from pathlib import Path
 from .schemas import Product, Rule
 from .merchants import merchant_for
-from .merchant_risk import assess, session_config
+from .merchant_risk import assess, assess_live, session_config
+from .risk_agent import snapshot
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = json.loads((ROOT / "config/policy.json").read_text(encoding="utf-8-sig"))
@@ -171,8 +172,14 @@ def evaluate(s, a):
         if p.source == "browser_use":
             import re
             from datetime import datetime, timezone
-            session_config(s)  # Invalid policy configuration still blocks.
-            a.risk = None
+            config = session_config(s)  # Invalid policy configuration still blocks.
+            cached = s.live_risk.get(p.id)
+            if cached and cached.snapshot == snapshot(p):
+                a.risk = assess_live(p, merchant, catalogue(s), config, cached)
+            else:
+                a.risk = None
+                rule("risk_review_unavailable", "REVIEW", "merchant_risk",
+                     "Automated risk review of this listing is unavailable. Check the seller, returns and payment terms on the source page yourself.")
             age = (datetime.now(timezone.utc) - datetime.fromisoformat(p.observed_at)).total_seconds()
             rule("live_snapshot", "BLOCK" if age > 1800 or age < 0 else "REVIEW", "source",
                  "This is an unverified web snapshot, not a merchant safety assessment. Prices and stock may change. Refresh searches older than 30 minutes. Checkout is simulated only.")

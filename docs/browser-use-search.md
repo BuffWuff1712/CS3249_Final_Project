@@ -12,8 +12,8 @@ Add these settings to your ignored **backend/.env**, not frontend environment va
 BEANY_SEARCH_PROVIDER=browser_use
 BROWSER_USE_API_KEY=your_browser_use_cloud_key
 BROWSER_USE_ALLOWED_DOMAINS=retailer.example,another-retailer.example
-BROWSER_USE_TIMEOUT_SECONDS=120
-BROWSER_USE_MAX_COST_USD=0.5
+BROWSER_USE_TIMEOUT_SECONDS=240
+BROWSER_USE_MAX_COST_USD=1
 # Optional: select a model supported by your Browser Use account.
 # BROWSER_USE_MODEL=
 ```
@@ -34,10 +34,63 @@ fingerprints predate the new provenance fields. Existing receipts remain histori
 To revert, set `BEANY_SEARCH_PROVIDER=catalogue`, restart the backend and start a fresh session.
 Do not run the cloud quickstart simply to check configuration: it starts billable infrastructure.
 
+## Replay study listings (no web search)
+
+To test the whole flow (conversation, clarification, search, risk review, cart and checkout) with
+listings that are known to contain risk cues, replay the study dataset instead of calling Browser Use:
+
+```dotenv
+BEANY_SEARCH_PROVIDER=browser_use
+BROWSER_USE_REPLAY=data/replay/study_listings.json
+BEANY_LLM_MODE=openai
+```
+
+Restart the backend and click **Fresh session**. The replay path is saved per session, like the
+provider. No Browser Use key, retailer list or credits are needed, and no network call is made for
+search. Everything after search is unchanged: the configured model still runs clarification, the
+search planner, the risk review agent and explanations. The UI labels these sessions as replays.
+Use `BEANY_LLM_MODE=openai`. In mock mode the risk agent only reads the verbatim evidence lists,
+which replayed study listings leave empty, so every offer comes out LOW.
+
+A replay search returns every fixture listing in the brief's category whose name, brand, category,
+description or attributes contain all search words. Only the top four appear as recommendations;
+**Find another merchant** moves through the remaining offers. The supported categories come from the
+fixture (Headphones, Running shoes and Backpacks for the study data). Fixture hosts use reserved
+`.test` domains, which are accepted only in replay sessions.
+
+`backend/scripts/build_replay_fixture.py` generates the fixture from `data/products/catalogue.json`
+and `data/merchants/merchants.json`. It never reads `data/research/`. Only shopper-visible text is
+mapped:
+
+| Study field | Replayed evidence field |
+|---|---|
+| merchant name, website | seller name, seller page URL; product URL is `<website>/products/<product id>` |
+| merchant description | seller about |
+| contact | seller email (or phone) |
+| verified business | seller badge "Verified business" |
+| merchant review count and rating | seller rating as displayed |
+| return policy, payment methods | return policy, payment methods listed |
+| checkout note | page notices |
+| product name, brand, price, attributes, sizes, description, stock | same listing fields |
+
+Product and merchant reviews, specifications, `requested_information` (only visible at checkout) and
+the boolean risk flags are not converted. Variants whose cue appears only in those fields, such as
+reviews or a missing contact, are expected to be missed by the agent. Blank fields are never evidence.
+Rebuild after editing study data (from `backend/`):
+
+```sh
+.venv/bin/python -m scripts.build_replay_fixture
+.venv/bin/python -m scripts.build_replay_fixture --only study-hp-target-trusted,study-hp-target-external --output data/replay/hp_pair.json
+```
+
+`tests/test_replay.py` fails if the committed fixture is out of date.
+
 ## Behaviour and boundaries
 
-The adapter posts a task with outputSchema and maxCostUsd, polls the run, validates output with
-Pydantic and validates returned HTTPS product URLs against the retailer list. It never follows
+The adapter posts a task with outputSchema and maxCostUsd, polls the run, and validates each returned
+listing separately with Pydantic plus a check that its HTTPS product URL is on the retailer list. Currency
+symbols are normalised (S$ or S to SGD, US$ to USD; a bare $ is rejected). Invalid listings are skipped;
+the search fails only when every returned listing is invalid. It never follows
 provider redirects carrying credentials. There is no automatic provider fallback or task retry.
 Up to two search tool calls can each start a run; the cost setting is per run, not per conversation.
 Timeout cancels the known run on a best-effort basis. If creation times out before an ID is returned,
@@ -52,9 +105,10 @@ agent: these behavioural instructions are not a hard read-only browser sandbox. 
 constrains accepted results and instructs navigation; it is not a provider-enforced network allowlist.
 
 Results are unverified snapshots saved with the session. Details inspection reads that snapshot,
-not another paid browse. Existing brief filters still apply. Live merchant risk is unknown: fictional
-fraud classifications are not reused. Live proposals require review; detected instruction injection
-and existing hard-constraint checks still block. Snapshots older than 30 minutes cannot check out.
+not another paid browse. Existing brief filters still apply. Fictional fraud classifications are not
+reused; live risk comes from the captured evidence and review agent described below. Live proposals
+always require review; detected instruction injection and existing hard-constraint checks still block.
+Snapshots older than 30 minutes cannot check out.
 Cart and checkout use snapshot data and **never call Browser Use** or a merchant purchase endpoint.
 They do not verify the current live price, delivery, taxes, actual accepted payments or real stock.
 To refresh, search again and replace the old cart item. Checkout and receipts remain simulated.
@@ -63,9 +117,34 @@ The app remains a local single-worker prototype; synchronous browser searches ho
 and can take several minutes across multiple calls. UI cancellation cannot interrupt that locked request;
 use the Browser Use dashboard to stop an active run. Background jobs/streaming are a future upgrade.
 
+## Captured evidence and risk review
+
+Each listing may also carry `web_evidence` (`schemas.WebEvidence`): seller name, page link, store description, badges,
+displayed rating, business name, registration number, address, email, phone and ships-from location;
+return policy summary and link, refund promises, warranty, listed payment methods, off-site payment
+instructions, personal-information requests, urgency claims, text aimed at AI assistants, shipping and
+other page notices.
+Browser Use reads only the product page plus the seller and return-policy pages linked from it on the
+same retailer. Images, review lists, other websites and price research are out of scope. Every field is
+optional: a blank field means "not visible", and is neither a risk signal nor evidence of safety. Null
+or overlong values are blanked or clipped instead of failing the run; links outside the retailer list are
+dropped. A named seller becomes its own merchant ID, so "Find another merchant" excludes that seller
+rather than the whole retailer. This extra browsing raises the cost and duration of each run.
+
+When a live product is proposed, `runtime/risk_agent.py` makes one call to the configured model. It
+reports signals from the existing merchant-risk categories (except `low_price`). Every finding must quote
+the captured text. Findings whose quote does not appear in the snapshot are discarded, and each rule
+counts once. Python scores the remaining findings with `merchant_risk_rules.json`, using the same
+weights, levels and decisions as the catalogue. External payment and injection always block. `low_price`
+is computed deterministically against other captured listings from the same session, with no extra
+browsing. The review is cached per product snapshot, so cart review and checkout reuse it instead of
+calling the model again. If the agent fails, the proposal shows "Automated risk review of this listing is
+unavailable" and stays at REVIEW. Mock mode flags only the verbatim evidence lists, so it can run offline.
+The agent can make a proposal stricter but never less strict than REVIEW.
+
 ## Validation
 
-Offline tests in tests/test_browser_search.py use httpx.MockTransport and fixtures; no paid calls.
+Offline tests in tests/test_browser_search.py and tests/test_risk_agent.py use httpx.MockTransport and fixtures; no paid calls.
 Live compatibility and result quality have not been tested with your account. Start with a small
 manual search when you choose to enable it, and inspect both the source listing and Cloud run.
 

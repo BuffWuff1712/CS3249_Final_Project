@@ -6,6 +6,7 @@ from .llm import OpenAIConversation, explain_outcome
 from .merchants import merchant_for
 from .merchant_risk import load_config, digest
 from .shopping_workflow import run_shopping
+from .risk_agent import review as review_listing
 
 llm = OpenAIConversation()
 ELICITATION_PATH = Path(__file__).resolve().parents[2] / "config/elicitation.json"
@@ -66,8 +67,10 @@ def edit(s, field, fact):
 
 
 def create(*, search_provider=None):
-    from .browser_search import configured_provider
+    from .browser_search import configured_provider, configured_replay
     s = Session(mode=os.getenv("BEANY_LLM_MODE", "openai"), search_provider=search_provider or configured_provider())
+    if s.search_provider == "browser_use":
+        s.search_replay = configured_replay()
     config = load_config()
     s.experiment = {
         "profile": "standard",
@@ -83,6 +86,8 @@ def create(*, search_provider=None):
     )
     if s.search_provider == "browser_use":
         s.messages[-1].text = "Hi, I’m Beany. Tell me what you’re shopping for. I can search public product listings using Browser Use. Prices and merchant details need review; checkout here is always simulated."
+        if s.search_replay:
+            s.messages[-1].text = "Hi, I’m Beany. Tell me what you’re shopping for. This session replays saved study listings instead of searching the web. Prices and merchant details need review; checkout here is always simulated."
     event(s, "session_started", "Fresh shopping session")
     return s
 
@@ -139,6 +144,9 @@ def propose(s, product=None, *, recommendations=None, **kwargs):
             return
         product = s.recommendations[0]
     merchant = merchant_for(product, s)
+    if product.source == "browser_use":
+        # One cached agent review per snapshot; later policy rechecks reuse it.
+        review_listing(s, product, merchant)
     allowed = [
         m for m in s.permissions.payment_methods if m in merchant.payment_methods
     ]

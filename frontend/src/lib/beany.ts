@@ -35,10 +35,37 @@ export type Permissions = {
   restricted_merchants: string[];
   autonomy: "guided" | "balanced";
 };
+export type WebEvidence = {
+  seller: {
+    name: string;
+    page_url: string;
+    about: string;
+    badges: string[];
+    rating: string;
+    business_name: string;
+    registration_number: string;
+    address: string;
+    email: string;
+    phone: string;
+    ships_from: string;
+  };
+  return_policy: string;
+  return_policy_url: string;
+  refund_claims: string[];
+  warranty: string;
+  payment_methods: string[];
+  off_platform_payment: string[];
+  personal_data_requests: string[];
+  urgency_claims: string[];
+  agent_directed_text: string[];
+  shipping: string;
+  notices: string[];
+};
 export type Product = {
   source?: "catalogue" | "browser_use";
   source_url?: string;
   observed_at?: string;
+  web_evidence?: WebEvidence | null;
   id: string;
   name: string;
   category: string;
@@ -67,6 +94,7 @@ export type Action = {
 };
 export type Session = {
   search_provider: "catalogue" | "browser_use";
+  search_replay?: string;
   id: string;
   participant: string;
   scenario_id: string | null;

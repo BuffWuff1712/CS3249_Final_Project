@@ -71,7 +71,7 @@ def test_live_results_use_existing_policy_and_simulated_cart(config, monkeypatch
     assert len(found) == 1 and found[0].source == "browser_use"
     service.propose(s, found[0])
     a = s.proposals[-1]
-    assert a.decision == "REVIEW" and a.risk is None and not s.receipts
+    assert a.decision == "REVIEW" and a.risk.level == "LOW" and not s.receipts
     chosen = CartSelection(proposal_id=a.id, fingerprint=a.fingerprint)
     cart.add(s, chosen)
     cart.checkout(s, CartCheckout(items=[chosen]))
@@ -100,3 +100,67 @@ def test_missing_key_fails_before_network(monkeypatch):
     monkeypatch.delenv("BROWSER_USE_API_KEY", raising=False)
     with pytest.raises(LLMError, match="BROWSER_USE_API_KEY"):
         browser.run_task({}, "")
+
+
+AMAZON = {"url": "https://www.amazon.sg/Brooks-Adrenaline-Supportive-Running-Shoes/dp/B0DM3S2J3J",
+          "name": "Brooks Men's Adrenaline GTS 25", "brand": "Brooks", "price": 178.08, "currency": "S",
+          "attributes": ["Sole material: Rubber"], "sizes": ["9 US"], "description": "Supportive running shoe.",
+          "in_stock": True, "evidence": {
+              "seller": {"name": "Amazon US", "page_url": "https://www.amazon.sg/sp?seller=ARPIJN329XQ0D",
+                         "business_name": "Amazon Export Sales LLC", "badges": [], "rating": ""},
+              "urgency_claims": ["Only 1 left in stock."], "payment_methods": [],
+              "return_policy_url": "https://www.amazon.sg/gp/help/customer/display.html/?nodeId=GV38326YW5JX9V9X"}}
+
+
+def completed(products, monkeypatch, domains="amazon.sg"):
+    monkeypatch.setenv("BROWSER_USE_ALLOWED_DOMAINS", domains)
+    def handler(req):
+        if req.method == "POST":
+            return httpx.Response(200, json={"id": RUN})
+        return httpx.Response(200, json={"status": "completed", "output": {"products": products}})
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        return browser.run_task({"category": "Running shoes"}, "", client=client)[1]
+
+
+@pytest.mark.parametrize("raw,code", [("S", "SGD"), ("S$", "SGD"), (" sgd ", "SGD"), ("US$", "USD")])
+def test_currency_symbols_normalised(raw, code):
+    assert browser.Listing.model_validate(listing(currency=raw)).currency == code
+
+
+def test_bare_dollar_stays_ambiguous():
+    assert browser.Listing.model_validate(listing(currency="$")).currency == "$"
+
+
+def test_real_amazon_output_is_accepted(config, monkeypatch):
+    out = completed([AMAZON], monkeypatch)
+    row = out.products[0]
+    assert row.currency == "SGD" and row.evidence.seller.business_name == "Amazon Export Sales LLC"
+
+
+def test_invalid_rows_are_skipped_not_fatal(config, monkeypatch):
+    bad_currency = {**AMAZON, "currency": "$"}
+    off_list = {**AMAZON, "url": "https://evil.example/x"}
+    no_price = {**AMAZON, "price": 0}
+    out = completed([bad_currency, off_list, no_price, AMAZON], monkeypatch)
+    assert len(out.products) == 1 and out.products[0].url == AMAZON["url"]
+
+
+def test_all_rows_invalid_reports_why(config, monkeypatch):
+    with pytest.raises(LLMError, match="none had an SGD/USD price"):
+        completed([{**AMAZON, "currency": "JPY"}], monkeypatch)
+
+
+def test_empty_result_is_not_an_error(config, monkeypatch):
+    assert completed([], monkeypatch).products == []
+
+
+def test_prompt_requests_iso_currency(config, monkeypatch):
+    calls = []
+    def handler(req):
+        calls.append(req)
+        if req.method == "POST":
+            return httpx.Response(200, json={"id": RUN})
+        return httpx.Response(200, json={"status": "completed", "output": {"products": []}})
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        browser.run_task({}, "", client=client)
+    assert "ISO code SGD or USD" in json.loads(calls[0].content)["task"]

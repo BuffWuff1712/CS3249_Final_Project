@@ -150,7 +150,7 @@ export default function Home() {
       <div className="demo-note">
         SANDBOX{" "}
         <span>
-          {session?.search_provider === "browser_use" ? "Browser Use live search · unverified listings · simulated checkout." : "Fictional products and simulated checkout."}{" "}
+          {session?.search_replay ? "Replay of saved study listings (no web search) · simulated checkout." : session?.search_provider === "browser_use" ? "Browser Use live search · unverified listings · simulated checkout." : "Fictional products and simulated checkout."}{" "}
           {session?.mode === "mock"
             ? "MOCK LLM MODE — offline test responses."
             : "Conversation via your configured NUS model."}
@@ -207,7 +207,7 @@ export default function Home() {
             {a && (
               <article className="product-card">
                 <div className="row">
-                  <span className="tag">{a.product.category} · {a.product.source === "browser_use" ? "live listing" : "fictional"}</span>
+                  <span className="tag">{a.product.category} · {a.product.source !== "browser_use" ? "fictional" : session?.search_replay ? "replayed listing" : "live listing"}</span>
                   <span className="tag">{a.status}</span>
                 </div>
                 <h3>{a.product.name}</h3>

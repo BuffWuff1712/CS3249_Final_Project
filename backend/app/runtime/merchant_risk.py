@@ -76,19 +76,9 @@ def assess(product, merchant, comparables, config):
             RiskEvidence(rule_id=rule, evidence=text, weight=config.weights[rule])
         )
 
-    prices = [
-        p.price
-        for p in comparables
-        if p.id != product.id
-        and p.category == product.category
-        and p.brand == product.brand
-        and p.currency == product.currency
-    ]
-    if prices and product.price < median(prices) * config.low_price_ratio:
-        add(
-            "low_price",
-            f"Price {product.price:.2f} is below {config.low_price_ratio:.0%} of the comparable-brand median {median(prices):.2f} {product.currency}. A discount alone does not establish wrongdoing.",
-        )
+    cheap = low_price(product, comparables, config)
+    if cheap:
+        add("low_price", cheap)
     if not merchant.contact.strip() or not merchant.verified_business:
         add(
             "missing_business",
@@ -148,28 +138,31 @@ def assess(product, merchant, comparables, config):
             "injection",
             "The description contains instructions aimed at changing assistant behaviour; these are treated as untrusted content.",
         )
-    score = sum(e.weight for e in evidence)
+    # Non-negotiable application safeguards cannot be tuned away.
+    force_block = bool(
+        merchant.external_payment
+        or excessive & {"password", "bank_password", "card_number", "government_id"}
+        or any(e.rule_id == "injection" for e in evidence)
+    )
+    return score(merchant, evidence, config, force_block, "observable simulation signals")
+
+
+def score(merchant, evidence, config, force_block, basis):
+    total = sum(e.weight for e in evidence)
     level = (
         "CRITICAL"
-        if score >= config.critical
+        if total >= config.critical
         else "HIGH"
-        if score >= config.high
+        if total >= config.high
         else "MEDIUM"
-        if score >= config.medium
+        if total >= config.medium
         else "LOW"
     )
     if evidence and all(e.rule_id == "low_price" for e in evidence):
         level = "LOW"
-    decision = config.decisions[level]
-    # Non-negotiable application safeguards cannot be tuned away.
-    if (
-        merchant.external_payment
-        or excessive & {"password", "bank_password", "card_number", "government_id"}
-        or any(e.rule_id == "injection" for e in evidence)
-    ):
-        decision = "BLOCK"
+    decision = "BLOCK" if force_block else config.decisions[level]
     explanation = (
-        f"{merchant.name}: {level.lower()} predicted risk from observable simulation signals. "
+        f"{merchant.name}: {level.lower()} predicted risk from {basis}. "
         + (
             " ".join(e.evidence for e in evidence)
             if config.explanation_detail == "detailed"
@@ -182,10 +175,43 @@ def assess(product, merchant, comparables, config):
     return RiskAssessment(
         merchant_id=merchant.id,
         level=level,
-        score=score,
+        score=total,
         evidence=evidence,
         recommended_decision=decision,
         explanation=explanation,
         config_version=config.version,
         config_hash=digest(config),
     )
+
+
+def low_price(product, comparables, config):
+    prices = [
+        p.price
+        for p in comparables
+        if p.id != product.id
+        and p.category == product.category
+        and p.brand == product.brand
+        and p.currency == product.currency
+    ]
+    if prices and product.price < median(prices) * config.low_price_ratio:
+        return f"Price {product.price:.2f} is below {config.low_price_ratio:.0%} of the comparable-brand median {median(prices):.2f} {product.currency}. A discount alone does not establish wrongdoing."
+    return None
+
+
+def assess_live(product, merchant, comparables, config, review):
+    """Score grounded agent findings for a web snapshot; blank page fields are never evidence."""
+    evidence = [
+        RiskEvidence(
+            rule_id=f.rule_id,
+            evidence=f"{f.reason} Observed: \u201c{f.quote}\u201d",
+            weight=config.weights[f.rule_id],
+        )
+        for f in review.findings
+    ]
+    cheap = low_price(product, comparables, config)
+    if cheap:
+        evidence.append(
+            RiskEvidence(rule_id="low_price", evidence=cheap + " Compared with other captured listings only.", weight=config.weights["low_price"])
+        )
+    force_block = any(e.rule_id in ("external_payment", "injection") for e in evidence)
+    return score(merchant, evidence, config, force_block, "the captured listing details")
