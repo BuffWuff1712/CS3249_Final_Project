@@ -71,7 +71,7 @@ def test_live_results_use_existing_policy_and_simulated_cart(config, monkeypatch
     assert len(found) == 1 and found[0].source == "browser_use"
     service.propose(s, found[0])
     a = s.proposals[-1]
-    assert a.decision == "REVIEW" and a.risk is None and not s.receipts
+    assert a.decision == "REVIEW" and a.risk.level == "LOW" and not s.receipts
     chosen = CartSelection(proposal_id=a.id, fingerprint=a.fingerprint)
     cart.add(s, chosen)
     cart.checkout(s, CartCheckout(items=[chosen]))

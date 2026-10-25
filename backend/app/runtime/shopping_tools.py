@@ -7,6 +7,9 @@ from .merchants import merchant_for
 
 def supported_categories(session):
     if session.search_provider == "browser_use" and not session.scenario_id:
+        if session.search_replay:
+            from .browser_search import replay_categories
+            return replay_categories(session.search_replay)
         return []  # Open-ended public product search, not the study category list.
     return sorted({p.category for p in policy.catalogue(session)})
 

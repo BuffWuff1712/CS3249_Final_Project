@@ -32,6 +32,7 @@ try an impossible budget. Approval must still refer to the displayed proposal.
 
 Limitations: keyword matching is literal; there is no synonym expansion, live inventory or basket
 planning. The additional model decisions add latency and consume gateway usage (up to eight calls
-including interpretation and final explanation). Existing single-worker locking remains. Structured
+including interpretation and final explanation, plus one risk-review call per newly proposed
+Browser Use listing). Existing single-worker locking remains. Structured
 steps use the existing gateway JSON adapter, not native provider tool-calling. Model explanations
 remain generated wording; the proposal card and policy records are authoritative.
