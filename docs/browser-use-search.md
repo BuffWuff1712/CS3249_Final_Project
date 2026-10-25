@@ -12,8 +12,8 @@ Add these settings to your ignored **backend/.env**, not frontend environment va
 BEANY_SEARCH_PROVIDER=browser_use
 BROWSER_USE_API_KEY=your_browser_use_cloud_key
 BROWSER_USE_ALLOWED_DOMAINS=retailer.example,another-retailer.example
-BROWSER_USE_TIMEOUT_SECONDS=120
-BROWSER_USE_MAX_COST_USD=0.5
+BROWSER_USE_TIMEOUT_SECONDS=240
+BROWSER_USE_MAX_COST_USD=1
 # Optional: select a model supported by your Browser Use account.
 # BROWSER_USE_MODEL=
 ```
@@ -87,8 +87,10 @@ Rebuild after editing study data (from `backend/`):
 
 ## Behaviour and boundaries
 
-The adapter posts a task with outputSchema and maxCostUsd, polls the run, validates output with
-Pydantic and validates returned HTTPS product URLs against the retailer list. It never follows
+The adapter posts a task with outputSchema and maxCostUsd, polls the run, and validates each returned
+listing separately with Pydantic plus a check that its HTTPS product URL is on the retailer list. Currency
+symbols are normalised (S$ or S to SGD, US$ to USD; a bare $ is rejected). Invalid listings are skipped;
+the search fails only when every returned listing is invalid. It never follows
 provider redirects carrying credentials. There is no automatic provider fallback or task retry.
 Up to two search tool calls can each start a run; the cost setting is per run, not per conversation.
 Timeout cancels the known run on a best-effort basis. If creation times out before an ID is returned,

@@ -52,6 +52,8 @@ Configure `backend/.env` using `backend/.env.example`. Obtain your NUS SoCLaaS A
 
 Responses is the default API mode; Chat Completions is an explicit compatible adapter. The selected NUS model passed endpoint probes, but full-schema responses require explicit JSON instructions plus Pydantic validation; accepting a schema parameter does not prove constrained decoding. See [configuration guide](docs/configuration-guide.md) for exact settings, empirical compatibility results, model listing and connectivity commands.
 
+Any OpenAI-compatible HTTPS endpoint works through the same settings. For DeepSeek, use `OPENAI_BASE_URL=https://api.deepseek.com/v1`, `OPENAI_API_MODE=chat`, `OPENAI_STRUCTURED_MODE=json`, a blank `OPENAI_REASONING_EFFORT`, and a model listed by `python -m app.check_gateway` (`deepseek-flash` was used for testing). `backend/.env.example` shows both setups. Run `python -m app.check_gateway --generate` from `backend/` before starting the app; it consumes a small amount of credit.
+
 For offline testing set `BEANY_LLM_MODE=mock`. This mode is visibly labelled and is not a substitute for real conversational evaluation. Missing credentials never silently activate it. The API key must never appear in frontend variables or Git. Only recent conversation and observable catalogue/merchant/risk data are sent to the configured model; hidden ground truth is never included.
 
 ## Using Beany
@@ -76,6 +78,8 @@ npm run test:e2e
 
 On macOS/Linux use `.venv/bin/python`. Playwright starts isolated servers at 3100/8100 with an explicit mock LLM and test SQLite file. It exercises desktop and mobile layouts, approval/receipt persistence, cancellation, hard blocking and exports.
 
+Pytest never uses your `backend/.env`: `backend/tests/conftest.py` pins mock mode, catalogue search, blank API keys and a temporary database before the app is imported, so a live configuration cannot trigger paid model or Browser Use calls from the test suite.
+
 Your original learning modules (`workflow.py`, `review.py`, `checkout.py`, `shopping_service.py`, etc.) remain intact as optional exercises. The integrated `app.main` does **not** import LangGraph. `legacy_main.py` preserves the earlier scripted API for regression tests only. To run LangGraph exercises/tests, install `requirements-legacy.txt`; those tests skip when LangGraph is absent. Do not expose the legacy app as the participant backend.
 
 ## Study sessions
@@ -90,6 +94,9 @@ Open http://localhost:3000/research and enter the backend researcher key. Start 
 - Scenarios: `backend/data/scenarios/scenarios.json`
 - UI: `frontend/src/app/page.tsx`, `frontend/src/components/Brief.tsx`, `frontend/src/app/globals.css`
 - Backend state/orchestration: `backend/app/runtime/`
+- Browser Use task and captured evidence fields: `backend/app/runtime/browser_search.py`, `backend/app/runtime/schemas.py` (`WebEvidence`)
+- Live-listing risk review prompt and grounding: `backend/app/runtime/risk_agent.py`; weights and levels: `backend/config/merchant_risk_rules.json`
+- Replay fixture: `backend/data/replay/study_listings.json`, rebuilt by `python -m scripts.build_replay_fixture`
 
 See `docs/architecture.md` and `docs/editing-guide.md` for details.
 
@@ -99,14 +106,21 @@ This is a local, single-worker study application, not an internet deployment. Se
 
 LLM extraction remains probabilistic. Confirmed changes need a supporting quote and pass deterministic field validation; quote matching cannot prove semantic correctness. The editable brief and receipts make interpretation inspectable. Unknown free-text requirements require review. Search uses deterministic keyword/brand matching, not semantic retrieval. USD requests may have no matches because the seeded catalogue uses SGD. Prices use fixed catalogue decimals; no real financial processing occurs.
 
-Live endpoint probes and synthetic shopping turns were exercised against the selected NUS model. Broader conversational quality still requires human-reviewed evaluations. Automated tests validate deterministic behaviour and gateway contracts. LangGraph, MCP, RAG, website automation and real checkout are absent from the runtime.
+Live endpoint probes and synthetic shopping turns were exercised against the selected NUS model. Broader conversational quality still requires human-reviewed evaluations. Automated tests validate deterministic behaviour and gateway contracts. LangGraph, MCP, RAG and real checkout are absent from the runtime. Website automation is limited to optional, read-only Browser Use product search.
 
 ## Merchant-risk extension
 
 Optional live product discovery is now available through Browser Use Cloud V4, disabled by default.
 See [Browser Use setup and switching guide](docs/browser-use-search.md). Catalogue/research records
 remain fictional; Browser Use listings are clearly labelled unverified web snapshots. All checkout
-and receipts remain simulated. No Browser Use live call was made during implementation.
+and receipts remain simulated. Live search was checked manually against amazon.sg.
+
+Browser Use also captures seller, return-policy, payment and page-notice details when visible
+(blank when not). A risk review agent checks each proposed live listing once: every finding must
+quote the captured text, and Python scores the findings with the existing merchant-risk weights.
+External payment and injection always block. Live listings never drop below REVIEW. To test the full
+flow with known risk cues and no web search, set `BROWSER_USE_REPLAY` to replay the study listings.
+Details and the field mapping are in the [Browser Use guide](docs/browser-use-search.md).
 
 The participant UI supports a persistent session cart, `/checkout` review, and `/receipts` history.
 Adding an item is not approval. Final checkout submits specific proposal IDs and fingerprints,
@@ -119,8 +133,8 @@ loses access to that history. No real payment, tax, shipping or order processing
 
 Chat requests now use a bounded search-and-inspect workflow over the fictional catalogue before
 policy evaluation. See [the shopping workflow guide](docs/shopping-workflow.md) for tool contracts,
-limits, audit events and offline testing. The new planner has offline regression coverage; its
-multi-step behaviour has not yet been verified against the live NUS model.
+limits, audit events and offline testing. The new planner has offline regression coverage. Its
+multi-step behaviour was exercised manually with DeepSeek (replay and live search), not yet with the NUS model.
 
 Separate product and merchant databases support fictional multi-merchant offers. Risk is predicted from observable signals; hidden labels are joined only in authenticated researcher reports. Configure thresholds, warning profiles, scenarios and evaluation using [docs/configuration-guide.md](docs/configuration-guide.md). The participant UI offers merchant details and a deterministic “Find another merchant” control. Every checkout still passes policy rechecks and action-specific approval checks.
 
