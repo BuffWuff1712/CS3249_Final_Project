@@ -91,7 +91,10 @@ The adapter posts a task with outputSchema and maxCostUsd, polls the run, and va
 listing separately with Pydantic plus a check that its HTTPS product URL is on the retailer list. Currency
 symbols are normalised (S$ or S to SGD, US$ to USD; a bare $ is rejected). Invalid listings are skipped;
 the search fails only when every returned listing is invalid. It never follows
-provider redirects carrying credentials. There is no automatic provider fallback or task retry.
+provider redirects carrying credentials. There is no automatic provider fallback or task-creation retry.
+Status reads of an existing run retry transient transport errors and HTTP 429/502/503/504, up to three
+attempts per read with 1- and 2-second backoff (or a longer numeric Retry-After). Retries stay within
+the overall search deadline. Authentication, validation and other permanent errors are not retried.
 Up to two search tool calls can each start a run; the cost setting is per run, not per conversation.
 Timeout cancels the known run on a best-effort basis. If creation times out before an ID is returned,
 or cancellation fails, inspect Cloud dashboard runs before retrying. A finished browser may remain
@@ -116,6 +119,46 @@ To refresh, search again and replace the old cart item. Checkout and receipts re
 The app remains a local single-worker prototype; synchronous browser searches hold its mutation lock
 and can take several minutes across multiple calls. UI cancellation cannot interrupt that locked request;
 use the Browser Use dashboard to stop an active run. Background jobs/streaming are a future upgrade.
+
+## Diagnosing failed searches
+
+The normal Uvicorn command now prints JSON diagnostic events alongside its access logs at INFO.
+No extra logging flag or package is needed. The diagnostics answer:
+
+- Did the request reach the backend, finish, or raise an exception?
+- Did task creation succeed, which cloud run was created, and what status did it reach?
+- Did polling, result validation, a model call or saving the session fail, and how long did it take?
+
+Follow a single `request_id` through `request_started`, `stage_started` / `stage_finished`,
+`browser_run_created`, `browser_run_status`, `browser_results_validated`, `model_call_finished`
+and `request_finished`. Model logs include the output schema name, which distinguishes interpretation,
+shopping planning and risk review. Browser logs include the provider `run_id` for dashboard lookup.
+Repeated unchanged cloud statuses are DEBUG; status transitions, retries and failures are visible at INFO.
+`browser_listing_rejected` identifies schema, source URL or currency validation as the reason.
+
+Handled errors retain their specific message and add `request_id` to the JSON response. Unexpected
+errors return a generic 500 with a visible reference and CORS headers, rather than exposing exception
+details. `X-Request-ID` is also returned and exposed to browser clients. In DevTools, inspect the
+failed messages request and match this header to the terminal logs. A server-side 200 alone does not
+prove the browser received and processed the complete response. If no new `request_started` appears,
+check the browser's Network/Console output for connection, preflight or origin failures.
+
+Diagnostic logs exclude chat/brief contents, keys, response bodies, product URLs, raw exception
+messages and session IDs. Unexpected exceptions record their class and stack frame file/line/function
+without local values or source excerpts. Do not enable provider SDK/HTTP debug logging or dump bodies
+to diagnose this feature; those can reveal private content. Uvicorn's own access logs still include
+request paths, as before. Logs go to the terminal, not a new persistent file.
+
+`browser_run_failed` with `stage=create` and `outcome_unknown=true` means task creation failed before
+a usable run ID was received; the provider may still have started a paid run. Check the cloud dashboard
+before retrying manually. `browser_cancel_failed` also requires dashboard inspection. Neither case
+automatically creates another run.
+
+These diagnostics and polling retries do not remove the long HTTP request. A more resilient next step
+is a persisted background job: return a job ID immediately, save its provider run ID as soon as creation
+succeeds, let the UI poll progress and retrieve the saved result after refresh/disconnect. Deduplicate
+job submissions with an idempotency key and keep cloud work outside the session-wide mutation lock.
+That requires a separate change to the request lifecycle and UI; it is not implemented here.
 
 ## Captured evidence and risk review
 

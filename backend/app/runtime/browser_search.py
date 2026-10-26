@@ -1,6 +1,7 @@
 """Optional Browser Use Cloud V4 product discovery; never an ordering adapter."""
 import hashlib
 import json
+import logging
 import math
 import os
 import re
@@ -12,6 +13,7 @@ import httpx
 from pydantic import field_validator
 from .schemas import Model, Field, Product, Merchant, Event, WebEvidence, now
 from .gateway import LLMError
+from .diagnostics import log
 
 BASE = "https://api.browser-use.com/api/v4"
 ROOT = Path(__file__).resolve().parents[2]
@@ -83,13 +85,18 @@ def usable_output(raw, hosts):
     if not isinstance(rows, list):
         raise TypeError("products must be a list")
     kept = []
-    for item in rows[:8]:
+    for index, item in enumerate(rows[:8]):
+        reason = "schema"
         try:
             row = Listing.model_validate(item)
+            reason = "source_url"
             allowed_url(row.url, hosts)
+            reason = "currency"
             if row.currency not in ("SGD", "USD"):
                 raise ValueError("Unsupported currency")
-        except ValueError:
+        except ValueError as exc:
+            log("browser_listing_rejected", level=logging.WARNING, index=index,
+                reason=reason, error_type=type(exc).__name__)
             continue
         kept.append(row)
     if rows and not kept:
@@ -97,7 +104,43 @@ def usable_output(raw, hosts):
             f"Browser Use returned {len(rows)} listing(s), but none had an SGD/USD price and a product link "
             "on the configured retailers. No fallback was used."
         )
+    log("browser_results_validated", returned_count=len(rows), accepted_count=len(kept))
     return SearchOutput(products=kept)
+
+
+TIMEOUT_MESSAGE = "Browser Use search timed out; cancellation will be requested. No fallback was used."
+
+
+def poll_run(client, run_id, headers, deadline, sleep, clock):
+    """Retry only idempotent reads of a known run, within the search deadline."""
+    for attempt in range(1, 4):
+        remaining = deadline - clock()
+        if remaining <= 0:
+            raise LLMError(TIMEOUT_MESSAGE)
+        try:
+            response = client.get(BASE + "/runs/" + run_id, headers=headers,
+                                  timeout=min(20, remaining))
+            response.raise_for_status()
+            return response
+        except (httpx.TransportError, httpx.HTTPStatusError) as exc:
+            status = exc.response.status_code if isinstance(exc, httpx.HTTPStatusError) else None
+            if attempt == 3 or (status is not None and status not in (429, 502, 503, 504)):
+                raise
+            delay = float(2 ** (attempt - 1))
+            if status is not None:
+                try:
+                    retry_after = float(exc.response.headers.get("Retry-After", "0"))
+                    if math.isfinite(retry_after):
+                        delay = max(delay, retry_after)
+                except ValueError:
+                    pass
+            remaining = deadline - clock()
+            if remaining <= delay:
+                raise LLMError(TIMEOUT_MESSAGE) from None
+            log("browser_poll_retry", level=logging.WARNING, run_id=run_id,
+                attempt=attempt, delay_seconds=delay, status_code=status,
+                error_type=type(exc).__name__)
+            sleep(delay)
 
 
 def run_task(brief, query, *, client=None, sleep=time.sleep, clock=time.monotonic):
@@ -156,35 +199,58 @@ def run_task(brief, query, *, client=None, sleep=time.sleep, clock=time.monotoni
     run_id = None
     terminal = False
     started = clock()
+    stage = "create"
+    log("browser_run_starting", timeout_seconds=timeout, max_cost_usd=cost)
     try:
         response = client.post(BASE + "/runs", headers=headers, json=payload)
         response.raise_for_status()
         run_id = str(UUID(response.json()["id"]))
+        log("browser_run_created", run_id=run_id)
+        stage = "poll"
+        previous_status = None
         while clock() - started < timeout:
-            response = client.get(BASE + "/runs/" + run_id, headers=headers)
-            response.raise_for_status()
+            response = poll_run(client, run_id, headers, started + timeout, sleep, clock)
             data = response.json()
             status = data["status"]
+            if status not in ("queued", "dispatching", "running", "completed", "failed", "cancelled"):
+                raise ValueError("Unknown run status")
+            # Status transitions at INFO; identical polls at DEBUG to avoid noise.
+            log("browser_run_status", level=logging.INFO if status != previous_status else logging.DEBUG,
+                run_id=run_id, status=status, elapsed_seconds=round(clock() - started, 2))
+            previous_status = status
             if status in ("completed", "failed", "cancelled"):
                 terminal = True
                 if status != "completed":
                     raise LLMError("Browser Use search did not complete. No catalogue fallback was used.")
-                return run_id, usable_output(data.get("output"), hosts)
-            if status not in ("queued", "dispatching", "running"):
-                raise ValueError("Unknown run status")
-            sleep(2)
-        raise LLMError("Browser Use search timed out; cancellation will be requested. No fallback was used.")
+                stage = "validate"
+                output = usable_output(data.get("output"), hosts)
+                log("browser_run_completed", run_id=run_id, product_count=len(output.products),
+                    elapsed_seconds=round(clock() - started, 2))
+                return run_id, output
+            sleep(min(2, max(0, started + timeout - clock())))
+        raise LLMError(TIMEOUT_MESSAGE)
     except httpx.HTTPStatusError as exc:
+        log("browser_run_failed", level=logging.ERROR, stage=stage, run_id=run_id,
+            error_type=type(exc).__name__, status_code=exc.response.status_code)
         raise LLMError(f"Browser Use returned HTTP {exc.response.status_code}. Check access, credits and configuration.") from None
-    except (httpx.HTTPError, ValueError, KeyError, TypeError):
+    except (httpx.HTTPError, ValueError, KeyError, TypeError) as exc:
+        log("browser_run_failed", level=logging.ERROR, stage=stage, run_id=run_id,
+            error_type=type(exc).__name__, outcome_unknown=stage == "create")
         raise LLMError("Browser Use returned invalid results or could not be reached. No fallback was used.") from None
+    except LLMError as exc:
+        log("browser_run_failed", level=logging.ERROR, stage=stage, run_id=run_id,
+            error_type=type(exc).__name__, elapsed_seconds=round(clock() - started, 2))
+        raise
     finally:
         if run_id and not terminal:
+            log("browser_cancel_requested", run_id=run_id)
             try:
                 client.post(BASE + "/runs/" + run_id + "/cancel", headers=headers).raise_for_status()
-            except httpx.HTTPError:
+                log("browser_cancel_succeeded", run_id=run_id)
+            except httpx.HTTPError as exc:
                 # Cancellation is best effort; operator can inspect the Cloud dashboard.
-                pass
+                log("browser_cancel_failed", level=logging.ERROR, run_id=run_id,
+                    error_type=type(exc).__name__)
         if owned:
             client.close()
 

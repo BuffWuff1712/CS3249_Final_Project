@@ -2,10 +2,13 @@
 
 import json
 import os
+import logging
+import time
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 import httpx
 from pydantic import BaseModel
+from .diagnostics import log
 
 
 class LLMError(Exception):
@@ -108,6 +111,8 @@ def structured_call(schema: type[BaseModel], instructions: str, payload, setting
         "\nOUTPUT CONTRACT: Return exactly one valid JSON object, no markdown or prose outside it. All fields must match this schema: "
         + json.dumps(schema.model_json_schema())
     )
+    started = time.monotonic()
+    log("model_call_started", schema=schema.__name__, api=config.api)
     try:
         if config.api == "responses":
             options = (
@@ -155,8 +160,14 @@ def structured_call(schema: type[BaseModel], instructions: str, payload, setting
                 )
         if output is None:
             raise ValueError("Missing parsed output or refusal")
-        return schema.model_validate(output)
+        parsed = schema.model_validate(output)
+        log("model_call_finished", schema=schema.__name__,
+            duration_ms=round((time.monotonic() - started) * 1000))
+        return parsed
     except (OpenAIError, ValueError, TypeError, IndexError) as exc:
+        log("model_call_failed", level=logging.ERROR, schema=schema.__name__,
+            error_type=type(exc).__name__, status_code=getattr(exc, "status_code", None),
+            duration_ms=round((time.monotonic() - started) * 1000))
         raise LLMError(safe_error(exc)) from exc
     finally:
         client.close()

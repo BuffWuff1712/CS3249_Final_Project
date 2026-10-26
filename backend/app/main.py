@@ -1,6 +1,6 @@
 """Integrated app. Earlier classroom prototype remains in legacy_main.py."""
 
-import csv, io, json, os, secrets
+import csv, io, json, os, secrets, time
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -9,6 +9,7 @@ from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from .runtime import service, storage
+from .runtime.diagnostics import RequestDiagnostics, context, log, span
 from .runtime import cart
 from .runtime.schemas import CartSelection, CartCheckout
 from .runtime.schemas import (
@@ -24,42 +25,54 @@ from .runtime.llm import LLMError
 from .runtime.policy import ROOT, catalogue
 
 app = FastAPI(title="Beany Shopping Oversight", version="1.0.0")
+# CORS wraps diagnostics so generated error responses remain browser-readable.
+app.add_middleware(RequestDiagnostics)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")],
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Content-Type", "X-Research-Key"],
+    expose_headers=["X-Request-ID"],
 )
+
+
+def rejected_response(status, exc):
+    from fastapi.responses import JSONResponse
+    import logging
+
+    request_id = (context.get() or {}).get("request_id")
+    log("request_rejected", level=logging.WARNING, status_code=status,
+        error_type=type(exc).__name__)
+    return JSONResponse(status_code=status, content={"detail": str(exc), "request_id": request_id})
 
 
 @app.exception_handler(LLMError)
 async def llm_error(request, exc):
-    from fastapi.responses import JSONResponse
-
-    return JSONResponse(status_code=503, content={"detail": str(exc)})
+    return rejected_response(503, exc)
 
 
 @app.exception_handler(ValueError)
 async def invalid(request, exc):
-    from fastapi.responses import JSONResponse
-
-    return JSONResponse(status_code=409, content={"detail": str(exc)})
+    return rejected_response(409, exc)
 
 
 @app.exception_handler(LookupError)
 async def missing(request, exc):
-    from fastapi.responses import JSONResponse
-
-    return JSONResponse(status_code=404, content={"detail": str(exc)})
+    return rejected_response(404, exc)
 
 
 def mutate(sid, fn):
     # Run one Uvicorn worker. The lock prevents lost updates and duplicate checkouts.
-    with storage.lock:
-        s = storage.load(sid)
-        fn(s)
-        storage.save(s)
-        return s
+    with span("mutation"):
+        waiting = time.monotonic()
+        log("mutation_lock_waiting")
+        with storage.lock:
+            log("mutation_lock_acquired", wait_ms=round((time.monotonic() - waiting) * 1000))
+            s = storage.load(sid)
+            fn(s)
+            with span("session_save"):
+                storage.save(s)
+            return s
 
 
 @app.get("/health")

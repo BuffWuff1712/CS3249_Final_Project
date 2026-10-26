@@ -52,7 +52,7 @@ def test_timeout_requests_cancellation(config, monkeypatch):
     times = iter([0, 11])
     with httpx.Client(transport=httpx.MockTransport(handler)) as client:
         with pytest.raises(LLMError, match="timed out"):
-            browser.run_task({}, "", client=client, clock=lambda: next(times))
+            browser.run_task({}, "", client=client, clock=lambda: next(times, 11))
     assert calls[-1].endswith(f"/{RUN}/cancel")
 
 
@@ -137,12 +137,17 @@ def test_real_amazon_output_is_accepted(config, monkeypatch):
     assert row.currency == "SGD" and row.evidence.seller.business_name == "Amazon Export Sales LLC"
 
 
-def test_invalid_rows_are_skipped_not_fatal(config, monkeypatch):
+def test_invalid_rows_are_skipped_not_fatal(config, monkeypatch, caplog):
+    import logging
+    caplog.set_level(logging.INFO, logger="uvicorn.error")
     bad_currency = {**AMAZON, "currency": "$"}
     off_list = {**AMAZON, "url": "https://evil.example/x"}
     no_price = {**AMAZON, "price": 0}
     out = completed([bad_currency, off_list, no_price, AMAZON], monkeypatch)
     assert len(out.products) == 1 and out.products[0].url == AMAZON["url"]
+    rows = [json.loads(r.message) for r in caplog.records if r.message.startswith("{")]
+    assert {r["reason"] for r in rows if r["event"] == "browser_listing_rejected"} == {
+        "currency", "source_url", "schema"}
 
 
 def test_all_rows_invalid_reports_why(config, monkeypatch):
@@ -164,3 +169,113 @@ def test_prompt_requests_iso_currency(config, monkeypatch):
     with httpx.Client(transport=httpx.MockTransport(handler)) as client:
         browser.run_task({}, "", client=client)
     assert "ISO code SGD or USD" in json.loads(calls[0].content)["task"]
+
+
+@pytest.mark.parametrize("failure", ["network", 429, 502, 503, 504])
+def test_transient_poll_retries_same_run(config, failure, caplog):
+    import logging
+    caplog.set_level(logging.INFO, logger="uvicorn.error")
+    calls, delays = [], []
+    polls = 0
+
+    def handler(req):
+        nonlocal polls
+        calls.append(req)
+        if req.method == "POST":
+            return httpx.Response(200, json={"id": RUN})
+        polls += 1
+        if polls < 3:
+            if failure == "network":
+                raise httpx.ReadTimeout("test-secret", request=req)
+            return httpx.Response(failure, headers={"Retry-After": "2"})
+        return httpx.Response(200, json={"status": "completed", "output": {"products": [listing()]}})
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        run, output = browser.run_task({}, "private-query", client=client, sleep=delays.append)
+    assert run == RUN and output.products
+    assert len([r for r in calls if r.method == "POST"]) == 1
+    assert len(delays) == 2 and all(d >= 1 for d in delays)
+    rows = [json.loads(r.message) for r in caplog.records if r.message.startswith("{")]
+    assert sum(r["event"] == "browser_poll_retry" for r in rows) == 2
+    assert "test-secret" not in caplog.text and "private-query" not in caplog.text
+
+
+def test_creation_timeout_is_not_retried(config, caplog):
+    import logging
+    caplog.set_level(logging.INFO, logger="uvicorn.error")
+    calls = []
+
+    def handler(req):
+        calls.append(req)
+        raise httpx.ReadTimeout("test-secret", request=req)
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(LLMError):
+            browser.run_task({}, "", client=client)
+    assert len(calls) == 1
+    assert '"stage": "create"' in caplog.text
+    assert '"outcome_unknown": true' in caplog.text
+
+
+def test_exhausted_poll_retries_cancel_known_run(config):
+    calls, delays = [], []
+
+    def handler(req):
+        calls.append((req.method, req.url.path))
+        if req.method == "POST":
+            return httpx.Response(200, json={"id": RUN})
+        return httpx.Response(503)
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(LLMError, match="HTTP 503"):
+            browser.run_task({}, "", client=client, sleep=delays.append)
+    assert sum(method == "GET" for method, _ in calls) == 3
+    assert calls[-1][1].endswith("/cancel") and delays == [1, 2]
+
+
+@pytest.mark.parametrize("status", [400, 401, 403, 404, 422])
+def test_permanent_poll_errors_are_not_retried(config, status):
+    calls = []
+
+    def handler(req):
+        calls.append(req.method)
+        return httpx.Response(200, json={"id": RUN}) if req.method == "POST" else httpx.Response(status)
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(LLMError, match=f"HTTP {status}"):
+            browser.run_task({}, "", client=client)
+    assert calls == ["POST", "GET", "POST"]  # Creation, one read, cancellation.
+
+
+def test_retry_after_cannot_extend_search_deadline(config, monkeypatch):
+    monkeypatch.setenv("BROWSER_USE_TIMEOUT_SECONDS", "10")
+    calls, delays = [], []
+
+    def handler(req):
+        calls.append(req.method)
+        if req.method == "POST":
+            return httpx.Response(200, json={"id": RUN})
+        return httpx.Response(429, headers={"Retry-After": "60"})
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(LLMError, match="timed out"):
+            browser.run_task({}, "", client=client, clock=lambda: 0, sleep=delays.append)
+    assert calls == ["POST", "GET", "POST"] and not delays
+
+
+def test_cancellation_failure_logged_without_masking_original_error(config, caplog):
+    import logging
+    caplog.set_level(logging.INFO, logger="uvicorn.error")
+
+    def handler(req):
+        if req.url.path.endswith("/cancel"):
+            raise httpx.ReadTimeout("private-cancel-error", request=req)
+        if req.method == "POST":
+            return httpx.Response(200, json={"id": RUN})
+        return httpx.Response(401)
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(LLMError, match="HTTP 401"):
+            browser.run_task({}, "", client=client)
+    assert '"event": "browser_cancel_failed"' in caplog.text
+    assert "private-cancel-error" not in caplog.text

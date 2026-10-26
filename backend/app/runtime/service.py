@@ -6,6 +6,7 @@ from .llm import OpenAIConversation, explain_outcome
 from .merchants import merchant_for
 from .merchant_risk import load_config, digest
 from .shopping_workflow import run_shopping
+from .diagnostics import span
 from .risk_agent import review as review_listing
 
 llm = OpenAIConversation()
@@ -194,7 +195,8 @@ def chat(s, text):
     if not text:
         raise ValueError("Please enter a message")
     elicitation = json.loads(ELICITATION_PATH.read_text(encoding="utf-8-sig"))
-    result = llm.interpret(s, text)  # Failure leaves persisted state unchanged.
+    with span("interpret"):
+        result = llm.interpret(s, text)  # Failure leaves persisted state unchanged.
     s.messages.append(Message(role="user", text=text))
     event(s, "user_message", "Message received")
     if result.intent == "checkout":
@@ -279,7 +281,8 @@ def chat(s, text):
         event(s, "alternative", previous.id)
     if "category" in s.brief:
         invalidate(s)
-        outcome = run_shopping(s)
+        with span("shopping"):
+            outcome = run_shopping(s)
         event(s, "shopping_result", outcome.model_dump_json())
         if outcome.status != "proposed":
             s.stage = "no_match" if outcome.status == "no_match" else "ready"
