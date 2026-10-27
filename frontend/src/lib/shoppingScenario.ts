@@ -19,23 +19,39 @@ export const headphoneOffers: ShoppingOffer[] = headphoneProducts.flatMap((p, i)
   ];
 });
 
-export function referenceDecision(): ShoppingDecision {
-  const needs: Needs = {
+export function referenceNeeds(): Needs {
+  return {
     category: { value: "Headphones", source: "confirmed", hard: true },
     usage: { value: "daily train commute", source: "confirmed", hard: false },
     budget: { value: "300", source: "confirmed", hard: true },
     currency: { value: "SGD", source: "confirmed", hard: true },
     priority: { value: "noise cancellation", source: "confirmed", hard: false },
   };
-  const [product, alternative] = headphoneProducts;
+}
+
+export function createDecision(needs: Needs, revision: number): ShoppingDecision | null {
+  const budget = needs.budget ? Number(needs.budget.value) : Infinity;
+  if (!(budget > 0)) return null;
+  const eligible = headphoneProducts.filter(p => headphoneOffers.some(o =>
+    o.productId === p.id && o.price <= budget && o.payment === "Ordinary checkout"));
+  const comfort = needs.priority?.value === "comfort";
+  eligible.sort((a, b) => comfort ? b.comfort - a.comfort : b.noise - a.noise);
+  const product = eligible[0];
+  if (!product) return null;
+  const alternative = headphoneProducts.find(p => p.id !== product.id)!;
   const offers = headphoneOffers.filter(o => o.productId === product.id);
-  const offer = offers[0], cheaper = offers[1];
-  return { revision: 1, needs, product, offer, alternative,
+  const offer = offers.find(o => o.price <= budget && o.payment === "Ordinary checkout")!;
+  const cheaper = offers.find(o => o.price < offer.price && o.payment === "Ordinary checkout");
+  return { revision, needs, product, offer, alternative,
     comparedProducts: headphoneProducts, comparedOffers: offers,
     reasons: [
-      { id: "needs", text: "You prioritised noise cancellation for your train commute, within SGD300.", evidence: ["needs:priority", "needs:budget"] },
-      { id: "comparison", text: `Both models fit your budget. ${product.name} has stronger listed noise cancellation than ${alternative.name}.`, evidence: [product.id, alternative.id] },
-      { id: "seller", text: `I favoured ${offer.merchant}'s ${offer.returnsDays}-day returns over ${cheaper.merchant}'s ${cheaper.returnsDays} days, for SGD${offer.price - cheaper.price} more. Longer returns are my tie-breaker; you can change that.`, evidence: [offer.id, cheaper.id] },
-      { id: "tradeoff", text: `The compromise is ${product.weight - alternative.weight}g extra weight. Comfort has not been personally tested.`, evidence: [product.id, alternative.id] },
+      { id: "needs", text: `${needs.priority ? "Your priority is" : "I assumed"} ${needs.priority?.value || "noise cancellation"} for ${needs.usage?.value || "everyday listening"}. ${needs.budget ? `Spending limit: SGD${budget}.` : "No spending limit is confirmed."}`, evidence: ["needs:priority", "needs:budget"] },
+      { id: "comparison", text: `${!Number.isFinite(budget) ? "I compared both models without a confirmed limit." : eligible.length > 1 ? "Both models fit your budget." : "The other model has no suitable offer within your limit."} ${product.name} ${comfort ? "is lighter with cushioned pads" : "has stronger listed noise cancellation"} than ${alternative.name}.`, evidence: [product.id, alternative.id] },
+      { id: "seller", text: cheaper ? `I favoured ${offer.merchant}'s ${offer.returnsDays}-day returns over ${cheaper.merchant}'s ${cheaper.returnsDays} days, for SGD${offer.price - cheaper.price} more. Longer returns are my tie-breaker; you can change that.` : `${offer.merchant} fits your limit and lists ${offer.returnsDays}-day returns. A smaller review history alone is not a warning.`, evidence: [offer.id, ...(cheaper ? [cheaper.id] : [])] },
+      { id: "tradeoff", text: comfort ? `The compromise is less noise cancellation. Comfort is subjective and untested.` : `The compromise is ${product.weight - alternative.weight}g extra weight. Comfort has not been personally tested.`, evidence: [product.id, alternative.id] },
     ] };
+}
+
+export function referenceDecision(): ShoppingDecision {
+  return createDecision(referenceNeeds(), 1)!;
 }

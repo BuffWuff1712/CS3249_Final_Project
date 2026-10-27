@@ -1,0 +1,32 @@
+"use client";
+import { useState } from "react";
+import type { Fact } from "@/lib/beany";
+import type { Needs, NeedKey } from "@/lib/decision";
+
+export function NeedsSummary({ needs, edit }: { needs: Needs; edit: (key: NeedKey, fact: Fact | null) => void }) {
+  const [field, setField] = useState<NeedKey>("budget");
+  const [value, setValue] = useState(needs.budget?.value || "");
+  const [hard, setHard] = useState(needs.budget?.hard ?? false);
+  const [error, setError] = useState("");
+  return <section className="cui-needs" aria-label="Purchase needs">
+    <h2>What I understand</h2>
+    <p>{Object.entries(needs).map(([key, fact]) => <span className="tag" key={key}>{key === "budget" ? `Up to SGD${fact.value}` : fact.value}{fact.source !== "confirmed" ? ` (${fact.source})` : ""} </span>)}</p>
+    <details><summary>Edit purchase needs</summary>
+      <form onSubmit={e => {
+        e.preventDefault();
+        if (!value.trim() || (field === "budget" && (!Number.isFinite(Number(value)) || Number(value) <= 0))) { setError("Enter a positive budget or a non-empty preference."); return; }
+        if (field === "priority" && !["comfort", "noise cancellation"].includes(value.trim().toLowerCase())) { setError("Choose comfort or noise cancellation for this comparison."); return; }
+        setError(""); edit(field, { value: field === "priority" ? value.trim().toLowerCase() : value.trim(), source: "confirmed", hard });
+      }}>
+        <label>Purchase field<select value={field} onChange={e => {
+          const key = e.target.value as NeedKey;
+          setField(key); setValue(needs[key]?.value || ""); setHard(needs[key]?.hard ?? false);
+        }}><option value="budget">Spending limit</option><option value="usage">Use case</option><option value="priority">Priority</option></select></label>
+        <label>Preference value<input maxLength={120} value={value} onChange={e => setValue(e.target.value)} /></label>
+        <label className="check"><input type="checkbox" checked={hard} onChange={e => setHard(e.target.checked)} />Must have</label>
+        {error && <p role="alert">{error}</p>}
+        <div className="decisions"><button type="submit">Save need</button><button type="button" onClick={() => edit(field, null)}>Remove need</button></div>
+      </form>
+    </details>
+  </section>;
+}
