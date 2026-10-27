@@ -2,6 +2,19 @@ import { test, expect } from "@playwright/test";
 
 const request = "Headphones for my daily train commute, under SGD300. Noise cancellation matters more than weight.";
 
+test("source evidence is optional and separates product reviews from seller reputation", async ({ page }) => {
+  await page.goto("/shop");
+  await page.getByRole("textbox", { name: "Message Beany" }).fill(request);
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+  await expect(page.getByLabel("Comparison and sources")).toBeHidden();
+  await page.getByText("View comparison and sources", { exact: true }).click();
+  const evidence = page.getByLabel("Comparison and sources");
+  await expect(evidence).toContainText("730 product reviews");
+  await expect(evidence).toContainText("2,140 seller reviews");
+  await expect(evidence).toContainText("Unknown; not supplied");
+  await expect(evidence).toContainText("echo-quiet-northline");
+});
+
 test("clarification asks one useful question and permits browsing without an invented limit", async ({ page }) => {
   await page.goto("/shop");
   await page.getByRole("textbox", { name: "Message Beany" }).fill("headphones");
@@ -52,6 +65,6 @@ test("a specific request receives one short personalised recommendation", async 
   await expect(result).toContainText("45g");
   const rationale = result.getByLabel("Why I recommend this for you");
   expect((await rationale.innerText()).split(/\s+/).length).toBeLessThanOrEqual(120);
-  await expect(page.getByText("Fictional catalogue", { exact: false })).toBeVisible();
+  await expect(page.getByText(/^Fictional catalogue ·/)).toBeVisible();
   expect(paidCalls).toEqual([]);
 });

@@ -2,7 +2,7 @@ import type { Fact, Product } from "./beany";
 
 export type NeedKey = "category" | "usage" | "budget" | "currency" | "priority";
 export type Needs = Partial<Record<NeedKey, Fact>>;
-export type ShoppingProduct = Pick<Product, "id" | "name" | "category" | "attributes" | "specifications"> & {
+export type ShoppingProduct = Pick<Product, "id" | "name" | "category" | "attributes" | "specifications" | "rating" | "rating_count" | "reviews"> & {
   variant: string;
   weight: number;
   noise: number;

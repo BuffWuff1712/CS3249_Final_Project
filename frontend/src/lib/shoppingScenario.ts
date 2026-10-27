@@ -3,9 +3,11 @@ import type { ShoppingProduct, ShoppingOffer, ShoppingDecision, Needs } from "./
 export const SCENARIO_VERSION = "headphones-v2.1";
 export const headphoneProducts: ShoppingProduct[] = [
   { id: "echo-quiet", name: "Echo Quiet", category: "Headphones", variant: "standard-new",
+    rating: 4.6, rating_count: 730, reviews: [{ rating: 4, title: "Train journeys", text: "Noise cancellation helped on my commute, but the weight is noticeable.", date: "2026-10-01" }],
     weight: 290, noise: 3, comfort: 2, attributes: ["wireless", "noise-cancelling"],
     specifications: { "Noise cancellation": "Stronger listed noise cancellation", "Weight": "290g", "Ear pads": "Standard cushions" } },
   { id: "luma-air", name: "Luma Air", category: "Headphones", variant: "standard-new",
+    rating: 4.4, rating_count: 460, reviews: [{ rating: 4, title: "Long listening", text: "Light to wear for long sessions. Train noise is still audible.", date: "2026-10-02" }],
     weight: 245, noise: 2, comfort: 3, attributes: ["wireless", "cushioned pads"],
     specifications: { "Noise cancellation": "Moderate listed noise cancellation", "Weight": "245g", "Ear pads": "Soft cushioned pads" } },
 ];

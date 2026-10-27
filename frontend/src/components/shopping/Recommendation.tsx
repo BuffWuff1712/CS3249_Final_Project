@@ -1,4 +1,5 @@
 import type { ShoppingDecision } from "@/lib/decision";
+import { ComparisonEvidence } from "./ComparisonEvidence";
 
 export function Recommendation({ decision, stale = false }: { decision: ShoppingDecision; stale?: boolean }) {
   return <article className="cui-result" aria-label={stale ? "Previous recommendation" : "Current recommendation"}>
@@ -10,5 +11,6 @@ export function Recommendation({ decision, stale = false }: { decision: Shopping
       <h3>Why I recommend this for you</h3>
       {decision.reasons.map(reason => <p key={reason.id}>{reason.text}</p>)}
     </section>
+    <ComparisonEvidence decision={decision} />
   </article>;
 }
