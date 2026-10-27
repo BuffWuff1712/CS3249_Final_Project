@@ -2,6 +2,20 @@ import { test, expect } from "@playwright/test";
 
 const request = "Headphones for my daily train commute, under SGD300. Noise cancellation matters more than weight.";
 
+test("clarification asks one useful question and permits browsing without an invented limit", async ({ page }) => {
+  await page.goto("/shop");
+  await page.getByRole("textbox", { name: "Message Beany" }).fill("headphones");
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+  await expect(page.getByLabel("Purchase clarification")).toContainText("mainly use");
+  await expect(page.getByRole("article", { name: "Current recommendation" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Commuting", exact: true }).click();
+  await expect(page.getByLabel("Purchase clarification")).toContainText("spending");
+  await page.getByRole("button", { name: "Show options", exact: true }).click();
+  await expect(page.getByRole("article", { name: "Current recommendation" })).toBeVisible();
+  await expect(page.getByLabel("Purchase needs")).not.toContainText("300");
+  await expect(page.getByLabel("Why I recommend this for you")).toContainText("No spending limit is confirmed");
+});
+
 test("purchase needs can be edited without inheriting a constraint and survive refresh", async ({ page }) => {
   await page.goto("/shop");
   await page.getByRole("textbox", { name: "Message Beany" }).fill(request);

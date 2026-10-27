@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { ShoppingDecision, Needs } from "@/lib/decision";
-import { referenceNeeds, createDecision } from "@/lib/shoppingScenario";
+import { createDecision } from "@/lib/shoppingScenario";
+import { interpretPurchase } from "@/lib/purchaseIntent";
 import { Recommendation } from "./Recommendation";
 import { NeedsSummary } from "./NeedsSummary";
 import "./shopping.css";
@@ -13,6 +14,18 @@ export function ShoppingWorkspace() {
   const [needs, setNeeds] = useState<Needs>({});
   const [revision, setRevision] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const [questions, setQuestions] = useState(0);
+  const [clarification, setClarification] = useState<{ reply: string; options: string[] } | null>(null);
+  function send(value: string) {
+    if (!value.trim()) return;
+    const result = interpretPurchase(value.trim(), needs, questions);
+    setRequest(value.trim()); setNeeds(result.needs); setRevision(revision + 1); setText("");
+    if (result.ready) {
+      setDecision(createDecision(result.needs, revision + 1)); setClarification(null);
+    } else {
+      setQuestions(questions + 1); setClarification(result);
+    }
+  }
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem("beany-cui-needs") || "null");
@@ -40,13 +53,15 @@ export function ShoppingWorkspace() {
         setNeeds(next); setRevision(revision + 1);
       }} />}
       {request && <p className="cui-request"><strong>You</strong><br />{request}</p>}
+      {clarification && <section aria-label="Purchase clarification" className="cui-result">
+        <p role="status">{clarification.reply}</p>
+        <div className="decisions">{clarification.options.map(option => <button key={option} onClick={() => send(option)}>{option}</button>)}</div>
+      </section>}
       {decision && <Recommendation decision={decision} stale={decision.revision !== revision} />}
       {revision > 0 && decision?.revision !== revision && <button onClick={() => setDecision(createDecision(needs, revision))}>Compare current needs</button>}
       <form className="cui-composer" onSubmit={e => {
         e.preventDefault();
-        if (!text.trim()) return;
-        const next = Object.keys(needs).length ? needs : referenceNeeds();
-        setRequest(text.trim()); setNeeds(next); setRevision(revision + 1); setDecision(createDecision(next, revision + 1)); setText("");
+        send(text);
       }}>
         <label htmlFor="cui-message">Message Beany</label>
         <div className="cui-compose-row"><textarea id="cui-message" rows={2} maxLength={2000} value={text} onChange={e => setText(e.target.value)} required placeholder="Headphones for my train commute, under SGD300. Noise cancellation first." /><button className="primary">Send</button></div>
