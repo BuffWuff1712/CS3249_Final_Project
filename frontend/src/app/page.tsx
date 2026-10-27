@@ -101,6 +101,7 @@ export default function Home() {
           <span className="brand-dot">.</span>
         </a>
         <div className="header-right">
+          <a className="header-action cart-action" href="/shop">Personalised shopping</a>
           <span className="demo-badge">● SIMULATED SHOPPING</span>
           <div className="header-actions">
             <a className="header-action cart-action" href="/cart">Cart ({session?.cart?.length || 0})</a>

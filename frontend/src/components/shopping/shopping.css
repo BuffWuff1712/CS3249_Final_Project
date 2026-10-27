@@ -1,0 +1,5 @@
+.cui-shell{max-width:1056px}.cui-shell header{gap:16px}.cui-shell header a:last-child{color:var(--muted)}
+.cui-workspace{display:block;max-width:768px;margin:32px auto 64px}.cui-workspace h1{font-size:32px;letter-spacing:-1px}.cui-workspace h2{font-size:24px}.cui-workspace h3{font-size:16px;margin:20px 0 12px}
+.cui-source{color:var(--muted);font-size:12px;line-height:1.6}.cui-result{background:white;border:1px solid var(--line);border-radius:12px;padding:24px;margin:24px 0}.cui-result p{line-height:1.6}.cui-result .cui-offer{font-size:18px}.cui-request{padding:16px;border-left:3px solid var(--line);line-height:1.6;white-space:pre-wrap}
+.cui-composer{margin:24px 0}.cui-composer label{margin-bottom:8px}.cui-compose-row{display:flex;gap:12px;align-items:stretch}.cui-compose-row textarea{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:16px;resize:vertical}.cui-compose-row button{align-self:flex-end;min-height:44px}
+@media(max-width:480px){.cui-workspace{margin-top:24px}.cui-workspace h1{font-size:28px}.cui-result{padding:16px}.cui-compose-row{gap:8px}}
