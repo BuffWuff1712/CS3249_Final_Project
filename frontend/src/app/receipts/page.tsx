@@ -17,7 +17,7 @@ export default function Receipts() {
     void load().catch(() => setError("Could not load purchase history.")).finally(() => setBusy(false));
   }, []);
   return <div className="shell">
-    <header><a className="brand" href="/">Beany</a><nav><a href="/">Keep shopping</a> · <a href="/cart">Cart</a></nav></header>
+    <header><a className="brand" href="/">Beany</a><nav className="header-actions" aria-label="Shopping navigation"><a className="header-action cart-action" href="/">Keep shopping</a><a className="header-action history-action" href="/cart">Cart</a></nav></header>
     <main className="settings-page"><h1>Purchase history</h1>
       <p>Simulated purchases from sessions saved in this browser. No real orders or payments were made.</p>
       {busy && <p role="status">Loading receipts…</p>}

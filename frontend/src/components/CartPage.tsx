@@ -36,14 +36,14 @@ export function CartPage({ checkout = false }: { checkout?: boolean }) {
     return out;
   }, {});
   return <div className="shell">
-    <header><a className="brand" href="/">Beany</a><nav><a href="/">Keep shopping</a> · <a href="/cart">Cart</a> · <a href="/receipts">Purchase history</a></nav></header>
+    <header><a className="brand" href="/">Beany</a><nav className="header-actions" aria-label="Shopping navigation"><a className="header-action cart-action" href="/">Keep shopping</a><a className="header-action history-action" href="/cart">Cart</a><a className="header-action history-action" href="/receipts">Purchase history</a></nav></header>
     <main className="settings-page">
       <h1>{checkout ? "Review checkout" : "Your cart"}</h1>
       <p>All purchases are simulated. Each item keeps the shopping requirements used when it was added. Current permissions apply at checkout. Budgets are per item, not a combined cart limit.</p>
       {error && <p role="alert" className="error">{error}</p>}
       {busy && <p role="status">Updating cart…</p>}
-      {done && <p role="status" className="notice">Simulated checkout complete. <a href="/receipts">View receipts</a>. No real payment or order was made.</p>}
-      {!busy && !rows.length && !done && <p>Your cart has no items to review. <a href="/">Find something with Beany</a>.</p>}
+      {done && <div role="status" className="notice"><p>Simulated checkout complete. No real payment or order was made.</p><a className="action-link" href="/receipts">View receipts</a></div>}
+      {!busy && !rows.length && !done && <div><p>Your cart has no items to review.</p><a className="action-link primary" href="/">Find something with Beany</a></div>}
       {rows.map(({action: a, error: issue}) => <article className="panel boundaries" key={a.id}>
         <h2>{a.product.name}</h2><p>{a.product.merchant} · Quantity: 1</p>
         <p className="price">{a.product.currency} {a.product.price.toFixed(2)}</p>

@@ -25,8 +25,10 @@ class OpenAIConversation:
                 "checkout_ui": "For a suitable pending product ask whether to Add to cart or Proceed to checkout. Both lead to review, never claim an order occurred. Final approval happens on the checkout page using Confirm simulated checkout. These labels replace any older approval-button wording.",
                 "permissions_read_only": session.permissions.model_dump(),
                 "current_proposal": session.proposals[-1].model_dump()
-                if session.proposals
+                if session.proposals and session.proposals[-1].status == "pending"
+                and not any(i.action.id == session.proposals[-1].id for i in session.cart)
                 else None,
+                "cart_items": [{"name": i.action.product.name, "category": i.action.product.category} for i in session.cart],
                 "history": [m.model_dump() for m in session.messages[-20:]],
                 "latest_message": text,
             },
@@ -36,6 +38,12 @@ class OpenAIConversation:
 def mock_interpret(session, text):
     """Explicit offline test double; not a substitute for the research conversation."""
     lower = text.lower()
+    if re.fullmatch(r"\s*(hello|hi|hey|thanks|thank you)[!.?\s]*", lower):
+        reply = "You're welcome!" if lower.strip().startswith("thank") else (
+            "Hi again! Would you like to find something else or review your cart?"
+            if session.cart else "Hi! What would you like to find today?"
+        )
+        return Interpretation(reply=reply, changes=[], intent="respond", suggestions=[])
     changes = []
 
     def add(field, value, hard=False):
@@ -45,13 +53,17 @@ def mock_interpret(session, text):
             )
         )
 
+    category_text = lower
+    if "those are shoes not bags" in lower:
+        category_text = "bags"
     for term, category in [
         ("shoe", "Running shoes"),
         ("running", "Running shoes"),
         ("headphone", "Headphones"),
         ("backpack", "Backpacks"),
+        ("bag", "Backpacks"),
     ]:
-        if term in lower:
+        if term in category_text:
             add("category", category)
             break
     budget = re.search(r"(?:under|budget|below|\$)\s*\$?(\d+(?:\.\d+)?)", lower)
@@ -62,6 +74,9 @@ def mock_interpret(session, text):
         session.brief.get("category").value if session.brief.get("category") else None,
     )
     intent = "search" if category else "clarify"
+    old_category = session.brief.get("category")
+    if old_category and category and category != old_category.value:
+        intent = "new_task"
     question = None
     if "checkout" in lower or "check out" in lower:
         intent = "checkout"
@@ -71,6 +86,13 @@ def mock_interpret(session, text):
         intent = "alternative"
     elif "explain" in lower:
         intent = "explain"
+        current = session.proposals[-1] if session.proposals else None
+        if current and current.status == "pending" and not any(
+            item.action.id == current.id for item in session.cart
+        ):
+            question = " ".join(r.explanation for r in current.rules) or "No policy concerns were reported for this item."
+        else:
+            question = "What would you like me to explain?"
     elif not category:
         question = (
             "What would you like to shop for: running shoes, headphones or a backpack?"

@@ -197,6 +197,13 @@ def chat(s, text):
     result = llm.interpret(s, text)  # Failure leaves persisted state unchanged.
     s.messages.append(Message(role="user", text=text))
     event(s, "user_message", "Message received")
+    if result.intent in ("respond", "explain"):
+        # Conversation cannot edit the brief, invalidate a proposal, or authorize checkout.
+        # The interpreter has current proposal facts; keep its answer to this question
+        # instead of replacing it with rules from an unrelated historical proposal.
+        event(s, "interpretation", result.model_dump_json())
+        message(s, result.reply)
+        return s
     if result.intent == "checkout":
         s.stage = "cart_review" if s.cart else "ready"
         s.suggestions = []
@@ -204,11 +211,13 @@ def chat(s, text):
                 if s.cart else "Your cart is empty. Tell me what you'd like to find first.")
         event(s, "cart_review_requested", "User requested checkout review; no purchase authorized")
         return s
+    # The interpreter decides whether this is a new task, including within one category.
     if result.intent == "new_task":
         invalidate(s)
         s.brief = {}
         s.rejected_products = []
         s.rejected_merchants = []
+        event(s, "brief_reset", "Started a new product request; cart and permissions retained")
     for change in result.changes:
         if change.field == "currency" and change.source == "confirmed" and change.value:
             aliases = {
@@ -262,12 +271,6 @@ def chat(s, text):
         s.clarification_count += 1
         s.stage = "clarifying"
         event(s, "clarification", "Question asked")
-        return s
-    if result.intent == "explain":
-        if s.proposals:
-            message(s, " ".join(r.explanation for r in s.proposals[-1].rules))
-        else:
-            message(s, result.reply)
         return s
     if result.intent == "alternative" and s.proposals:
         previous = s.proposals[-1]

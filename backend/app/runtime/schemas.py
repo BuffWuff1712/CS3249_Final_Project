@@ -290,7 +290,7 @@ class Interpretation(Model):
         description="Complete user-facing message, including one question when intent is clarify.",
     )
     changes: list[Change]
-    intent: Literal["search", "clarify", "explain", "cancel", "new_task", "alternative", "checkout"]
+    intent: Literal["respond", "search", "clarify", "explain", "cancel", "new_task", "alternative", "checkout"]
     suggestions: list[str]
 
 

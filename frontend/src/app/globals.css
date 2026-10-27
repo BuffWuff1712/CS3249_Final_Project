@@ -20,3 +20,10 @@
 .settings-page{display:grid;grid-template-columns:minmax(0,1fr);max-width:620px;margin:32px auto;gap:20px;padding-bottom:32px}
 .settings-page h1{font-size:32px;letter-spacing:-1px}
 .settings-page .notice,.settings-page .error{margin-bottom:0}
+.action-link{display:inline-flex;align-items:center;justify-content:center;max-width:100%;min-height:44px;margin-block:6px;padding:10px 14px;border:1px solid #a9c6f8;border-radius:8px;background:#edf4ff;color:#2457a6;font-weight:600;line-height:1.4;text-align:center;text-decoration:none;overflow-wrap:anywhere;cursor:pointer;transition:background .15s,border-color .15s}
+.action-link:hover{background:#dbeafe;border-color:#60a5fa}
+.action-link.primary{background:var(--blue);border-color:var(--blue);color:white}
+.action-link.primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+summary{width:fit-content;max-width:100%;min-height:44px;padding:10px 14px;border:1px solid #a9c6f8;border-radius:8px;background:#edf4ff;color:#2457a6;font-weight:600;line-height:1.5;cursor:pointer;overflow-wrap:anywhere;transition:background .15s}
+summary:hover{background:#dbeafe}
+details[open]>summary{margin-bottom:12px;background:#dbeafe}

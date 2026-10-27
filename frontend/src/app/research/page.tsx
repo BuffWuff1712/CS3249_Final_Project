@@ -27,7 +27,7 @@ export default function Research() {
   }
   return (
     <main className="research" style={{ display: "block" }}>
-      <a href="/">← Beany participant interface</a>
+      <a className="action-link" href="/">← Beany participant interface</a>
       <h1>Study workspace</h1>
       <p>
         Researcher controls. Use fictional participant IDs and obtain consent
@@ -97,7 +97,7 @@ export default function Research() {
             Open the participant interface in another tab. Refresh this
             workspace’s session after the task.
           </p>
-          <a href="/" target="_blank" rel="noreferrer">
+          <a className="action-link" href="/" target="_blank" rel="noreferrer">
             Open participant interface ↗
           </a>
           <div className="decisions">

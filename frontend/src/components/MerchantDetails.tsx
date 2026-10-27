@@ -65,9 +65,9 @@ function LiveEvidence({ action }: { action: Action }) {
       )}
       {(seller.page_url || e.return_policy_url) && (
         <p>
-          {seller.page_url && <a href={seller.page_url} target="_blank" rel="noopener noreferrer">Seller page</a>}
+          {seller.page_url && <a className="action-link" href={seller.page_url} target="_blank" rel="noopener noreferrer">Seller page ↗</a>}
           {seller.page_url && e.return_policy_url && " · "}
-          {e.return_policy_url && <a href={e.return_policy_url} target="_blank" rel="noopener noreferrer">Return policy</a>}
+          {e.return_policy_url && <a className="action-link" href={e.return_policy_url} target="_blank" rel="noopener noreferrer">Return policy ↗</a>}
         </p>
       )}
       <p>
@@ -85,7 +85,7 @@ export function MerchantDetails({ action }: { action: Action }) {
     <section className="merchant-details">
       <RiskNotice action={action} />
       <strong>Live listing · merchant information unverified</strong>
-      <p>Source: <a href={action.product.source_url} target="_blank" rel="noopener noreferrer">{m.name}</a></p>
+      <p>Source: <a className="action-link" href={action.product.source_url} target="_blank" rel="noopener noreferrer">{m.name} ↗</a></p>
       <p>Captured: {action.product.observed_at ? new Date(action.product.observed_at).toLocaleString() : "Unknown"}</p>
       <p>Prices and availability may change. Seller and policy details below were captured from the listing pages and have not been verified. Demo payment options apply only to Beany’s simulated checkout.</p>
       <LiveEvidence action={action} />

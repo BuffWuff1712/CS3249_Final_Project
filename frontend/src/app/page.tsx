@@ -92,7 +92,7 @@ export default function Home() {
   const addedToCart = !!latestProposal && !!session?.events.some(
     e => e.kind === "cart_added" && e.detail === latestProposal.id,
   );
-  const a = addedToCart ? undefined : latestProposal;
+  const a = addedToCart || latestProposal?.status !== "pending" ? undefined : latestProposal;
   return (
     <div className="shell">
       <header>
@@ -299,7 +299,7 @@ export default function Home() {
               </div>
             ))}
             {session?.stage === "cart_review" && !!session.cart.length && (
-              <p><a href="/checkout">Review cart and checkout</a></p>
+              <p><a className="action-link primary" href="/checkout">Review cart and checkout</a></p>
             )}
             {session && !addedToCart && session.recommendations.length > 1 && (
               <details>
@@ -381,6 +381,14 @@ export default function Home() {
                 disabled={busy || !session}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing || e.keyCode === 229) return;
+                  e.preventDefault();
+                  if (!e.repeat && !busy && session && text.trim()) {
+                    e.currentTarget.form?.requestSubmit();
+                  }
+                }}
+                aria-describedby="composer-help"
                 placeholder="Tell me what you’re looking for…"
               />
               <button
@@ -390,8 +398,8 @@ export default function Home() {
                 Send ↗
               </button>
             </div>
-            <small>
-              Ask questions, revise your preferences, or say “cancel this task”.
+            <small id="composer-help">
+              Enter to send · Shift+Enter for a new line. Ask questions, revise your preferences, or say “cancel this task”.
             </small>
           </form>
         </section>
