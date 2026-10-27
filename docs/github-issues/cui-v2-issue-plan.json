@@ -1,0 +1,501 @@
+{
+  "repository": "BuffWuff1712/CS3249_Final_Project",
+  "source_prd": "docs/2026-10-27-beany-cui-prd.md",
+  "epic": {
+    "title": "[CUI v2] Deliver personalised recommendations with explicit decision traces",
+    "body": "## Product goal\n\nDeliver Beany CUI v2: delegate shopping research while making the personalised recommendation's reasoning explicit at low reading cost.\n\n**Trust versus convenience is the design constraint.** The default result must explain the choice without requiring users to inspect every source. A mock catalogue, ranking/risk outcomes, progress events and scenario state manager are acceptable; real payments, live browsing and new production infrastructure are outside this scope.\n\n## Required experience\n\n- One primary recommendation with product, seller and price.\n- A visible 3–4 statement decision trace, targeting at most 120 words: the user's decisive priority, relevant alternative, seller rationale and main compromise.\n- An optional expanded explanation following **needs → eligibility → product comparison → seller comparison → choice**, with evidence references and editable criteria.\n- Selective clarification, a compact editable needs summary and consequential corrections. Changed and unchanged winners must both be explainable; target change explanations at most 40 words.\n- Material merchant cautions are visible and actionable. Clean small sellers and benign discounts remain viable.\n- Normal completion requires no compulsory evidence opening, long form or checkout. Selection creates no real order/payment.\n- Fictional data and represented checks are honest and consistent; no raw private reasoning or fabricated completed checks.\n\n## Delivery phases\n\nThe child issues will be indexed here in dependency order. Each is a focused slice with acceptance and verification.\n\n**Final demo:** headphones first, the second existing category next, responsive/keyboard verification, study protocol and working final presentation.\n**Before future recruitment:** usable GUI baseline, linked condition assignments, minimal task metrics and anonymised exports. These four study implementation issues do not block presenting the study plan.\n\nNo assignees or deadlines are assumed. Existing unrelated work is not superseded or closed.\n\n## Checkpoints\n\n- [ ] Specific headphone request produces a personalised recommendation and optional source evidence.\n- [ ] Clarification, explicit reasoning, correction and material tradeoffs work together.\n- [ ] Seller changes, cautions, failure states and selection preserve user control.\n- [ ] Both categories work on mobile/by keyboard; the demo and study plan are ready.\n- [ ] Before recruitment only: baseline, assignments, metrics and exports are validated.\n\n## Source PRD\n\nBeany Conversational Shopping Product Requirements, version 2, 27 October 2026. The full product requirements are embedded below so these issues do not depend on an unpublished local document.\n\n<details>\n<summary>Read the complete PRD v2</summary>\n\n# Beany Conversational Shopping Product Requirements\n\nVersion 2 | 27 October 2026 | CS3249 final project\n\n## 1 Product decision\n\nBeany helps consumers delegate product research while understanding why the resulting recommendation fits them. The core experience is a short conversation followed by a personalised recommendation with an explicit decision trace. Users see which needs shaped the search, what was compared, which source signals influenced the choice and what compromise remains. They can change a priority and see the decision change without repeating the research.\n\nThe central design tradeoff is trust versus convenience. Delegation loses its value if users must inspect every product, seller and review themselves. A recommendation also loses credibility when it supplies an unexplained answer. Beany must make the decisive reasoning visible at low reading cost, while keeping supporting evidence available on demand.\n\nThe product promise is: I researched for you, using your priorities. Here is why I chose this, what I checked and what would change my recommendation.\n\nThis PRD sets the product direction for the next CUI iteration. Its default recommendation, explanation and mock-backend requirements take precedence over conflicting requirements in the earlier product scope specification. The earlier codebase review remains a record of the assessed implementation; this PRD does not claim the proposed experience is already built.\n\n## 2 Audience and intended outcome\n\nThe primary user wants help with a considered consumer purchase and has limited time, product knowledge or familiarity with sellers. They can usually describe their situation more easily than translate it into technical filters. They want a suitable recommendation and enough understanding to decide whether to accept it.\n\nThe initial demonstration covers headphones and one existing second category, recommended as running shoes. Purchases above SGD200 can motivate a task, but are not an eligibility requirement. State currency explicitly. No unsourced market statistic or public figure endorsement is needed to justify the product.\n\nA comparison GUI can already present filters, products and seller information. It can also provide explanations. Beany's proposed value comes from combining conversational clarification, explicit personalised reasoning and conversational revision while the agent performs the comparison. The evaluation must test that value rather than assume that conversation is superior.\n\nSuccess means users save research effort and can explain the main reason for the recommendation, recognise an important compromise or concern and redirect the agent when needed. Higher trust, more purchases or more evidence-panel openings alone do not establish success.\n\n## 3 Product principles and scope\n\n### Principles\n\n- Delegate the research. The default path must not require reading raw reviews, opening sources, checking every seller or maintaining a long preference form.\n- Explain the decision. Personalised rationale and the compact decision trace are essential product features, not optional detail below the recommendation.\n- Make conversation consequential. A stated priority must affect the selection or its explanation. If the winner remains the same, explain why.\n- Interrupt selectively. Ask when the answer could materially change the decision; use visible, editable assumptions for low-impact gaps.\n- Preserve user authority. Never silently relax a spending ceiling or convert an assumption into a stated preference.\n- Communicate uncertainty accurately. Seller history, ratings and return terms support a judgement; they do not prove safety or authenticity.\n\n### Required experience\n\nThe minimum experience includes selective purchase intent clarification, a compact editable needs summary, one primary recommendation, explicit personalised decision reasoning, a meaningful alternative, a concise seller explanation, an actionable material warning, optional evidence detail, and conversational correction with an explanation of what changed.\n\nThe supporting catalogue, search, ranking, risk findings, source records and progress events may be mocked. They must be consistent with the visible scenario and user actions. The submitted interaction must work; recording an interaction that the submitted system cannot perform is insufficient.\n\n### Deferred work\n\nReal payments, real orders, autonomous purchasing, agent-to-agent commerce, live crawling, production infrastructure, general scam detection, raw model reasoning transcripts, elaborate streaming architecture and additional product categories are outside this iteration. Existing cart and receipt features may remain as secondary simulated paths. Expanding them is not a prerequisite for the CUI redesign.\n\nThe final presentation requires a study plan. Implementing the baseline, recruiting participants and reporting study results are later study-readiness work, unless the course subsequently requires otherwise.\n\n## 4 Explicit decision trace\n\n### Definition\n\nThe feature requested as a chain-of-thought display is implemented as a user-facing decision trace: an explicit, concise account grounded in purchase needs, comparison outcomes and source evidence. It explains the observable decision process. It is not a verbatim transcript of the model's private internal reasoning, and generated prose is not evidence that a check occurred.\n\nUse the participant-facing title Why I recommend this for you. This makes the purpose clearer than a technical label. The trace must answer four questions in a connected sequence.\n\n| Question | Required explanation | Example in a fictional task |\n| --- | --- | --- |\n| What did you optimise for me | Restate the decisive user priority and hard limit | You prioritised noise cancellation for commuting, within SGD300 |\n| What did you compare | State the actual comparison scope and relevant difference | Both models fit your budget; Echo Quiet has stronger listed noise cancellation |\n| Why this product and seller | Connect the choice to that priority and the merchant evidence | I chose Echo Quiet for noise cancellation; Northline provides more return time than the cheaper seller |\n| What am I giving up | State the main compromise or material uncertainty | Echo Quiet is 45g heavier; comfort has not been personally tested |\n\nThe trace must include a comparative reason: I chose X over Y because you prioritised Z. A generic list such as great sound, good value and trusted merchant fails this requirement. If no comparable alternative exists, say that the comparison is limited rather than inventing a losing candidate.\n\n### Default disclosure\n\nShow one recommendation and a compact trace in the normal conversation flow. The trace should contain three or four short statements, with the recommendation and explanation together targeting no more than 120 words, excluding controls and optional detail. This is a proposed writing constraint, not a measured usability result.\n\nKeep the main compromise and any material warning visible. Put full specifications, review excerpts, rejected candidates, source records and detailed price comparisons behind View comparison and sources. The user must be able to select an offer without opening those details. A trace should summarise the work the user delegated, not recreate that work as a reading assignment.\n\n### Expanded explanation\n\nAn optional How I reached this recommendation view makes the reasoning sequence explicit through five steps: interpreted needs; eligibility decisions; product comparison; seller comparison; final choice. Each step states the criterion, the relevant observation and how that observation affected the decision, with a direct evidence link. A list of activity labels such as checking reviews is insufficient.\n\nFor the reference task, the sequence reads: You prioritised noise cancellation within SGD300; both models passed the budget limit; Echo Quiet's listed noise cancellation was stronger, so I preferred it despite extra weight; I favoured Northline's longer return period over saving SGD20, using a disclosed tie-breaker; therefore I recommend that product and offer, with weight as the compromise.\n\nUsers can select a criterion in this explanation to correct it. After a correction, highlight the affected comparison and conclusion rather than replaying all steps. This expanded view is optional; the decisive reason remains visible in the default result.\n\n### Progress before the recommendation\n\nShow the relevant plan briefly, such as comparing models against the commute and budget, then reviewing seller terms. Mark planned, running, completed and unavailable states accurately. As steps complete, concise observations can appear: Two eligible models compared; Three offers reviewed for the selected model. Keep the completed trace available with the result.\n\nA catalogue simulation must say it compared records, not that it visited websites. Mock events should come from fixture operations or explicit scenario transitions. Do not use timed messages that claim checks succeeded regardless of what the scenario did. The synchronous fallback can show a labelled plan followed by the completed trace; genuine streaming is optional. Do not add artificial waiting to dramatise research.\n\n### Evidence and limits\n\nEach factual statement needs an inspectable source reference or structured comparison fact. Separate the observed value from the implication: 30-day returns is a term in the seller record; favouring more return time is a decision rule. If the user did not request flexible returns, present that tie-breaker as Beany's assumption and make it easy to change.\n\nShow rating counts alongside ratings and distinguish product reviews from seller reviews. Missing evidence remains unknown. Neither an unfamiliar small merchant nor a low price alone establishes wrongdoing. If a check fails, say what is unavailable and adjust or qualify the recommendation; never display a completed check for a missing result.\n\n## 5 Conversation and interaction requirements\n\n### CUI01 Clarify purchase intent with low friction\n\nExtract category, use case, budget, currency and explicitly stated priorities from the user's message. A detailed request can proceed immediately. For a bare category, ask the next question most likely to distinguish suitable products. Ask one question at a time and provide answer choices plus free text. Accept uncertainty and requests to browse.\n\nFor the ordinary demo path, target no more than two clarifying turns before offering a useful result or an explicit browse path. This is not permission to guess a hard limit. Explain an unresolved high-impact ambiguity or let the user browse without claiming all criteria are settled. Do not ask for a brand, specification or merchant preference solely to populate a field.\n\nAcceptance: a detailed commute request does not trigger repeated questions; a bare headphones request receives a useful clarification; Show options works without a completed questionnaire; inferred currency or preferences remain labelled as assumptions.\n\n### CUI02 Keep the needs summary compact and correctable\n\nDisplay a short summary such as Commuting, up to SGD300, noise cancellation first. Make its values editable and allow natural-language corrections. Keep less important fields in an optional editor. No mandatory confirmation screen is required when the summary accurately reflects the request.\n\nAcceptance: users can change a value from the summary or conversation; confirmed needs are distinguished from assumptions; an edit does not inherit another field's hard-constraint state; the next recommendation reflects the current needs.\n\n### CUI03 Personalise the recommendation explicitly\n\nThe default result must name the user priority responsible for the choice, compare it with at least one relevant alternative when available, explain the seller choice separately and expose the main compromise. The interpretation must follow the data: stronger listed noise cancellation can support a commute recommendation, but cannot establish that everyone will find a model comfortable.\n\nAcceptance: the result answers Why this for me and Why this over the alternative without opening details. Replacing the user's priority changes the choice or produces a concrete explanation of why the choice remains appropriate. Every cited alternative exists in the compared set.\n\n### CUI04 Resolve routine tradeoffs and negotiate material conflicts\n\nThe agent should resolve routine comparisons using stated priorities and disclosed tie-breakers. It should ask the user to prioritise only when the answer is likely to change the recommendation or when no eligible option satisfies important needs. Avoid asking users to approve every ordinary comparison decision.\n\nAcceptance: comparable products do not automatically produce another question; a genuine comfort-versus-noise conflict can produce a focused question; no product above a hard budget is presented as eligible until the user changes the limit. Exploratory options above that limit are labelled clearly.\n\n### CUI05 Make corrections visibly consequential\n\nSupport replies such as Actually, comfort matters more or Keep the product but find another seller. On correction, acknowledge the changed criterion, update the compact summary, recompute the scenario outcome and show a short explanation of what changed. Preserve unaffected needs and comparison work where relevant.\n\nTarget a change explanation of no more than 40 words before the updated result. Do not require the user to reread a complete transcript. Superseded recommendations must be labelled as previous or replaced. If a selected offer no longer fits, explicitly require a fresh selection.\n\nAcceptance: changing noise cancellation to comfort changes the seeded winner; a deliberately unchanged-winner scenario explains why; switching seller preserves the product variant; old reasons and concerns are not silently carried into the new result.\n\n### CUI06 Explain merchant concerns through their consequence\n\nA material concern must identify the observation, explain its practical consequence and offer a recommended next step. For example: This seller requests gift cards outside checkout. I recommend another offer for SGD20 more. Keep the underlying source available without making it compulsory to open.\n\nDo not treat all uncertainty as a warning requiring interruption. Smaller review history can be disclosed neutrally; unusual payment demands merit prominent caution. Clean small merchants remain viable alternatives. A seller warning must not make the product itself appear unsuitable unless the evidence concerns the product.\n\nAcceptance: material concerns are visible before selection; unfamiliarity alone does not block selection; a benign discount is not labelled fraudulent; hidden fixture labels never enter participant-facing explanations.\n\n### CUI07 Support a concise final decision\n\nThe primary action is Select this offer. After selection, show a brief recap of the product, seller, price, fit and any remaining material concern. The user can revise or finish. Selection does not place a real order. Any existing checkout is secondary and visibly simulated.\n\nAcceptance: users can finish the normal task without opening evidence details or changing settings; payment credentials are never requested; unresolved material concerns remain visible; invalidated offers cannot be silently selected from an earlier recommendation.\n\n## 6 Screen structure and information hierarchy\n\nKeep the conversation and its current recommendation together. On desktop, an adjacent comparison area may expand when requested. On mobile, place details immediately after the relevant recommendation. A permanent multi-product grid or separate oversight dashboard is not required.\n\n| Surface | Always visible when relevant | Available on request |\n| --- | --- | --- |\n| Needs summary | Decisive need, spending limit and priority | Complete editor and assumption provenance |\n| Conversation | Useful question, answer or concise update | Earlier turns |\n| Recommendation | Product, seller, price and explicit personalised trace | Full product and seller comparison |\n| Merchant concern | Material observation, consequence and next step | Original record and supporting excerpts |\n| Comparison activity | Short, accurate status while work runs | Detailed record of completed checks |\n| Selection | Selected offer and unresolved material issue | Secondary simulated checkout |\n\nProvide one primary action per result, with Change priorities and View comparison and sources as secondary routes. Controls must work with keyboard and touch, disclosures must be labelled, and updates must be announced without repeatedly reading the full conversation. Evidence must remain available without hover.\n\n## 7 Reference scenario\n\nAll names, prices, ratings and product differences in this scenario are fictional design fixtures. Stronger noise cancellation is an authored specification for demonstrating a decision rule, not a measured performance claim.\n\n### Initial purchase needs\n\nUser: I need headphones for my daily train commute, under SGD300. Noise cancellation matters more than weight.\n\nBeany proceeds without another question. The compact summary shows the commute, confirmed SGD300 ceiling and stated priority. It compares two models: Echo Quiet at a main offer of SGD289, weight 290g and stronger listed noise cancellation; Luma Air at SGD279, weight 245g and moderate listed noise cancellation.\n\nFor Echo Quiet, Northline Audio offers SGD289, 30-day returns and 2,140 seller reviews averaging 4.7. Everyday Sound offers SGD269, 14-day returns and 84 seller reviews averaging 4.5. It is a clean small merchant. SoundRush Deals offers SGD209, 12 seller reviews averaging 4.8, no supplied return policy and a request for gift-card payment outside checkout.\n\n### Default recommendation\n\nRecommended for your train commute: Echo Quiet, SGD289 from Northline Audio.\n\nYou prioritised noise cancellation within SGD300. Both models fit your budget; Echo Quiet has stronger listed noise cancellation than Luma Air. I favoured Northline's 30-day returns over the cheaper seller's 14 days, costing SGD20 more. That return preference is my tie-breaker. The compromise is 45g extra weight; comfort is not personally verified.\n\nControls: Select this offer; Change priorities; View comparison and sources.\n\nThe final explanation is intentionally short. The clean small merchant remains available if the user prefers saving SGD20. The suspicious offer does not have to dominate the initial recommendation; its material concern becomes visible whenever that offer is presented or inspected.\n\n### Personalisation through correction\n\nUser: Actually, comfort matters more.\n\nBeany: Updated: comfort now comes first. Luma Air's lighter weight and cushioned-pad specification make it the closer fit, while Echo Quiet still offers stronger noise cancellation. Comfort remains subjective.\n\nThe new recommendation uses the appropriate Luma Air offer and its own source records. It does not reuse Echo Quiet's seller prices or product review counts. The needs summary, comparison reason and current selection state all update together.\n\n### Boundary paths\n\nWith a new hard budget of SGD180, the selected scenario has no eligible offer. Beany explains the conflict and offers to change the budget or explore a different product; it does not quietly raise the limit. If the user asks for the cheapest Echo Quiet offer, Beany surfaces the gift-card concern and proposes the clean SGD269 alternative. The known smaller merchant is not rejected merely because it has fewer reviews.\n\n## 8 Mocking and explanation contract\n\nThe team may implement the complete experience through a small scenario-driven state manager. A real LLM is optional for wording or intent interpretation. Neither a new database nor live merchant detection is required to evaluate this design.\n\nUse one shared structured scenario state for the needs summary, recommendation, trace and evidence. Each decision record should contain user priorities and assumptions, considered product and offer IDs, the chosen product and seller, the decisive comparison, seller tie-breakers, the main compromise, material concerns, evidence references and a needs revision. Explanations are rendered from that record; a model must not invent missing comparisons or checks.\n\nThe minimum scenario branches are complete request, ambiguous request, explicit browse, priority correction that changes the winner, correction that preserves the winner, same-product seller change, no eligible match, risky cheapest offer and unavailable evidence. Both demonstration categories should reuse the same interaction pattern.\n\nThe visible counts and activity states must agree with the scenario data. A preference correction must select the appropriate branch; replaying an identical script regardless of input fails the requirement. An unsupported input must prompt a useful clarification rather than silently mapping to an unrelated result.\n\nClearly label fictional data and simulated transactions. Study participants should understand that the prototype represents an interaction concept. Results can speak to comprehension, perceived credibility, effort and choice within the simulation; they cannot establish real merchant legitimacy or the factual reliability of a production agent.\n\n## 9 Evaluation plan\n\n### Research questions\n\nRQ1: Does Beany reduce the time and perceived effort needed to reach a suitable choice compared with a comparison GUI?\n\nRQ2: Can users explain how their own priorities influenced the recommendation and recognise the main product tradeoff and merchant concern?\n\nRQ3: Does the explicit decision trace support justified confidence and effective correction without requiring users to inspect all supporting evidence?\n\n### Conditions\n\nCondition A is a usable comparison GUI with filters and the same raw product, offer, review and return information. Condition B is the full Beany CUI with selective clarification, personalised reasoning, decision trace, correction and optional evidence. Give both conditions the same task goals, source records and offer availability. Do not make the baseline artificially difficult or hide its raw information.\n\nThis comparison evaluates the complete experience. It does not isolate conversation, personalisation or the decision trace as independent causes. A later explanation-on versus explanation-off comparison within the same CUI could isolate the trace more directly, but is outside the required final study plan.\n\nUse two matched category tasks and counterbalance condition and category order. A proposed course-feasible target is 16 to 24 adults with online-shopping experience; this is not a statistical power claim. Use fresh linked sessions and pseudonymous participant IDs. Obtain professor feedback before recruitment. No participant results are required for the final presentation.\n\n### Measures and interpretation\n\n| Measure | Collection method | Interpretation |\n| --- | --- | --- |\n| Convenience | Time to final choice, perceived effort, clarification turns and required actions | Reduced work must not come at the expense of suitable choices |\n| Personalisation comprehension | Short post-task explanation of the decisive user need and alternative | Checks that the rationale was understood, not merely displayed |\n| Decision quality | Fit with hard constraints and priorities; recognition of visible concerns | Uses participant-accessible evidence rather than hidden labels |\n| Trust calibration | Confidence ratings alongside comprehension and response to uncertainty | High confidence with missed material concerns is an adverse outcome |\n| Correction and recovery | Whether a correction updates the brief, choice and explanation coherently | Tests the value of conversational negotiation |\n| Verification burden | Evidence openings, time in detail and whether detail was necessary | Fewer openings can be positive when understanding remains adequate |\n\nPair a brief survey after each task with a comparative interview. Surveys support consistent ratings of effort, understanding and control; interviews explain what made the reasoning credible, confusing or burdensome. Log only what is needed to interpret the task and manage free-text data appropriately.\n\nReport paired differences, distributions and uncertainty, with order and category limitations. Predefine the scoring rules before data collection. Concealed malicious fixtures with no observable distinguishing evidence cannot count as avoidable participant errors. Do not equate accepting the agent's choice, rejecting a small seller or opening more details with success.\n\nThe main hypothesis is improved convenience with preserved or improved decision comprehension and quality. If participants save time but misunderstand important concerns, or understand everything only by rereading every source, the design has not resolved the central tradeoff. Pilot and red-team work belong to Assignment 2, not the final-presentation agenda.\n\n## 10 Delivery priorities and acceptance\n\n### Required before final recording\n\nFirst implement the complete headphones journey with a consistent mock state and concise decision trace. Add correction, negotiation and the boundary paths before expanding to the second category. Reuse the same interaction components for running shoes. Prepare the controlled dataset and the study design, then record the working experience.\n\nThe following are mandatory in this new direction: explicit personalised rationale, comparison with an alternative, seller-choice explanation, visible compromise, user correction and a trace grounded in the represented checks. A generic recommendation banner without this content is insufficient. Full live streaming, extensive source panels and sophisticated ranking infrastructure are optional.\n\n### Acceptance checklist\n\n- A specific request reaches a recommendation without a compulsory questionnaire or brief confirmation.\n- The default result identifies the user's decisive priority, the relevant alternative, the seller rationale and the main compromise within the proposed writing budget.\n- Evidence opens are optional for the normal completion path; material concerns remain visible without opening details.\n- Every completed check and factual reason maps to current scenario data or an actual operation.\n- Priority changes update the brief, recommendation and explanation together; an unchanged recommendation receives a meaningful reason.\n- Hard limits remain in force, and same-product merchant changes preserve the product variant.\n- A clean small merchant and a benign discount remain viable; concrete risky behaviour receives an actionable explanation.\n- Missing evidence and provider failures produce clear uncertainty rather than fictional completed checks.\n- Both categories support the same core interactions on desktop and mobile with keyboard access.\n- Selection is explicit and creates no real payment or order. The submitted system can reproduce the recorded interactions.\n- The presentation contains the study plan and rationale, with no fabricated results.\n\n### Work required before recruitment\n\nImplement and validate the fair GUI baseline, condition assignment, linked participant IDs, task start and end markers, choice recording and minimal exports. Freeze scenario, explanation, model and configuration versions. These are study-readiness requirements, not additional conditions for presenting the plan.\n\n## 11 Existing code and implementation boundaries\n\nReuse the current Next.js conversation page, Brief component, MerchantDetails component and active `frontend/src/lib/beany.ts` contracts where useful. Simplify the primary experience around conversation and its current recommendation. Existing backend events and fixtures can supply the decision record, or a local fixture adapter can supply it for the prototype. Avoid changing the underlying control architecture merely to stage the interaction.\n\nKeep mock fixtures outside presentational components so the visible rationale, comparisons and source details share the same values. Use typed state and small, explicit transition functions. A real rendering pattern is `Fact(value=change.value, source=change.source, hard=change.hard)` in the existing Python runtime; preserve that clarity when adding scenario and explanation fields. Do not mix the older frontend contracts with the active runtime types.\n\nVerification should cover user-visible state transitions and source consistency. Existing backend tests do not prove that the new CUI communicates clearly. Where applicable, run `.venv/bin/python -m pytest -q -p no:cacheprovider` from `backend`, then `npm run typecheck`, `npm run build` and `npm run test:e2e` from `frontend`. Browser checks should exercise correction, optional disclosures, stale recommendations, no-match and mobile behaviour. Pin test source mode and credentials so offline checks cannot call paid services.\n\nDevelopment commands remain `.venv/bin/python -m uvicorn app.main:app --reload --port 8000` from `backend`, and `npm run dev` from `frontend`. Tests live in the existing `backend/tests` and `frontend/tests` directories; product documentation and curated scenario records belong under `docs` and the existing fixture directories.\n\nAlways keep explanations grounded, assumptions visible, fictional data labelled and final selection under user control. Never fabricate completed checks, request payment credentials, expose participant data, or weaken hard constraints for a demonstration. Obtain a separate scope decision before adding real transactions, live-source dependencies or new categories.\n\n## 12 Presentation and assumptions to validate\n\nAllocate the 15 minutes to the problem and trust-convenience tension, 2 minutes; the revised CUI and why it changed, 2 minutes; a working demo showing explicit reasoning and a consequential correction, 5 minutes; the A/B study plan and rationale, 4 minutes; and limits and conclusion, 2 minutes. Validate claims about the mid-project version against the actual presentation materials.\n\nThe demo should make the contribution visible: start with a user goal, show the personalised decision trace, change a priority, show the changed recommendation and reason, then inspect one merchant concern only when it matters. The second category demonstrates reuse of the interaction pattern. End at an informed user selection; simulated checkout is optional.\n\nAssumptions to validate are that a short decision trace is read and understood, comparative reasons feel more useful than generic benefits, users can correct priorities without extra research, and optional detail offers sufficient reassurance without becoming compulsory. Whether those assumptions hold is an evaluation question, not a claim established by a polished prototype.\n\n</details>\n"
+  },
+  "tasks": [
+    {
+      "id": "brief-fix",
+      "title": "Fix hard-constraint state when switching brief fields",
+      "phase": "Demo required",
+      "size": "S · 2 files",
+      "refs": "CUI02",
+      "deps": [],
+      "files": [
+        "frontend/src/components/Brief.tsx",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "The current preference selector changes the field and value but retains the previous field's hard setting. Repair this existing bug before using the editor as a trust mechanism.",
+      "ac": [
+        "Selecting an existing field restores that field's own value and hard setting; selecting an empty field uses a deliberate default.",
+        "Switching from a hard budget to a soft feature, and back, does not silently strengthen or weaken either constraint.",
+        "Saving or removing the edited preference preserves all unrelated values and remains correct after refresh."
+      ],
+      "verify": "Add one focused browser regression covering both switch directions and refresh. Run `npm run typecheck` and the relevant Playwright test from `frontend`."
+    },
+    {
+      "id": "first-result",
+      "title": "Show one personalised headphone recommendation from a mock scenario",
+      "phase": "Demo required",
+      "size": "M · 4–5 files",
+      "refs": "§§4, 7–8; CUI03",
+      "deps": [],
+      "files": [
+        "frontend/src/app/page.tsx",
+        "frontend/src/lib/decision.ts (proposed new module)",
+        "frontend/src/lib/shoppingScenario.ts (proposed new fixture adapter)",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Deliver the first visible CUI slice: a specific commute request reaches one recommendation with a short, explicit decision trace. A local fixture adapter is sufficient; production ranking, a new database and live APIs are not required. Reuse active types rather than the legacy contracts.",
+      "ac": [
+        "The reference request (commute, SGD300 ceiling, noise cancellation over weight) yields Echo Quiet at SGD289 from Northline, with no redundant clarification or mandatory brief confirmation.",
+        "The visible result contains product/seller/price and 3–4 short statements connecting the user's priority, a real alternative, the seller choice and the 45g compromise; target at most 120 words excluding controls.",
+        "One typed decision record drives the recommendation and facts: considered IDs, selected IDs, priorities/assumptions, comparative reason, seller tie-breaker, compromise, evidence references and needs revision. Fictional data is labelled and no paid calls are necessary."
+      ],
+      "verify": "Exercise the complete request offline. Assert the priority, alternative, offer and word budget match the fixture; run `npm run typecheck` and `npm run build` from `frontend`."
+    },
+    {
+      "id": "needs-summary",
+      "title": "Replace the long default brief with a compact editable needs summary",
+      "phase": "Demo required",
+      "size": "M · 3–4 files",
+      "refs": "CUI02; §6",
+      "deps": [
+        "brief-fix",
+        "first-result"
+      ],
+      "files": [
+        "frontend/src/components/Brief.tsx",
+        "frontend/src/app/page.tsx",
+        "frontend/src/lib/shoppingScenario.ts (or chosen adapter)",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Keep the decisive use case, spending ceiling and priority visible without making users maintain a long form. Move secondary values and provenance into an optional editor.",
+      "ac": [
+        "The normal screen shows a compact summary such as 'Commuting · Up to SGD300 · Noise cancellation first'; secondary fields are available on demand.",
+        "Users can edit/remove a value, see confirmed versus assumed values, and continue without a compulsory confirmation screen.",
+        "An edit updates the current needs revision and marks prior recommendations stale until replaced; unrelated needs remain intact."
+      ],
+      "verify": "Verify compact desktop/mobile display, edit/remove, provenance and stale-state behaviour. Run typecheck and a focused browser flow."
+    },
+    {
+      "id": "clarification",
+      "title": "Ask only decision-changing purchase clarification questions",
+      "phase": "Demo required",
+      "size": "M · 3–5 files",
+      "refs": "CUI01",
+      "deps": [
+        "first-result"
+      ],
+      "files": [
+        "frontend/src/app/page.tsx",
+        "frontend/src/lib/shoppingScenario.ts (or chosen adapter)",
+        "frontend/tests/shopping.spec.ts",
+        "backend/config/elicitation.json (only if retaining backend interpretation)",
+        "backend/config/prompts/dialogue.txt (only if retaining backend interpretation)"
+      ],
+      "description": "Support a vague purchase request without turning the CUI into a questionnaire. Mock branching is acceptable; a detailed request must reach results directly.",
+      "ac": [
+        "A bare 'headphones' request asks one useful question at a time with answer choices and free text; the fully specified reference request searches immediately.",
+        "The ordinary demo path offers a useful result or explicit browse path within two clarification turns; 'I'm not sure' and 'Show options' do not loop.",
+        "Skipped information is not invented or marked confirmed, currency assumptions remain visible, and existing hard limits survive follow-ups."
+      ],
+      "verify": "Exercise detailed, vague, uncertain and browse requests offline; verify the number of turns and resulting needs. Run focused workflow/browser tests for the chosen adapter."
+    },
+    {
+      "id": "evidence",
+      "title": "Add optional comparison and source evidence to the recommendation",
+      "phase": "Demo required",
+      "size": "M · 3–5 files",
+      "refs": "§4 Evidence and limits; §6",
+      "deps": [
+        "first-result"
+      ],
+      "files": [
+        "frontend/src/components/MerchantDetails.tsx",
+        "frontend/src/lib/beany.ts or decision types",
+        "frontend/src/components/ComparisonEvidence.tsx (proposed)",
+        "frontend/src/app/page.tsx",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Let users verify a claim without making them repeat the research. Extend the active types for existing product and seller review data where reused.",
+      "ac": [
+        "'View comparison and sources' reveals specifications, relevant alternative, product rating/count, separate seller rating/count, return terms and source record references.",
+        "Displayed facts agree with the same decision record used by the recommendation; missing data is labelled unknown and fictional .test sources are not presented as visited stores.",
+        "Details start optional and collapsed; the ordinary completion path does not require opening them, while material concerns will remain visible in the main result."
+      ],
+      "verify": "Open a reference evidence item and trace it back to its record; exercise missing values and distinct product/seller ratings. Run typecheck and a focused disclosure test."
+    },
+    {
+      "id": "expanded-trace",
+      "title": "Show how the recommendation follows from needs and evidence",
+      "phase": "Demo required",
+      "size": "M · 3–4 files",
+      "refs": "§4 Expanded explanation",
+      "deps": [
+        "first-result",
+        "evidence"
+      ],
+      "files": [
+        "frontend/src/components/DecisionTrace.tsx (proposed)",
+        "frontend/src/app/page.tsx",
+        "frontend/src/lib/decision.ts (or chosen decision model)",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Add 'How I reached this recommendation' as an optional expanded decision explanation. This must explain why observations affected the decision, rather than list generic activity messages or expose raw model reasoning.",
+      "ac": [
+        "The expanded trace follows five explicit steps: interpreted needs, eligibility decisions, product comparison, seller comparison and final choice; each shows the criterion, observation and effect.",
+        "Each factual step links to the relevant source/comparison fact, and an unstated seller preference such as longer returns is identified as an editable agent tie-breaker.",
+        "A criterion can open its existing editor; the decisive personalised reason remains visible without expanding this view. Never invent alternatives, completed checks or private reasoning transcripts."
+      ],
+      "verify": "Walk through all five reference steps and their evidence links; verify the criterion-edit handoff and that the compact result is independently understandable."
+    },
+    {
+      "id": "activity",
+      "title": "Show honest comparison progress from represented scenario actions",
+      "phase": "Demo required",
+      "size": "M · 3 files",
+      "refs": "§4 Progress before the recommendation",
+      "deps": [
+        "first-result"
+      ],
+      "files": [
+        "frontend/src/app/page.tsx",
+        "frontend/src/lib/shoppingScenario.ts (or existing event adapter)",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Replace the generic working indicator with a short plan and meaningful progress. Reuse current events or explicit mock transitions; streaming infrastructure is optional.",
+      "ac": [
+        "The interface distinguishes planned, running, completed and unavailable checks, using counts derived from fixture operations or actual events.",
+        "It distinguishes models found/compared and seller offers checked; a simulated catalogue does not claim that websites were visited.",
+        "The completed result retains its trace; failures never become completed checks and timers do not fabricate success or add artificial waiting."
+      ],
+      "verify": "Exercise success and failed-check branches with controlled transitions; compare visible counts with the fixture. The synchronous plan-then-completed-trace fallback is acceptable."
+    },
+    {
+      "id": "priority-repair",
+      "title": "Make priority corrections update the choice and its explanation",
+      "phase": "Demo required",
+      "size": "M · 4–5 files",
+      "refs": "CUI05",
+      "deps": [
+        "needs-summary",
+        "expanded-trace"
+      ],
+      "files": [
+        "frontend/src/app/page.tsx",
+        "frontend/src/lib/shoppingScenario.ts (or chosen adapter)",
+        "frontend/src/components/DecisionTrace.tsx (or chosen trace component)",
+        "frontend/src/components/Brief.tsx",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Make the personalisation loop tangible: the user corrects a priority, and the recommendation explains the consequence while preserving research and unaffected needs.",
+      "ac": [
+        "'Actually, comfort matters more' updates the summary and seeded winner from Echo Quiet to Luma Air with a concise change explanation targeting at most 40 words before the new result.",
+        "A second fixture deliberately retains the same winner after a correction and explains the concrete reason; unrelated limits remain unchanged.",
+        "Only affected comparison/conclusion steps are highlighted; earlier recommendations are labelled previous or replaced, stale facts do not carry forward and an incompatible selection requires fresh selection."
+      ],
+      "verify": "Cover changed-winner, unchanged-winner and stale-selection paths with meaningful transition tests; confirm the UI does not demand a transcript reread."
+    },
+    {
+      "id": "tradeoffs",
+      "title": "Negotiate material tradeoffs without relaxing hard limits",
+      "phase": "Demo required",
+      "size": "M · 3–4 files",
+      "refs": "CUI04",
+      "deps": [
+        "clarification",
+        "priority-repair"
+      ],
+      "files": [
+        "frontend/src/lib/shoppingScenario.ts (or chosen adapter)",
+        "frontend/src/app/page.tsx",
+        "frontend/src/components/Brief.tsx",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Let the agent resolve routine comparisons, asking a focused question only when the user's answer could change the decision. Include a truthful no-match path.",
+      "ac": [
+        "Ordinary comparisons use stated priorities/disclosed tie-breakers without another approval question; a genuine comfort-versus-noise conflict offers a focused prioritisation question.",
+        "With a hard SGD180 limit, the reference fixture reports no eligible offer and offers an explicit budget revision or different-product search.",
+        "No hard limit is silently raised; exploratory above-limit offers are labelled and cannot be selected as eligible until the user explicitly changes the constraint."
+      ],
+      "verify": "Exercise routine selection, a material conflict and the SGD180 boundary; confirm that the prior needs persist until an explicit change."
+    },
+    {
+      "id": "seller-change",
+      "title": "Change seller while preserving the selected product variant",
+      "phase": "Demo required",
+      "size": "M · 3–4 files",
+      "refs": "CUI05–CUI06",
+      "deps": [
+        "evidence",
+        "needs-summary"
+      ],
+      "files": [
+        "frontend/src/app/page.tsx",
+        "frontend/src/components/MerchantDetails.tsx or comparison component",
+        "frontend/src/lib/shoppingScenario.ts (or existing alternative handler)",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Make 'Keep this product, find another seller' mean exactly that. Reuse a fixture group/variant identifier; a new product database is not necessary.",
+      "ac": [
+        "A seller change stays within the same product model, variant and currency while preserving the current purchase needs.",
+        "Price, returns, seller evidence and seller-choice rationale all update to the new offer; product facts remain unchanged.",
+        "If no eligible other seller exists, Beany says so and separately offers a different-product search; it does not silently substitute another model."
+      ],
+      "verify": "Use the same-product multi-seller fixture and a single-seller boundary. Assert both product identity and the refreshed merchant facts."
+    },
+    {
+      "id": "merchant-warning",
+      "title": "Show actionable merchant cautions without penalising clean small sellers",
+      "phase": "Demo required",
+      "size": "M · 3–4 files",
+      "refs": "CUI06",
+      "deps": [
+        "evidence",
+        "seller-change"
+      ],
+      "files": [
+        "frontend/src/components/MerchantDetails.tsx",
+        "frontend/src/app/page.tsx",
+        "frontend/src/lib/shoppingScenario.ts (or selected evidence adapter)",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Communicate an observed concern, its consequence and a useful alternative without forcing users to investigate from scratch or treating unfamiliarity as fraud.",
+      "ac": [
+        "When the SGD209 SoundRush offer is surfaced, its gift-card/outside-checkout demand is visible before selection, with the observation, consequence and a suggested clean offer such as Everyday Sound at SGD269.",
+        "Everyday Sound remains viable despite a smaller review history; a benign discount is not labelled fraudulent and low price alone is not a blocking warning.",
+        "Product fit and seller concern remain distinct; uncertainty, return tie-breakers and evidence references are explicit, and hidden diagnostic labels are not exposed."
+      ],
+      "verify": "Exercise the risky-cheapest-offer, clean-small-merchant and benign-discount branches; verify the recommended alternative and exact prices match the records."
+    },
+    {
+      "id": "missing-evidence",
+      "title": "Recover clearly when source evidence or an input is unavailable",
+      "phase": "Demo required",
+      "size": "M · 3–4 files",
+      "refs": "§4 Evidence and limits; §8",
+      "deps": [
+        "evidence",
+        "activity",
+        "clarification"
+      ],
+      "files": [
+        "frontend/src/app/page.tsx",
+        "frontend/src/components/MerchantDetails.tsx or comparison component",
+        "frontend/src/lib/shoppingScenario.ts (or chosen adapter)",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Add the bounded failure and unsupported-input paths needed for a credible CUI demonstration. These are interaction states, not a real detection service.",
+      "ac": [
+        "An unavailable source/check is labelled unavailable or unknown, qualifies the relevant recommendation and never shows a fictional completed verification.",
+        "A provider/scenario failure preserves the user's needs and message and offers a useful retry or edit path without duplicating a proposal.",
+        "An unsupported input asks a useful clarification rather than mapping to an unrelated fixture; no fabricated source fact fills a gap."
+      ],
+      "verify": "Inject a missing return policy/source, a failed comparison and an unsupported request; check honest wording, preserved state and retry behaviour."
+    },
+    {
+      "id": "selection",
+      "title": "Let users select an offer without mandatory evidence review or checkout",
+      "phase": "Demo required",
+      "size": "M · 3–4 files",
+      "refs": "CUI07",
+      "deps": [
+        "priority-repair",
+        "seller-change",
+        "merchant-warning"
+      ],
+      "files": [
+        "frontend/src/app/page.tsx",
+        "frontend/src/components/DecisionSummary.tsx (proposed)",
+        "frontend/src/lib/shoppingScenario.ts (or existing selection state)",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Make 'Select this offer' the primary completion action. Present a brief decision recap instead of forcing users into the existing simulated purchasing workflow.",
+      "ac": [
+        "A current eligible offer can be selected without opening evidence, confirming every brief field or changing permissions; the recap names product, seller, price, fit and any material uncertainty.",
+        "A stale/ineligible recommendation cannot silently become the current selection; after relevant corrections the user explicitly selects a valid current offer.",
+        "Selection creates no real order/payment and requests no credentials. Existing cart, receipts and simulated checkout remain secondary routes, with no weakening of their current approval guards."
+      ],
+      "verify": "Complete the normal flow with zero evidence opens; exercise stale/budget-invalid selection and correction, and confirm no real payment or automatic simulated checkout occurs."
+    },
+    {
+      "id": "second-category",
+      "title": "Reuse the CUI journey for a curated running-shoes scenario",
+      "phase": "Demo required",
+      "size": "M · 2–4 files",
+      "refs": "§§2, 8, 10",
+      "deps": [
+        "tradeoffs",
+        "merchant-warning",
+        "missing-evidence"
+      ],
+      "files": [
+        "frontend/src/lib/shoppingScenario.ts (or selected fixture adapter)",
+        "curated running-shoes fixture in the existing data location",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Demonstrate the same interaction design in one existing second category. Reuse components and state transitions rather than adding another agent or category-specific interface.",
+      "ac": [
+        "A realistic SGD running-shoes task supports concise clarification, a needs summary, one personalised recommendation and an evidence-backed product/seller comparison.",
+        "A meaningful shoe preference correction changes the outcome or explains why it remains; same-product seller change, no-match and material-concern branches use the shared pattern.",
+        "All product/seller facts and counts are internally consistent; a clean small merchant and benign discount remain viable, and no new category/live service is required."
+      ],
+      "verify": "Run the second-category journey from a fresh session, inspect rationale/evidence consistency and repeat a priority change using the shared browser flow."
+    },
+    {
+      "id": "accessibility",
+      "title": "Verify the CUI flow on mobile and with keyboard navigation",
+      "phase": "Demo required",
+      "size": "M · 2–4 files",
+      "refs": "§6; §10 acceptance",
+      "deps": [
+        "selection",
+        "second-category",
+        "missing-evidence"
+      ],
+      "files": [
+        "frontend/src/app/globals.css",
+        "frontend/src/app/page.tsx",
+        "focused components needing semantic fixes",
+        "frontend/tests/shopping.spec.ts"
+      ],
+      "description": "Finish the primary interaction quality after the core flows exist. This ticket is for cross-cutting layout/interaction defects; each feature should already have its focused verification.",
+      "ac": [
+        "Both scenarios fit desktop and a narrow mobile viewport without clipped controls or horizontal overflow; expanded detail follows its relevant recommendation.",
+        "Keyboard users can clarify, edit, inspect the trace, follow evidence, correct a priority and select an offer with visible focus and labelled controls.",
+        "Meaningful updates are announced once without rereading the full transcript; evidence is accessible without hover and normal completion remains possible without opening it."
+      ],
+      "verify": "Run both flows by keyboard and at mobile width; use existing desktop/mobile Playwright projects and run `npm run typecheck` plus `npm run build`. Attach concise verification evidence."
+    },
+    {
+      "id": "study-protocol",
+      "title": "Write the A/B study protocol for convenience and justified trust",
+      "phase": "Demo required · study design only",
+      "size": "S · 1–2 documentation files",
+      "refs": "§9",
+      "deps": [],
+      "files": [
+        "docs/evaluation-guide.md",
+        "study protocol document under docs if needed"
+      ],
+      "description": "Prepare the study plan required for the final presentation. No recruitment, baseline implementation or fabricated results are needed to close this issue.",
+      "ac": [
+        "Define the fair comparison-GUI baseline and full CUI using identical source records/task goals; state explicitly that this tests the whole package rather than isolating the trace or conversation.",
+        "Document counterbalanced category/condition order, a feasible proposed sample, convenience/effort, rationale comprehension, visible-risk understanding, confidence calibration, correction and verification-burden measures, with survey/interview rationale.",
+        "Predefine evidence-based scoring and limitations, including invisible concealed risk and optional evidence opening; professor feedback precedes recruitment, and Assignment 2 pilot/red-team work is excluded from the final-presentation agenda."
+      ],
+      "verify": "Cross-check every research question against a measure, the task procedure and the claim it can support. Clearly separate planned methods from any future results."
+    },
+    {
+      "id": "final-demo",
+      "title": "Prepare the working demo and 15-minute final presentation",
+      "phase": "Demo required · final checkpoint",
+      "size": "M · 2–3 documentation/artifact files",
+      "refs": "§§10, 12",
+      "deps": [
+        "accessibility",
+        "study-protocol"
+      ],
+      "files": [
+        "README.md",
+        "demo script and final presentation materials under docs",
+        "recording artifact stored in the team's chosen location"
+      ],
+      "description": "Package the working CUI and study design for submission. The recording demonstrates real implemented interactions, not a fabricated substitute for the app.",
+      "ac": [
+        "Freeze scenario/configuration versions and run instructions; record headphones and running-shoes paths including explicit decision reasoning, consequential correction, a useful merchant concern and informed selection.",
+        "The 15-minute story covers trust versus convenience, changes since the actual mid-project deck, working demo and study plan/rationale; no invented results or final-presentation pilot/red-team section appears.",
+        "Verify detailed/vague/browse, changed/unchanged winner, seller change, hard-budget no-match, missing evidence and normal completion without compulsory detail review; submit a runnable system with visibly fictional data and simulated transactions."
+      ],
+      "verify": "Run the release checklist against a fresh session, confirm applicable offline tests/typecheck/build pass, time a rehearsal to 15 minutes and compare the recording with the submitted build."
+    },
+    {
+      "id": "baseline",
+      "title": "Build a fair comparison-GUI baseline for the future study",
+      "phase": "Study later · before recruitment, not required for final-plan presentation",
+      "size": "M · 3–5 files",
+      "refs": "§9 Conditions; §10 Work required before recruitment",
+      "deps": [
+        "evidence",
+        "study-protocol"
+      ],
+      "files": [
+        "frontend/src/app/compare/page.tsx (proposed baseline route)",
+        "shared comparison/evidence components",
+        "frontend/src/lib/shoppingScenario.ts (or chosen fixture adapter)",
+        "frontend/tests/study.spec.ts (proposed)"
+      ],
+      "description": "Create Condition A using the same product/merchant records as Condition B. Preserve a usable conventional comparison experience while omitting the CUI treatment.",
+      "ac": [
+        "Participants can filter/compare and make a final choice using the same offers, prices, specifications, ratings, review counts and return information as the full CUI.",
+        "The baseline omits conversational clarification, the extracted brief, personalised agent rationale, activity narration and synthesised risk labels; omit diagnostic/hidden labels from participant data rather than hiding them with CSS.",
+        "The baseline is not artificially obstructed and uses the same hard restrictions, task instructions and pre-checkout choice point; checkout does not reveal an answer before the choice measure."
+      ],
+      "verify": "Compare both conditions against the frozen fixture IDs and values; verify that baseline participant responses do not expose hidden labels or assistance fields."
+    },
+    {
+      "id": "study-assignment",
+      "title": "Persist study condition assignments and linked participant sessions",
+      "phase": "Study later · before recruitment",
+      "size": "M · 3–5 files",
+      "refs": "§9 Conditions; §10 Work required before recruitment",
+      "deps": [
+        "baseline",
+        "study-protocol"
+      ],
+      "files": [
+        "backend/app/runtime/research.py",
+        "backend/app/runtime/schemas.py",
+        "backend/app/main.py",
+        "frontend/src/components/RiskResearch.tsx or researcher controls",
+        "backend/tests/test_merchant_extension.py or focused study tests"
+      ],
+      "description": "Support a counterbalanced paired study without treating each fresh session as a new participant. Reuse research authentication and current storage; new production identity infrastructure is unnecessary.",
+      "ac": [
+        "A researcher assigns a pseudonymous shared study participant ID, task, condition and order to fresh separate sessions; assignments survive refresh/restart.",
+        "Catalogue/scenario, explanation/prompt, model/source mode and relevant configuration versions are fixed and recorded for each assignment; participant controls cannot change their condition.",
+        "Condition presentation receives only needed public fields, while researcher metadata, diagnostic flags and ground truth remain protected; no personal/payment information is required."
+      ],
+      "verify": "Create the paired task sessions under one study ID and check persistence and condition routing; verify unauthenticated research configuration is rejected."
+    },
+    {
+      "id": "study-events",
+      "title": "Record minimal task outcomes and verification burden for both conditions",
+      "phase": "Study later · before recruitment",
+      "size": "M · 3–5 files",
+      "refs": "§9 Measures and interpretation",
+      "deps": [
+        "study-assignment",
+        "selection"
+      ],
+      "files": [
+        "shared frontend study-event adapter (proposed)",
+        "frontend/src/app/page.tsx and baseline route",
+        "backend/app/runtime/research.py or event handler",
+        "focused study interaction tests"
+      ],
+      "description": "Instrument the measures actually needed by the protocol, applying equivalent start/end definitions in both interfaces. Avoid a new analytics service or unrelated telemetry.",
+      "ac": [
+        "Record task start/end, current final offer/needs revision, completion status, clarification/correction events and meaningful evidence openings with participant/condition/task/version linkage.",
+        "Selecting an offer is recorded before any optional simulated checkout; durations and event counts have documented semantics and are not double-counted on refresh/retry.",
+        "The same event definitions work in both conditions; only necessary data is collected and raw conversation/payment/personal text is excluded from the minimal metrics path."
+      ],
+      "verify": "Complete one task per condition, exercise refresh/retry and compute duration and evidence-open counts manually from recorded events to confirm their meaning."
+    },
+    {
+      "id": "study-export",
+      "title": "Export anonymised condition-aware study task results",
+      "phase": "Study later · before recruitment",
+      "size": "S · 2–3 files",
+      "refs": "§9; §10 Work required before recruitment",
+      "deps": [
+        "study-events"
+      ],
+      "files": [
+        "backend/app/runtime/research.py",
+        "backend/app/main.py",
+        "focused export tests"
+      ],
+      "description": "Make the future study's paired results usable without copying conversation text or relying on detector precision/recall as a user-experience measure.",
+      "ac": [
+        "Researcher-only export includes pseudonymous paired participant ID, condition, task/order, frozen versions, task timing/completion, final choice, corrections and evidence-open counts.",
+        "Raw messages, preference free text, personal/payment data and hidden merchant labels are omitted; spreadsheet formula injection and unauthenticated access are prevented.",
+        "Exports document the unit of analysis and count semantics, distinguish missing from zero, and support the protocol's paired comparisons without summing repeated session totals."
+      ],
+      "verify": "Export a two-condition fixture run and confirm column values, linkage, missing-value handling, no free text/hidden labels, formula escaping and authenticated access."
+    }
+  ]
+}

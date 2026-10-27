@@ -1,0 +1,143 @@
+<div id="beany-decision-workspace" aria-label="Beany shopping decision workspace">
+  <style>
+    #beany-decision-workspace{--beany-bg:light-dark(#faf9f5,#181c19);--beany-surface:light-dark(#ffffff,#232925);--beany-ink:light-dark(#203d30,#e7eee8);--beany-muted:light-dark(#52665b,#b3c4b8);--beany-line:light-dark(#dce3dc,#435047);--beany-soft:light-dark(#edf2e9,#2c3b2e);--beany-warn:light-dark(#fff3dd,#43351f);--beany-warn-ink:light-dark(#715016,#f1d299);color:var(--beany-ink);background:var(--beany-bg);font:14px/1.55 system-ui,sans-serif;border-radius:16px;overflow:hidden;color-scheme:light dark}
+    #beany-decision-workspace *{box-sizing:border-box}
+    #beany-decision-workspace [hidden]{display:none!important}
+    #beany-decision-workspace h2,#beany-decision-workspace h3,#beany-decision-workspace p{margin:0}
+    #beany-decision-workspace h2{font-size:23px;line-height:1.3;font-weight:600;letter-spacing:-.5px}
+    #beany-decision-workspace h3{font-size:16px;font-weight:600}
+    #beany-decision-workspace header{padding:20px 108px 18px 24px;display:flex;align-items:center;gap:18px;border-bottom:1px solid var(--beany-line);flex-wrap:wrap}
+    #beany-decision-workspace .beany-logo{font-size:24px;font-weight:650;letter-spacing:-1px}
+    #beany-decision-workspace .beany-secondary{color:var(--beany-muted);font-size:12px}
+    #beany-decision-workspace .beany-brief{padding:18px 24px;border-bottom:1px solid var(--beany-line)}
+    #beany-decision-workspace .beany-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+    #beany-decision-workspace .beany-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+    #beany-decision-workspace .beany-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;color:var(--beany-muted)}
+    #beany-decision-workspace button,#beany-decision-workspace input,#beany-decision-workspace select{font:inherit;color:inherit}
+    #beany-decision-workspace button{background:var(--beany-surface);border:1px solid var(--beany-line);border-radius:8px;padding:8px 12px;text-align:left;cursor:inherit}
+    #beany-decision-workspace button:focus-visible,#beany-decision-workspace input:focus-visible{outline:2px solid var(--beany-ink);outline-offset:3px}
+    #beany-decision-workspace button[aria-pressed="true"]{background:var(--beany-ink);color:var(--beany-bg);border-color:var(--beany-ink)}
+    #beany-decision-workspace .beany-primary{background:var(--beany-ink);color:var(--beany-bg);border-color:var(--beany-ink);text-align:center}
+    #beany-decision-workspace .beany-text-button{background:transparent;border:0;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+    #beany-decision-workspace .beany-columns{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+    #beany-decision-workspace .beany-conversation{padding:24px;border-right:1px solid var(--beany-line)}
+    #beany-decision-workspace .beany-shortlist{padding:24px;min-width:0}
+    #beany-decision-workspace .beany-turn{padding:16px 0;border-bottom:1px solid var(--beany-line)}
+    #beany-decision-workspace .beany-turn:first-of-type{padding-top:8px}
+    #beany-decision-workspace .beany-speaker{display:block;font-size:12px;color:var(--beany-muted);margin-bottom:5px}
+    #beany-decision-workspace .beany-prompt{margin-top:18px}
+    #beany-decision-workspace .beany-prompt .beany-row{margin-top:10px}
+    #beany-decision-workspace .beany-updated{padding:12px 0;color:var(--beany-muted)}
+    #beany-decision-workspace .beany-compose{display:flex;gap:8px;margin-top:16px;align-items:stretch}
+    #beany-decision-workspace .beany-compose input{background:var(--beany-surface);border:1px solid var(--beany-line);border-radius:8px;padding:10px;min-width:0;width:100%;font-size:16px}
+    #beany-decision-workspace .beany-activity{margin-top:20px;font-size:12px;color:var(--beany-muted)}
+    #beany-decision-workspace .beany-activity summary{cursor:inherit;padding:7px 0}
+    #beany-decision-workspace .beany-activity ol{margin:4px 0;padding-left:20px}
+    #beany-decision-workspace .beany-option{padding:15px 0;border-bottom:1px solid var(--beany-line)}
+    #beany-decision-workspace .beany-option.beany-featured{background:var(--beany-soft);border:0;border-radius:12px;padding:17px;margin-top:14px}
+    #beany-decision-workspace .beany-option p{margin-top:7px}
+    #beany-decision-workspace .beany-fit{font-size:12px;margin-bottom:8px}
+    #beany-decision-workspace .beany-tradeoff{color:var(--beany-muted);font-size:13px}
+    #beany-decision-workspace .beany-sellers{margin-top:18px}
+    #beany-decision-workspace .beany-seller{padding:14px 0;border-bottom:1px solid var(--beany-line)}
+    #beany-decision-workspace .beany-seller p{margin:4px 0;font-size:13px}
+    #beany-decision-workspace .beany-caution{background:var(--beany-warn);color:var(--beany-warn-ink);padding:9px 11px;border-radius:7px;margin:8px 0;font-size:13px}
+    #beany-decision-workspace .beany-confirm{padding:14px;background:var(--beany-soft);border-radius:8px;margin-top:14px}
+    #beany-decision-workspace .beany-editor{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    #beany-decision-workspace .beany-editor input{width:100px;background:var(--beany-surface);padding:8px;border:1px solid var(--beany-line);border-radius:6px;font-size:16px}
+    #beany-decision-workspace .beany-footer{padding:14px 24px;border-top:1px solid var(--beany-line);font-size:12px;color:var(--beany-muted)}
+    @media(max-width:650px){#beany-decision-workspace .beany-columns{grid-template-columns:1fr}#beany-decision-workspace .beany-conversation{border-right:0;border-bottom:1px solid var(--beany-line)}#beany-decision-workspace header,#beany-decision-workspace .beany-brief,#beany-decision-workspace .beany-conversation,#beany-decision-workspace .beany-shortlist{padding-left:16px;padding-right:16px}#beany-decision-workspace header{padding-right:100px}#beany-decision-workspace h2{font-size:21px}}
+    @media(pointer:coarse){#beany-decision-workspace button{min-height:44px}}
+  </style>
+  <header><span class="beany-logo">beany.</span><span class="beany-secondary">Your headphone comparison</span></header>
+  <section class="beany-brief" aria-label="Your editable purchase needs">
+    <div class="beany-heading"><span class="beany-eyebrow">What I understand</span><span class="beany-secondary">Based on what you told me</span></div>
+    <div class="beany-row"><span>Headphones for commuting</span><button type="button" id="beany-budget-button">Up to SGD300 · Edit</button><button type="button" id="beany-priority-button">Comfort first · Change</button></div>
+    <form class="beany-editor" id="beany-budget-editor" hidden><label for="beany-budget">Maximum SGD</label><input id="beany-budget" type="number" min="1" max="10000" value="300" required><button type="submit">Update comparison</button></form>
+  </section>
+  <main class="beany-columns">
+    <section class="beany-conversation" aria-label="Shopping conversation">
+      <div class="beany-eyebrow">Shape your decision</div>
+      <div class="beany-turn"><span class="beany-speaker">You</span><p>I need headphones for my commute, under SGD300. I’ll wear them for hours.</p></div>
+      <div class="beany-turn"><span class="beany-speaker">Beany</span><p>For long journeys, would you prioritise comfort or blocking out train noise?</p><div class="beany-row" style="margin-top:12px"><button type="button" data-beany-priority="comfort" aria-pressed="true">Comfort</button><button type="button" data-beany-priority="quiet" aria-pressed="false">Noise cancellation</button></div></div>
+      <div class="beany-turn"><span class="beany-speaker">Beany</span><p id="beany-advice">Luma Air fits your comfort priority: lighter weight and cushioned ear pads. Echo Quiet blocks more noise, but weighs more.</p></div>
+      <div class="beany-prompt"><p>Something I misunderstood?</p><div class="beany-row"><button type="button" id="beany-repair">Actually, noise cancellation matters more</button></div></div>
+      <p class="beany-updated" id="beany-feedback" role="status">You can change your priorities at any time.</p>
+      <form class="beany-compose" id="beany-message-form"><input id="beany-message" aria-label="Tell Beany what to change" placeholder="Tell me what to change…" maxlength="300" required><button type="submit" class="beany-primary">Send</button></form>
+      <details class="beany-activity"><summary>What was compared · simulated catalogue</summary><ol><li>Matched two models to your commute and budget.</li><li>Compared listed weights and noise cancellation.</li><li>Reviewed three seller records for each model.</li></ol><p>No websites visited. These are fictional records.</p></details>
+    </section>
+    <section class="beany-shortlist" aria-label="Recommendations and merchant evidence">
+      <div class="beany-heading"><h2>Your shortlist</h2><span class="beany-secondary">Two models compared</span></div>
+      <div id="beany-results" aria-live="polite"></div>
+      <section class="beany-sellers" id="beany-sellers" hidden aria-label="Offers for the selected model"><div class="beany-heading"><h3 id="beany-seller-title">Sellers for Luma Air</h3><button class="beany-text-button" type="button" id="beany-close-sellers">Close</button></div><div id="beany-seller-rows"></div></section>
+      <div id="beany-choice" class="beany-confirm" role="status" hidden></div>
+    </section>
+  </main>
+  <div class="beany-footer">Fictional products and sellers · Your selection does not place an order</div>
+</div>
+<script>
+(()=>{
+  const root=document.getElementById('beany-decision-workspace');
+  const el=id=>root.querySelector('#'+id);
+  let saved=window.openai?.widgetState?.modelContent;
+  let state={priority:saved?.priority==='quiet'?'quiet':'comfort',budget:Number.isFinite(saved?.budget)&&saved.budget>0?saved.budget:300,model:null};
+  const design={showSellerEvidence:false};
+  const products={comfort:{name:'Luma Air',price:279,weight:245,fit:'Lighter weight and cushioned ear pads for long commutes.',tradeoff:'Less effective noise cancellation than Echo Quiet.'},quiet:{name:'Echo Quiet',price:289,weight:290,fit:'Stronger noise cancellation for noisy train journeys.',tradeoff:'45g heavier than Luma Air; comfort is personal.'}};
+  function save(){if(window.openai?.setWidgetState)window.openai.setWidgetState({modelContent:{priority:state.priority,budget:state.budget},privateContent:{}}).catch(()=>{});}
+  function feedback(text){el('beany-feedback').textContent=text;}
+  function sellers(model){
+    state.model=model;
+    const p=products[model];
+    const offers=[{name:'Northline Audio',price:p.price,reviews:'4.7 / 5 · 2,140 seller reviews',terms:'30-day returns to original payment method.',note:'Business details listed in the demo retailer registry.'},{name:'Everyday Sound',price:p.price-20,reviews:'4.5 / 5 · 84 seller reviews',terms:'14-day returns to original payment method.',note:'Smaller independent seller. Contact and return terms are listed.'},{name:'SoundRush Deals',price:p.price-80,reviews:'4.8 / 5 · 12 seller reviews',terms:'Return policy not supplied.',note:'Seller asks for payment by gift card outside checkout.',caution:true}];
+    el('beany-seller-title').textContent='Sellers for '+p.name;
+    el('beany-seller-rows').replaceChildren();
+    offers.forEach(o=>{
+      const row=document.createElement('div');row.className='beany-seller';
+      const top=document.createElement('div');top.className='beany-heading';
+      const name=document.createElement('strong');name.textContent=o.name;
+      const price=document.createElement('span');price.textContent='SGD'+o.price;top.append(name,price);row.append(top);
+      for(const text of [o.reviews,o.terms,o.note]){const pp=document.createElement('p');pp.textContent=text;row.append(pp);}
+      if(o.caution){const warning=document.createElement('div');warning.className='beany-caution';warning.textContent='Concern: off-site gift-card payment. A lower price does not establish a safe offer.';row.append(warning);}
+      const pick=document.createElement('button');pick.type='button';pick.textContent=o.price>state.budget?'Above your SGD'+state.budget+' limit':o.caution?'Ask about this concern':'Select this offer';
+      pick.disabled=o.price>state.budget;
+      pick.addEventListener('click',()=>{
+        if(o.caution){feedback('The seller record asks for gift cards outside checkout. That is the concern; the low price alone is not the reason. You can compare another seller.');return;}
+        el('beany-choice').textContent='Selected '+p.name+' from '+o.name+' for SGD'+o.price+'. Your needs and seller evidence are ready to review. No order has been placed.';el('beany-choice').hidden=false;
+        save();
+      });row.append(pick);el('beany-seller-rows').append(row);
+    });
+    el('beany-sellers').hidden=false;
+  }
+  function render(){
+    el('beany-budget-button').textContent='Up to SGD'+state.budget+' · Edit';el('beany-budget').value=state.budget;
+    el('beany-priority-button').textContent=(state.priority==='comfort'?'Comfort':'Noise cancellation')+' first · Change';
+    root.querySelectorAll('[data-beany-priority]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.beanyPriority===state.priority)));
+    const lead=products[state.priority],other=products[state.priority==='comfort'?'quiet':'comfort'];
+    const within=lead.price<=state.budget;
+    el('beany-advice').textContent=within?lead.name+' fits your '+(state.priority==='comfort'?'comfort':'noise cancellation')+' priority. '+lead.tradeoff:'The two main seller offers are above your SGD'+state.budget+' limit. Other sellers may have lower prices, but their terms need checking. I have kept your limit.';
+    el('beany-results').replaceChildren();
+    [state.priority,state.priority==='comfort'?'quiet':'comfort'].forEach((key,i)=>{
+      const p=products[key],card=document.createElement('article');card.className='beany-option'+(i===0?' beany-featured':'');
+      const label=document.createElement('div');label.className='beany-fit';label.textContent=i===0?'Closer fit for your stated priority':'Another tradeoff to consider';card.append(label);
+      const heading=document.createElement('div');heading.className='beany-heading';const name=document.createElement('h3');name.textContent=p.name;const price=document.createElement('span');price.textContent='Main offer SGD'+p.price;heading.append(name,price);card.append(heading);
+      const fit=document.createElement('p');fit.textContent=p.fit;card.append(fit);
+      const tradeoff=document.createElement('p');tradeoff.className='beany-tradeoff';tradeoff.textContent='Tradeoff: '+p.tradeoff;card.append(tradeoff);
+      const facts=document.createElement('p');facts.className='beany-secondary';facts.textContent=p.weight+'g · '+(key==='comfort'?'4.4 / 5 · 460 product reviews':'4.6 / 5 · 730 product reviews');card.append(facts);
+      const b=document.createElement('button');b.type='button';b.textContent='Compare 3 sellers';b.style.marginTop='12px';b.addEventListener('click',()=>sellers(key));card.append(b);el('beany-results').append(card);
+    });
+    el('beany-choice').hidden=true;
+    if(state.model||design.showSellerEvidence)sellers(state.model||state.priority);
+  }
+  function setPriority(p){state.priority=p;state.model=null;el('beany-sellers').hidden=true;render();feedback('Updated: '+(p==='comfort'?'comfort':'noise cancellation')+' comes first. The shortlist and explanation now reflect that change.');save();}
+  root.querySelectorAll('[data-beany-priority]').forEach(b=>b.addEventListener('click',()=>setPriority(b.dataset.beanyPriority)));
+  el('beany-priority-button').addEventListener('click',()=>setPriority(state.priority==='comfort'?'quiet':'comfort'));
+  el('beany-repair').addEventListener('click',()=>setPriority('quiet'));
+  el('beany-budget-button').addEventListener('click',()=>{el('beany-budget-editor').hidden=!el('beany-budget-editor').hidden;if(!el('beany-budget-editor').hidden)el('beany-budget').focus();});
+  el('beany-budget-editor').addEventListener('submit',e=>{e.preventDefault();const b=Number(el('beany-budget').value);if(!Number.isFinite(b)||b<=0)return;state.budget=b;el('beany-budget-editor').hidden=true;render();feedback('Your spending limit is now SGD'+b+'. Offers above it cannot be selected.');save();});
+  el('beany-close-sellers').addEventListener('click',()=>{state.model=null;el('beany-sellers').hidden=true;});
+  el('beany-message-form').addEventListener('submit',e=>{e.preventDefault();const text=el('beany-message').value.trim();if(!text)return;const lower=text.toLowerCase();if(/noise|quiet|cancellation/.test(lower))setPriority('quiet');else if(/comfort|light|soft/.test(lower))setPriority('comfort');else if(/budget|under|sgd|\$/.test(lower)){const match=text.match(/\d+(?:\.\d+)?/);if(match&&Number(match[0])>0){state.budget=Number(match[0]);render();feedback('Updated your spending limit to SGD'+state.budget+'.');save();}else feedback('What maximum amount in SGD should I use?');}else feedback('Would you like to change your spending limit, comfort preference or noise cancellation priority?');el('beany-message').value='';});
+  window.addEventListener('openai:set_globals',event=>{const next=event.detail?.globals?.widgetState?.modelContent;if(next&&['comfort','quiet'].includes(next.priority)&&Number.isFinite(next.budget)&&next.budget>0){state={...state,priority:next.priority,budget:next.budget};render();}});
+  render();
+  if(globalThis.Tweak){const t=new Tweak({container:root,onChange:()=>{if(!design.showSellerEvidence){state.model=null;el('beany-sellers').hidden=true;}render();}});t.addToggle(design,'showSellerEvidence',{label:'Show seller evidence upfront'});}
+})();
+</script>

@@ -1,0 +1,278 @@
+{
+  "repository": "BuffWuff1712/CS3249_Final_Project",
+  "tracking_issue": {
+    "id": 6060559433,
+    "number": 3,
+    "title": "[CUI v2] Deliver personalised recommendations with explicit decision traces",
+    "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/3",
+    "state": "open"
+  },
+  "verified": true,
+  "issues": [
+    {
+      "id": 6060612338,
+      "number": 4,
+      "title": "[CUI v2] Fix hard-constraint state when switching brief fields",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/4",
+      "state": "open",
+      "task_id": "brief-fix",
+      "phase": "Demo required",
+      "depends_on": []
+    },
+    {
+      "id": 6060612539,
+      "number": 5,
+      "title": "[CUI v2] Show one personalised headphone recommendation from a mock scenario",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/5",
+      "state": "open",
+      "task_id": "first-result",
+      "phase": "Demo required",
+      "depends_on": []
+    },
+    {
+      "id": 6060612846,
+      "number": 6,
+      "title": "[CUI v2] Replace the long default brief with a compact editable needs summary",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/6",
+      "state": "open",
+      "task_id": "needs-summary",
+      "phase": "Demo required",
+      "depends_on": [
+        4,
+        5
+      ]
+    },
+    {
+      "id": 6060613139,
+      "number": 7,
+      "title": "[CUI v2] Ask only decision-changing purchase clarification questions",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/7",
+      "state": "open",
+      "task_id": "clarification",
+      "phase": "Demo required",
+      "depends_on": [
+        5
+      ]
+    },
+    {
+      "id": 6060613372,
+      "number": 8,
+      "title": "[CUI v2] Add optional comparison and source evidence to the recommendation",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/8",
+      "state": "open",
+      "task_id": "evidence",
+      "phase": "Demo required",
+      "depends_on": [
+        5
+      ]
+    },
+    {
+      "id": 6060613618,
+      "number": 9,
+      "title": "[CUI v2] Show how the recommendation follows from needs and evidence",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/9",
+      "state": "open",
+      "task_id": "expanded-trace",
+      "phase": "Demo required",
+      "depends_on": [
+        5,
+        8
+      ]
+    },
+    {
+      "id": 6060613859,
+      "number": 10,
+      "title": "[CUI v2] Show honest comparison progress from represented scenario actions",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/10",
+      "state": "open",
+      "task_id": "activity",
+      "phase": "Demo required",
+      "depends_on": [
+        5
+      ]
+    },
+    {
+      "id": 6060614090,
+      "number": 11,
+      "title": "[CUI v2] Make priority corrections update the choice and its explanation",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/11",
+      "state": "open",
+      "task_id": "priority-repair",
+      "phase": "Demo required",
+      "depends_on": [
+        6,
+        9
+      ]
+    },
+    {
+      "id": 6060614372,
+      "number": 12,
+      "title": "[CUI v2] Negotiate material tradeoffs without relaxing hard limits",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/12",
+      "state": "open",
+      "task_id": "tradeoffs",
+      "phase": "Demo required",
+      "depends_on": [
+        7,
+        11
+      ]
+    },
+    {
+      "id": 6060614676,
+      "number": 13,
+      "title": "[CUI v2] Change seller while preserving the selected product variant",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/13",
+      "state": "open",
+      "task_id": "seller-change",
+      "phase": "Demo required",
+      "depends_on": [
+        8,
+        6
+      ]
+    },
+    {
+      "id": 6060614901,
+      "number": 14,
+      "title": "[CUI v2] Show actionable merchant cautions without penalising clean small sellers",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/14",
+      "state": "open",
+      "task_id": "merchant-warning",
+      "phase": "Demo required",
+      "depends_on": [
+        8,
+        13
+      ]
+    },
+    {
+      "id": 6060615124,
+      "number": 15,
+      "title": "[CUI v2] Recover clearly when source evidence or an input is unavailable",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/15",
+      "state": "open",
+      "task_id": "missing-evidence",
+      "phase": "Demo required",
+      "depends_on": [
+        8,
+        10,
+        7
+      ]
+    },
+    {
+      "id": 6060615309,
+      "number": 16,
+      "title": "[CUI v2] Let users select an offer without mandatory evidence review or checkout",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/16",
+      "state": "open",
+      "task_id": "selection",
+      "phase": "Demo required",
+      "depends_on": [
+        11,
+        13,
+        14
+      ]
+    },
+    {
+      "id": 6060615530,
+      "number": 17,
+      "title": "[CUI v2] Reuse the CUI journey for a curated running-shoes scenario",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/17",
+      "state": "open",
+      "task_id": "second-category",
+      "phase": "Demo required",
+      "depends_on": [
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "id": 6060615751,
+      "number": 18,
+      "title": "[CUI v2] Verify the CUI flow on mobile and with keyboard navigation",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/18",
+      "state": "open",
+      "task_id": "accessibility",
+      "phase": "Demo required",
+      "depends_on": [
+        16,
+        17,
+        15
+      ]
+    },
+    {
+      "id": 6060615930,
+      "number": 19,
+      "title": "[CUI v2] Write the A/B study protocol for convenience and justified trust",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/19",
+      "state": "open",
+      "task_id": "study-protocol",
+      "phase": "Demo required \u00b7 study design only",
+      "depends_on": []
+    },
+    {
+      "id": 6060616133,
+      "number": 20,
+      "title": "[CUI v2] Prepare the working demo and 15-minute final presentation",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/20",
+      "state": "open",
+      "task_id": "final-demo",
+      "phase": "Demo required \u00b7 final checkpoint",
+      "depends_on": [
+        18,
+        19
+      ]
+    },
+    {
+      "id": 6060616411,
+      "number": 21,
+      "title": "[CUI v2] Build a fair comparison-GUI baseline for the future study",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/21",
+      "state": "open",
+      "task_id": "baseline",
+      "phase": "Study later \u00b7 before recruitment, not required for final-plan presentation",
+      "depends_on": [
+        8,
+        19
+      ]
+    },
+    {
+      "id": 6060616660,
+      "number": 22,
+      "title": "[CUI v2] Persist study condition assignments and linked participant sessions",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/22",
+      "state": "open",
+      "task_id": "study-assignment",
+      "phase": "Study later \u00b7 before recruitment",
+      "depends_on": [
+        21,
+        19
+      ]
+    },
+    {
+      "id": 6060616899,
+      "number": 23,
+      "title": "[CUI v2] Record minimal task outcomes and verification burden for both conditions",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/23",
+      "state": "open",
+      "task_id": "study-events",
+      "phase": "Study later \u00b7 before recruitment",
+      "depends_on": [
+        22,
+        16
+      ]
+    },
+    {
+      "id": 6060617147,
+      "number": 24,
+      "title": "[CUI v2] Export anonymised condition-aware study task results",
+      "html_url": "https://github.com/BuffWuff1712/CS3249_Final_Project/issues/24",
+      "state": "open",
+      "task_id": "study-export",
+      "phase": "Study later \u00b7 before recruitment",
+      "depends_on": [
+        23
+      ]
+    }
+  ],
+  "verification_method": "Every issue fetched individually from GitHub; open state, title, dependency references and parent checklist verified."
+}
