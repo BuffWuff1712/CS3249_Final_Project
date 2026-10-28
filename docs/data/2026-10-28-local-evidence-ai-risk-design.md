@@ -109,7 +109,8 @@ This applies only when `s.risk_detection == "ai"` and `product.source == "catalo
 
 ### 3.3 Known behaviour differences (note for the policy owner)
 
-- **Forced blocks.** `assess()` force-blocks external payment, injection, and requests for password, bank password, card number or government ID. `assess_live()` force-blocks only external payment and injection. In AI mode a government-ID request is therefore no longer force-blocked by the risk engine. It is still blocked by `merchant_privacy` in `policy.py` unless the participant enables personal-data sharing.
+- **Forced blocks are kept.** The non-negotiable safeguards are read from the record by `merchant_risk.safeguard_block()`, which both detectors use. They cover the external-payment flag, requests for password, bank password, card number or government ID, and the injection regex over the merchant and product descriptions. They block in AI mode even when the agent reports nothing. (Revised after final review: an earlier draft let AI mode drop them.)
+- **Provenance.** Each assessment records `basis` (`rules`, `ai` or `rules_fallback`). Researcher reports and CSV exports include `risk_basis` and the session's `risk_detection`.
 - **Non-determinism.** The same offer can be judged differently in different sessions, and researcher reports record whatever the agent predicted.
 - **Mock mode.** `mock_review()` reads only the evidence lists. With local data, only `personal_data_requests` is filled, so in `ai` plus mock mode most variants come out LOW apart from excessive data. Mock mode is not a measure of detection.
 

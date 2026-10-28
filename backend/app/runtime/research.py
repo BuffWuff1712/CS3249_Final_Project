@@ -124,6 +124,8 @@ def report(s):
                 .get("profile"),
                 "configuration_version": risk["config_version"] if risk else None,
                 "configuration_hash": risk["config_hash"] if risk else None,
+                "risk_detection": s.risk_detection,
+                "risk_basis": risk.get("basis", "rules") if risk else None,
                 "predicted_risk": predicted,
                 "ground_truth": label,
                 "triggered_rules": [e["rule_id"] for e in risk["evidence"]]

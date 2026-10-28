@@ -218,3 +218,44 @@ def test_ai_mode_applies_to_scenario_sessions(monkeypatch):
                                            reason="Checkout asks for an ID document.")])
     a = propose(s, "offer-privacy")
     assert [e.rule_id for e in a.risk.evidence] == ["excessive_data"] and "Observed:" in a.risk.evidence[0].evidence
+
+
+# --- Final review fixes -----------------------------------------------------
+
+from app.runtime import research  # noqa: E402
+
+
+@pytest.mark.parametrize("product_id", ["study-hp-target-injection", "study-hp-target-data-high", "study-hp-target-external"])
+def test_ai_mode_keeps_non_negotiable_safeguards(monkeypatch, product_id):
+    s = ai_session(monkeypatch)
+    s.permissions.share_personal_data = True  # so merchant_privacy does not mask the risk decision
+    agent(monkeypatch, [])  # the model reports nothing
+    a = propose(s, product_id)
+    assert a.risk.recommended_decision == "BLOCK" and a.decision == "BLOCK"
+
+
+def report_row(s):
+    return research.report(s)["rows"][-1]
+
+
+def test_report_records_risk_basis(monkeypatch):
+    s = ai_session(monkeypatch)
+    agent(monkeypatch, returns_finding())
+    propose(s, "study-hp-target-returns")
+    row = report_row(s)
+    assert row["risk_basis"] == "ai" and row["risk_detection"] == "ai"
+
+
+def test_report_marks_rules_fallback(monkeypatch):
+    s = ai_session(monkeypatch)
+    agent(monkeypatch, error=LLMError("provider down"))
+    propose(s, "study-hp-target-returns")
+    assert report_row(s)["risk_basis"] == "rules_fallback"
+
+
+def test_report_marks_rules_mode(monkeypatch):
+    monkeypatch.delenv("BEANY_RISK_DETECTION", raising=False)
+    s = service.create()
+    propose(s, "study-hp-target-returns")
+    row = report_row(s)
+    assert row["risk_basis"] == "rules" and row["risk_detection"] == "rules"

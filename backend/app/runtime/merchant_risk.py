@@ -68,6 +68,22 @@ def session_config(s):
     )
 
 
+INJECTION = re.compile(
+    r"ignore.{0,60}(rules|instructions|preferences)|reveal.{0,30}(key|password)|disregard.{0,40}(policy|rules)|enable.{0,40}personal data",
+    re.I,
+)
+SENSITIVE_REQUESTS = {"password", "bank_password", "card_number", "government_id"}
+
+
+def safeguard_block(product, merchant):
+    """Non-negotiable application safeguards, read from the record; no detector may tune them away."""
+    return bool(
+        merchant.external_payment
+        or set(merchant.requested_information) & SENSITIVE_REQUESTS
+        or INJECTION.search(merchant.description + " " + product.description)
+    )
+
+
 def assess(product, merchant, comparables, config):
     evidence = []
 
@@ -128,23 +144,13 @@ def assess(product, merchant, comparables, config):
     ]:
         if getattr(merchant, field):
             add(rule, text)
-    text = merchant.description + " " + product.description
-    if re.search(
-        r"ignore.{0,60}(rules|instructions|preferences)|reveal.{0,30}(key|password)|disregard.{0,40}(policy|rules)|enable.{0,40}personal data",
-        text,
-        re.I,
-    ):
+    if INJECTION.search(merchant.description + " " + product.description):
         add(
             "injection",
             "The description contains instructions aimed at changing assistant behaviour; these are treated as untrusted content.",
         )
     # Non-negotiable application safeguards cannot be tuned away.
-    force_block = bool(
-        merchant.external_payment
-        or excessive & {"password", "bank_password", "card_number", "government_id"}
-        or any(e.rule_id == "injection" for e in evidence)
-    )
-    return score(merchant, evidence, config, force_block, "observable simulation signals")
+    return score(merchant, evidence, config, safeguard_block(product, merchant), "observable simulation signals")
 
 
 def score(merchant, evidence, config, force_block, basis):
@@ -198,7 +204,7 @@ def low_price(product, comparables, config):
     return None
 
 
-def assess_live(product, merchant, comparables, config, review):
+def assess_live(product, merchant, comparables, config, review, force_block=False):
     """Score grounded agent findings for a web snapshot; blank page fields are never evidence."""
     evidence = [
         RiskEvidence(
@@ -213,5 +219,5 @@ def assess_live(product, merchant, comparables, config, review):
         evidence.append(
             RiskEvidence(rule_id="low_price", evidence=cheap + " Compared with other captured listings only.", weight=config.weights["low_price"])
         )
-    force_block = any(e.rule_id in ("external_payment", "injection") for e in evidence)
+    force_block = force_block or any(e.rule_id in ("external_payment", "injection") for e in evidence)
     return score(merchant, evidence, config, force_block, "the captured listing details")

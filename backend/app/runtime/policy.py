@@ -2,7 +2,7 @@ import hashlib, json
 from pathlib import Path
 from .schemas import Product, Rule, Event
 from .merchants import merchant_for
-from .merchant_risk import assess, assess_live, session_config
+from .merchant_risk import assess, assess_live, safeguard_block, session_config
 from .risk_agent import snapshot
 from .local_evidence import review_view
 
@@ -177,6 +177,7 @@ def evaluate(s, a):
             cached = s.live_risk.get(p.id)
             if cached and cached.snapshot == snapshot(p):
                 a.risk = assess_live(p, merchant, catalogue(s), config, cached)
+                a.risk.basis = "ai"
             else:
                 a.risk = None
                 rule("risk_review_unavailable", "REVIEW", "merchant_risk",
@@ -191,9 +192,13 @@ def evaluate(s, a):
             view = review_view(p, merchant)
             cached = s.live_risk.get(p.id)
             if cached and cached.snapshot == snapshot(view):
-                a.risk = assess_live(view, merchant, catalogue(s), session_config(s), cached)
+                # The record's safeguards still hard-block whatever the model reported.
+                a.risk = assess_live(view, merchant, catalogue(s), session_config(s), cached,
+                                     force_block=safeguard_block(p, merchant))
+                a.risk.basis = "ai"
             else:
                 a.risk = assess(p, merchant, catalogue(s), session_config(s))
+                a.risk.basis = "rules_fallback"
                 if not any(e.kind == "risk_agent_fallback" and e.detail == p.id for e in s.events):
                     s.events.append(Event(kind="risk_agent_fallback", detail=p.id))
         else:

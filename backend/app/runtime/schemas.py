@@ -78,6 +78,8 @@ class RiskAssessment(Model):
     explanation: str
     config_version: str
     config_hash: str
+    # Which detector produced the evidence; older stored assessments were all rules-based.
+    basis: Literal["rules", "ai", "rules_fallback"] = "rules"
 
 
 class Observed(Model):
