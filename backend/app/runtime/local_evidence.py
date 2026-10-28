@@ -5,6 +5,7 @@ two always see identical evidence. Boolean risk flags are never mapped: they are
 text. Absent details become explicit text because a local record knows they are missing.
 """
 
+import os
 from .schemas import LocalEvidence, Product, Merchant, SellerEvidence
 
 LABELS = {
@@ -13,6 +14,13 @@ LABELS = {
     "bank_password": "bank password",
     "card_number": "card number",
 }
+
+
+def configured_detection():
+    value = os.getenv("BEANY_RISK_DETECTION", "rules")
+    if value not in ("rules", "ai"):
+        raise ValueError("BEANY_RISK_DETECTION must be rules or ai")
+    return value
 
 
 def request_label(item):

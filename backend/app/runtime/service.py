@@ -7,6 +7,7 @@ from .merchants import merchant_for
 from .merchant_risk import load_config, digest
 from .shopping_workflow import run_shopping
 from .risk_agent import review as review_listing
+from .local_evidence import configured_detection, review_view
 
 llm = OpenAIConversation()
 ELICITATION_PATH = Path(__file__).resolve().parents[2] / "config/elicitation.json"
@@ -68,7 +69,8 @@ def edit(s, field, fact):
 
 def create(*, search_provider=None):
     from .browser_search import configured_provider, configured_replay
-    s = Session(mode=os.getenv("BEANY_LLM_MODE", "openai"), search_provider=search_provider or configured_provider())
+    s = Session(mode=os.getenv("BEANY_LLM_MODE", "openai"), search_provider=search_provider or configured_provider(),
+                risk_detection=configured_detection())
     if s.search_provider == "browser_use":
         s.search_replay = configured_replay()
     config = load_config()
@@ -147,6 +149,9 @@ def propose(s, product=None, *, recommendations=None, **kwargs):
     if product.source == "browser_use":
         # One cached agent review per snapshot; later policy rechecks reuse it.
         review_listing(s, product, merchant)
+    elif s.risk_detection == "ai":
+        # Local products are reviewed as the listing a shopper would read.
+        review_listing(s, review_view(product, merchant), merchant)
     allowed = [
         m for m in s.permissions.payment_methods if m in merchant.payment_methods
     ]

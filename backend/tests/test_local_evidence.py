@@ -127,3 +127,94 @@ def test_review_view_is_a_copy():
     view = review_view(p, merchants()[p.merchant_id])
     assert isinstance(view.web_evidence, LocalEvidence) and p.web_evidence is None
     assert (view.id, view.price) == (p.id, p.price)
+
+
+# --- Switch and AI routing (spec §3) ----------------------------------------
+
+from app.runtime import risk_agent, service  # noqa: E402
+from app.runtime.gateway import LLMError  # noqa: E402
+
+
+def agent(monkeypatch, findings=None, error=None):
+    """Route risk_agent.review to a fake model; returns the call log."""
+    calls = []
+
+    def fake(product, merchant):
+        calls.append(product.id)
+        if error:
+            raise error
+        return risk_agent.Review(findings=findings or [])
+    monkeypatch.setenv("BEANY_LLM_MODE", "openai")
+    monkeypatch.setattr(risk_agent, "ask_model", fake)
+    return calls
+
+
+def returns_finding():
+    return [risk_agent.Finding(rule_id="misleading_returns", quote="Refunds are issued as store credit only",
+                               reason="The refund promise conflicts with the policy.")]
+
+
+def ai_session(monkeypatch):
+    monkeypatch.setenv("BEANY_RISK_DETECTION", "ai")
+    return service.create()
+
+
+def propose(s, product_id):
+    p = next(x for x in catalogue(s) if x.id == product_id)
+    service.propose(s, p)
+    return s.proposals[-1]
+
+
+def test_switch_defaults_to_rules(monkeypatch):
+    monkeypatch.delenv("BEANY_RISK_DETECTION", raising=False)
+    assert service.create().risk_detection == "rules"
+
+
+def test_switch_rejects_unknown_value(monkeypatch):
+    monkeypatch.setenv("BEANY_RISK_DETECTION", "maybe")
+    with pytest.raises(ValueError, match="rules or ai"):
+        service.create()
+
+
+def test_rules_mode_never_calls_agent(monkeypatch):
+    monkeypatch.delenv("BEANY_RISK_DETECTION", raising=False)
+    s = service.create()
+    calls = agent(monkeypatch, error=AssertionError("agent must not run in rules mode"))
+    a = propose(s, "study-hp-target-external")
+    assert a.decision == "BLOCK" and calls == []
+    assert not any(e.kind in ("risk_agent", "risk_agent_fallback") for e in s.events)
+
+
+def test_ai_mode_scores_catalogue_offer_with_agent_findings(monkeypatch):
+    s = ai_session(monkeypatch)
+    agent(monkeypatch, returns_finding())
+    a = propose(s, "study-hp-target-returns")
+    assert [e.rule_id for e in a.risk.evidence] == ["misleading_returns"]
+    assert "Observed:" in a.risk.evidence[0].evidence
+    assert a.product.web_evidence is None
+
+
+def test_ai_mode_calls_agent_once_per_offer(monkeypatch):
+    s = ai_session(monkeypatch)
+    calls = agent(monkeypatch, returns_finding())
+    propose(s, "study-hp-target-returns")
+    propose(s, "study-hp-target-returns")
+    assert calls == ["study-hp-target-returns"]
+
+
+def test_ai_mode_falls_back_to_rules(monkeypatch):
+    s = ai_session(monkeypatch)
+    agent(monkeypatch, error=LLMError("provider down"))
+    a = propose(s, "study-hp-target-returns")
+    assert {e.rule_id for e in a.risk.evidence} == {"misleading_returns"}
+    assert "Observed:" not in a.risk.evidence[0].evidence
+    assert any(e.kind == "risk_agent_fallback" and e.detail == "study-hp-target-returns" for e in s.events)
+
+
+def test_ai_mode_applies_to_scenario_sessions(monkeypatch):
+    s = ai_session(monkeypatch)
+    s.scenario_id = "risk-c"
+    agent(monkeypatch, [risk_agent.Finding(rule_id="excessive_data", quote="government ID",
+                                           reason="Checkout asks for an ID document.")])
+    a = propose(s, "offer-privacy")
+    assert [e.rule_id for e in a.risk.evidence] == ["excessive_data"] and "Observed:" in a.risk.evidence[0].evidence

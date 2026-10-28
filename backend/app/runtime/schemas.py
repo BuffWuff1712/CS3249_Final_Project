@@ -247,6 +247,8 @@ class CartCheckout(Model):
 
 class Session(Model):
     search_provider: Literal["catalogue", "browser_use"] = "catalogue"
+    # Who finds risk signals in local products; fixed per session like the search provider.
+    risk_detection: Literal["rules", "ai"] = "rules"
     live_products: dict[str, Product] = Field(default_factory=dict)
     live_merchants: dict[str, Merchant] = Field(default_factory=dict)
     live_risk: dict[str, LiveRiskReview] = Field(default_factory=dict)
