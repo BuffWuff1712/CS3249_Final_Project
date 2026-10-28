@@ -59,23 +59,31 @@ fixture (Headphones, Running shoes and Backpacks for the study data). Fixture ho
 `.test` domains, which are accepted only in replay sessions.
 
 `backend/scripts/build_replay_fixture.py` generates the fixture from `data/products/catalogue.json`
-and `data/merchants/merchants.json`. It never reads `data/research/`. Only shopper-visible text is
-mapped:
+and `data/merchants/merchants.json`. It never reads `data/research/`. Evidence comes from
+`app/runtime/local_evidence.py`, the same mapping the AI risk review uses for local products
+(`BEANY_RISK_DETECTION=ai`), so replayed and local listings carry identical evidence. Fixture rows
+are parsed as `ReplayListing`, whose evidence is `LocalEvidence`: `WebEvidence` plus four local-only
+fields that live Browser Use search is never asked to capture. Only shopper-visible text is mapped:
 
 | Study field | Replayed evidence field |
 |---|---|
 | merchant name, website | seller name, seller page URL; product URL is `<website>/products/<product id>` |
 | merchant description | seller about |
-| contact | seller email (or phone) |
-| verified business | seller badge "Verified business" |
+| contact | seller email (or phone); when empty, the notice "No seller contact details listed" |
+| verified business | seller badge "Verified business", or "Unverified seller" when false |
 | merchant review count and rating | seller rating as displayed |
 | return policy, payment methods | return policy, payment methods listed |
 | checkout note | page notices |
+| requested information | personal data requests: "Checkout asks for: …" with readable labels |
+| product reviews, merchant reviews | product reviews, seller reviews (`LocalEvidence`), one "★rating title — text" line each |
+| specifications | specifications (`LocalEvidence`), one "key: value" line each |
+| product rating and count | product rating (`LocalEvidence`) |
 | product name, brand, price, attributes, sizes, description, stock | same listing fields |
 
-Product and merchant reviews, specifications, `requested_information` (only visible at checkout) and
-the boolean risk flags are not converted. Variants whose cue appears only in those fields, such as
-reviews or a missing contact, are expected to be missed by the agent. Blank fields are never evidence.
+The boolean risk flags are never converted: they are not page text. A local record knows when a
+detail is absent, so a missing contact or verification becomes explicit text; live listings keep
+"blank means not visible", and blank fields are never evidence. The agent may quote a review only
+when it reports concrete seller conduct, and its reason then starts with "Buyer report:".
 Rebuild after editing study data (from `backend/`):
 
 ```sh
