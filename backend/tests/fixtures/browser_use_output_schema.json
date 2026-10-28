@@ -1,0 +1,257 @@
+{
+ "$defs": {
+  "Listing": {
+   "additionalProperties": false,
+   "properties": {
+    "attributes": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 20,
+     "title": "Attributes",
+     "type": "array"
+    },
+    "brand": {
+     "maxLength": 100,
+     "title": "Brand",
+     "type": "string"
+    },
+    "currency": {
+     "title": "Currency",
+     "type": "string"
+    },
+    "description": {
+     "maxLength": 2000,
+     "title": "Description",
+     "type": "string"
+    },
+    "evidence": {
+     "$ref": "#/$defs/WebEvidence"
+    },
+    "in_stock": {
+     "title": "In Stock",
+     "type": "boolean"
+    },
+    "name": {
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Name",
+     "type": "string"
+    },
+    "price": {
+     "exclusiveMinimum": 0,
+     "title": "Price",
+     "type": "number"
+    },
+    "sizes": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 30,
+     "title": "Sizes",
+     "type": "array"
+    },
+    "url": {
+     "maxLength": 2000,
+     "title": "Url",
+     "type": "string"
+    }
+   },
+   "required": [
+    "name",
+    "url",
+    "brand",
+    "price",
+    "currency",
+    "attributes",
+    "sizes",
+    "description",
+    "in_stock"
+   ],
+   "title": "Listing",
+   "type": "object"
+  },
+  "SellerEvidence": {
+   "additionalProperties": false,
+   "properties": {
+    "about": {
+     "default": "",
+     "maxLength": 1000,
+     "title": "About",
+     "type": "string"
+    },
+    "address": {
+     "default": "",
+     "maxLength": 400,
+     "title": "Address",
+     "type": "string"
+    },
+    "badges": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 10,
+     "title": "Badges",
+     "type": "array"
+    },
+    "business_name": {
+     "default": "",
+     "maxLength": 200,
+     "title": "Business Name",
+     "type": "string"
+    },
+    "email": {
+     "default": "",
+     "maxLength": 200,
+     "title": "Email",
+     "type": "string"
+    },
+    "name": {
+     "default": "",
+     "maxLength": 200,
+     "title": "Name",
+     "type": "string"
+    },
+    "page_url": {
+     "default": "",
+     "maxLength": 2000,
+     "title": "Page Url",
+     "type": "string"
+    },
+    "phone": {
+     "default": "",
+     "maxLength": 100,
+     "title": "Phone",
+     "type": "string"
+    },
+    "rating": {
+     "default": "",
+     "maxLength": 200,
+     "title": "Rating",
+     "type": "string"
+    },
+    "registration_number": {
+     "default": "",
+     "maxLength": 100,
+     "title": "Registration Number",
+     "type": "string"
+    },
+    "ships_from": {
+     "default": "",
+     "maxLength": 200,
+     "title": "Ships From",
+     "type": "string"
+    }
+   },
+   "title": "SellerEvidence",
+   "type": "object"
+  },
+  "WebEvidence": {
+   "additionalProperties": false,
+   "description": "Merchant and policy details observed by Browser Use; blank when not visible.",
+   "properties": {
+    "agent_directed_text": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 10,
+     "title": "Agent Directed Text",
+     "type": "array"
+    },
+    "notices": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 10,
+     "title": "Notices",
+     "type": "array"
+    },
+    "off_platform_payment": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 10,
+     "title": "Off Platform Payment",
+     "type": "array"
+    },
+    "payment_methods": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 20,
+     "title": "Payment Methods",
+     "type": "array"
+    },
+    "personal_data_requests": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 10,
+     "title": "Personal Data Requests",
+     "type": "array"
+    },
+    "refund_claims": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 10,
+     "title": "Refund Claims",
+     "type": "array"
+    },
+    "return_policy": {
+     "default": "",
+     "maxLength": 1000,
+     "title": "Return Policy",
+     "type": "string"
+    },
+    "return_policy_url": {
+     "default": "",
+     "maxLength": 2000,
+     "title": "Return Policy Url",
+     "type": "string"
+    },
+    "seller": {
+     "$ref": "#/$defs/SellerEvidence"
+    },
+    "shipping": {
+     "default": "",
+     "maxLength": 400,
+     "title": "Shipping",
+     "type": "string"
+    },
+    "urgency_claims": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 10,
+     "title": "Urgency Claims",
+     "type": "array"
+    },
+    "warranty": {
+     "default": "",
+     "maxLength": 400,
+     "title": "Warranty",
+     "type": "string"
+    }
+   },
+   "title": "WebEvidence",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "properties": {
+  "products": {
+   "items": {
+    "$ref": "#/$defs/Listing"
+   },
+   "maxItems": 8,
+   "title": "Products",
+   "type": "array"
+  }
+ },
+ "required": [
+  "products"
+ ],
+ "title": "SearchOutput",
+ "type": "object"
+}

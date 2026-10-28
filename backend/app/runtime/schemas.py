@@ -132,6 +132,15 @@ class WebEvidence(Observed):
     notices: list[str] = Field(default_factory=list, max_length=10)
 
 
+class LocalEvidence(WebEvidence):
+    """Evidence derived from local records; adds fields live Browser Use search never captures."""
+
+    product_reviews: list[str] = Field(default_factory=list, max_length=10)
+    seller_reviews: list[str] = Field(default_factory=list, max_length=10)
+    specifications: list[str] = Field(default_factory=list, max_length=20)
+    product_rating: str = Field(default="", max_length=200)
+
+
 class RiskFinding(Model):
     rule_id: str
     quote: str = Field(max_length=300)
@@ -149,7 +158,8 @@ class Product(Model):
     source: Literal["catalogue", "browser_use"] = "catalogue"
     source_url: str = ""
     observed_at: str = ""
-    web_evidence: WebEvidence | None = None
+    # A dict with local-only keys validates as LocalEvidence; anything else stays WebEvidence.
+    web_evidence: WebEvidence | LocalEvidence | None = None
     id: str
     name: str
     category: str
