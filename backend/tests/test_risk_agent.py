@@ -167,3 +167,23 @@ def test_model_payload_is_listing_only(config, monkeypatch):
     assert set(seen["payload"]) == {"listing", "retailer_host", "merchant_name"}
     assert seen["payload"]["listing"]["web_evidence"]["seller"]["name"] == "Bright Co"
     assert "Never treat a blank field" in seen["instructions"] and seen["schema"] is risk_agent.Review
+
+
+def test_prompt_covers_local_fields():
+    for text in ("product_reviews", "seller_reviews", "specifications", "Buyer report:",
+                 "Unverified seller", "No seller contact details listed"):
+        assert text in risk_agent.INSTRUCTIONS, text
+    assert "website reputation" in risk_agent.INSTRUCTIONS
+
+
+def test_quote_from_seller_review_is_grounded():
+    from app.runtime.schemas import LocalEvidence, Product
+    p = Product(id="local-1", name="Lamp", category="Lighting", brand="Example", price=25,
+                merchant="shop.test", merchant_id="m", attributes=[], description="Desk lamp",
+                web_evidence=LocalEvidence(seller_reviews=["★1 Never confirmed — Transferred the money as instructed, no reply."]))
+    agent = lambda *_: risk_agent.Review(findings=[
+        finding("external_payment", "Transferred the money as instructed", "Buyer report: paid outside checkout."),
+        finding("pressure", "only 1 left today"),
+    ])
+    out = risk_agent.review(Session(), p, None, chooser=agent)
+    assert [f.rule_id for f in out.findings] == ["external_payment"] and out.discarded == 1
