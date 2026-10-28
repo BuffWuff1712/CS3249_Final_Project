@@ -5,7 +5,7 @@ import httpx
 import pytest
 from app.runtime import browser_search as browser, service, shopping_tools, cart, risk_agent
 from app.runtime.gateway import LLMError
-from app.runtime.schemas import Session, Fact, CartSelection, CartCheckout
+from app.runtime.schemas import Session, Fact, CartSelection, CartCheckout, LocalEvidence
 from scripts import build_replay_fixture as fixture
 
 FIXTURE = "data/replay/study_listings.json"
@@ -44,19 +44,32 @@ def test_converter_keeps_only_shopper_visible_text():
     rows = {r["listing"]["url"].rsplit("/", 1)[-1]: r for r in data["listings"]}
     assert all(k.startswith("study-") for k in rows)
     for r in data["listings"]:
-        browser.Listing.model_validate(r["listing"])
+        browser.ReplayListing.model_validate(r["listing"])
     external = rows["study-hp-target-external"]["listing"]["evidence"]
     assert "transfer the amount to our bank account" in external["seller"]["about"]
     assert external["payment_methods"] == ["Bank transfer"]
     data_high = rows["study-hp-target-data-high"]["listing"]["evidence"]
     assert "government-issued ID" in data_high["notices"][0]
-    nobiz = rows["study-hp-target-nobiz"]["listing"]["evidence"]["seller"]
-    assert "email" not in nobiz and "badges" not in nobiz
+    nobiz = rows["study-hp-target-nobiz"]["listing"]["evidence"]
+    assert nobiz["seller"]["badges"] == ["Unverified seller"] and "email" not in nobiz["seller"]
+    assert "No seller contact details listed" in nobiz["notices"]
+    data_mid = rows["study-hp-target-data-mid"]["listing"]["evidence"]
+    assert data_mid["personal_data_requests"] == ["Checkout asks for: date of birth, social media account"]
+    assert rows["study-hp-target-returns"]["listing"]["evidence"]["seller_reviews"]
+    assert "specifications" in rows["study-hp-target-trusted"]["listing"]["evidence"]
     text = json.dumps(data)
     for flag in ("external_payment", "misleading_returns", "lookalike_identity", "pressure_tactics", "merchant_reviews"):
         assert flag not in text
     source = Path(fixture.__file__).read_text(encoding="utf-8")
     assert "research/" not in source.split('"""', 2)[2] and "ground_truth" not in source
+
+
+def test_replayed_products_keep_local_evidence(replay):
+    s = headphones()
+    shopping_tools.search_products(s)
+    assert s.live_products
+    for p in s.live_products.values():
+        assert isinstance(p.web_evidence, LocalEvidence) and p.web_evidence.product_reviews, p.source_url
 
 
 def test_only_option_limits_listings():
