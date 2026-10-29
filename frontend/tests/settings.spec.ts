@@ -26,7 +26,7 @@ test("gear opens session permissions and saves them across navigation", async ({
 
 test("settings without a session explains how to start", async ({ page }) => {
   await page.goto("/settings");
-  await expect(page.getByRole("alert")).toContainText("Start a shopping session");
+  await expect(page.getByRole("alert").filter({ hasText: "Start a shopping session" })).toContainText("Start a shopping session");
   await expect(page.getByRole("button", { name: "Save permissions" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Back to shopping" })).toBeEnabled();
 });

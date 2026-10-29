@@ -82,6 +82,7 @@ export function Brief({
                 onChange={(e) => {
                   setField(e.target.value);
                   setValue(session.brief[e.target.value]?.value || "");
+                  setHard(session.brief[e.target.value]?.hard ?? false);
                 }}
               >
                 {fields.map((f) => (

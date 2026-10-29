@@ -17,6 +17,10 @@ export default defineConfig({
       url: "http://localhost:8100/health",
       env: {
         BEANY_LLM_MODE: "mock",
+        BEANY_SEARCH_PROVIDER: "catalogue",
+        BROWSER_USE_API_KEY: "",
+        BROWSER_USE_REPLAY: "",
+        OPENAI_API_KEY: "",
         BEANY_DB: "../backend/data/e2e.sqlite3",
         BEANY_RESEARCH_KEY: "e2e-key",
         FRONTEND_ORIGIN: "http://localhost:3100",

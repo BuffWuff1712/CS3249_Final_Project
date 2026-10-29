@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-29",
+  "scope": "fresh checkout /shop; fictional local records; no paid providers",
+  "reference": "mockup-1.png",
+  "desktop_viewport": {
+    "width": 1487,
+    "height": 1058,
+    "device_scale_factor": 1
+  },
+  "frontend_tests": {
+    "passed": 166,
+    "failed": 0,
+    "log": "frontend-tests.log"
+  },
+  "independent_probes": {
+    "passed": 3,
+    "failed": 0
+  },
+  "typecheck": "passed",
+  "production_build": "passed",
+  "direct_browser_checks": [
+    "headphone request and selection",
+    "readonly negative-review question preserves selection",
+    "combined reasons/reviews/returns question",
+    "exact product source focus",
+    "headphone decision completion",
+    "running-shoe priority conflict and answer",
+    "change to light weight",
+    "same-variant seller change to Everyday Run",
+    "320px running-shoe selection and completion",
+    "390px/320px reflow without overflow",
+    "no browser warning/error logs"
+  ],
+  "fixed_review_findings": [
+    "seller preference preserves explicit product lock",
+    "repeated seller criterion preserves lock",
+    "imperative alternatives remain readonly",
+    "capped history follows newest message ID",
+    "combined evidence questions retain all requested topics and relevant source links"
+  ],
+  "remaining_actionable_findings": 0,
+  "real_orders": 0,
+  "paid_api_calls": 0,
+  "preview_url": "http://localhost:3000/shop",
+  "qa_report": "../../design-qa.md",
+  "limitations": [
+    "bounded local interpretation, not an open-ended LLM",
+    "fictional reviews/terms, not verified merchant claims",
+    "visual reference contains desktop only; mobile is a responsive adaptation"
+  ]
+}

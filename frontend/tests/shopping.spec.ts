@@ -1,4 +1,33 @@
 import { test, expect } from "@playwright/test";
+test("brief field selector restores each field's hard constraint", async ({ page, request }) => {
+  const session = await (await request.post("http://localhost:8100/sessions")).json();
+  for (const [field, value, hard] of [["budget", "300", true], ["features", "wireless", false]] as const) {
+    await request.put(`http://localhost:8100/sessions/${session.id}/brief`, {
+      data: { field, fact: { value, source: "confirmed", hard } },
+    });
+  }
+  await page.addInitScript(id => localStorage.setItem("beany-session", id), session.id);
+  await page.goto("/");
+  await page.getByRole("button", { name: "Edit budget", exact: true }).click();
+  const selector = page.getByRole("combobox", { name: /^Preference/ });
+  const hard = page.getByRole("checkbox", { name: "Hard constraint" });
+  await expect(hard).toBeChecked();
+  await selector.selectOption("features");
+  await expect(hard).not.toBeChecked();
+  await selector.selectOption("budget");
+  await expect(hard).toBeChecked();
+  await selector.selectOption("other");
+  await expect(hard).not.toBeChecked();
+  await selector.selectOption("features");
+  await page.getByLabel("Value", { exact: true }).fill("wireless, comfortable");
+  await page.getByRole("button", { name: "Save preference" }).click();
+  await page.reload();
+  await page.getByRole("button", { name: "Edit features", exact: true }).click();
+  await expect(hard).not.toBeChecked();
+  await selector.selectOption("budget");
+  await expect(hard).toBeChecked();
+  await expect(page.getByLabel("Value", { exact: true })).toHaveValue("300");
+});
 test("conversation, specific approval and simulated receipt", async ({
   page,
 }) => {
