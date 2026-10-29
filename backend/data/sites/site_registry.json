@@ -1,0 +1,82 @@
+[
+ {
+  "domain": "shopverse.test",
+  "name": "Shopverse",
+  "kind": "marketplace",
+  "tier": "good",
+  "label": "Large marketplace",
+  "summary": "Large established marketplace; buyer protection and platform-managed refunds on all orders."
+ },
+ {
+  "domain": "dealbazaar.test",
+  "name": "DealBazaar",
+  "kind": "marketplace",
+  "tier": "mid",
+  "label": "Loosely regulated marketplace",
+  "summary": "Loosely regulated sellers; product quality varies; refunds are inconvenient."
+ },
+ {
+  "domain": "northline-outfitters.test",
+  "name": "Northline Outfitters",
+  "kind": "independent",
+  "tier": "good",
+  "label": "Established retailer",
+  "summary": "Established independent retailer; verified business since 2012."
+ },
+ {
+  "domain": "harbour-lane-goods.test",
+  "name": "Harbour Lane Goods",
+  "kind": "independent",
+  "tier": "good",
+  "label": "Verified small business",
+  "summary": "Registered small business; Small Business Verified."
+ },
+ {
+  "domain": "campus-corner-clearance.test",
+  "name": "Campus Corner Clearance",
+  "kind": "independent",
+  "tier": "good",
+  "label": "Verified small business",
+  "summary": "Registered small business; Small Business Verified."
+ },
+ {
+  "domain": "primegift-mart.test",
+  "name": "PrimeGift Mart",
+  "kind": "independent",
+  "tier": "good",
+  "label": "Verified small business",
+  "summary": "Registered small business; Small Business Verified."
+ },
+ {
+  "domain": "easyreturn-store.test",
+  "name": "EasyReturn Store",
+  "kind": "independent",
+  "tier": "good",
+  "label": "Verified small business",
+  "summary": "Registered small business; Small Business Verified."
+ },
+ {
+  "domain": "urban-kit-club.test",
+  "name": "Urban Kit Club",
+  "kind": "independent",
+  "tier": "good",
+  "label": "Verified small business",
+  "summary": "Registered small business; Small Business Verified."
+ },
+ {
+  "domain": "globalship-direct.test",
+  "name": "GlobalShip Direct",
+  "kind": "independent",
+  "tier": "good",
+  "label": "Verified small business",
+  "summary": "Registered small business; Small Business Verified."
+ },
+ {
+  "domain": "best-gear-outlet.test",
+  "name": "Best Gear Outlet",
+  "kind": "independent",
+  "tier": "poor",
+  "label": "Little-known website",
+  "summary": "This website is rarely mentioned anywhere and has almost no independent buyer reports."
+ }
+]

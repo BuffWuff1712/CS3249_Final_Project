@@ -42,6 +42,16 @@ class Review(Model):
     date: str  # ISO date, fictional
 
 
+class Site(Model):
+    """A registered website and its reputation; looked up by exact host."""
+    domain: str
+    name: str
+    kind: Literal["marketplace", "independent"]
+    tier: Literal["good", "mid", "poor"]
+    label: str = Field(max_length=40)
+    summary: str = Field(max_length=200)
+
+
 class Merchant(Model):
     id: str
     name: str
@@ -61,6 +71,7 @@ class Merchant(Model):
     inconsistent_information: bool = False
     merchant_reviews: list[Review] = Field(default_factory=list)
     checkout_note: str = ""
+    site: Site | None = None  # attached from the site registry, never stored in merchants.json
 
 
 class RiskEvidence(Model):
