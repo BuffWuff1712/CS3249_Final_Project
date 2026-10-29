@@ -13,6 +13,20 @@ Publication verified: 21 open task issues plus the tracking issue.
 - Keep supporting evidence optional, hard limits intact and final selection under user control.
 - Baseline, assignments, instrumentation and exports are later study-readiness work, not final-presentation blockers.
 
+## Implementation pass — 29 October 2026
+
+Continue the existing CUI work on `feat/cui-v2-issues`. Keep the generated `frontend/next-env.d.ts` outside implementation commits.
+
+1. Corrections and conflicts (#11–12): atomic typed state, explicit no-match and unchanged-winner explanations, strict budgets, and input recovery. Verify focused browser and decision tests.
+2. Seller choice and completion (#13–16): exact variant identity, observable cautions, optional sources, selection invalidation and validated refresh persistence. Verify a complete decision without opening evidence.
+3. Shared second category and explanation (#9–10, #17–18): running-shoes negotiation, source-linked decision steps, truthful completed activity, keyboard and narrow-screen checks.
+4. Study and demo preparation (#19–20): update run instructions, write the protocol, scoring rubric, reproducible demo script and presentation outline. No invented participant results.
+5. Final checkpoint: backend regression suite, frontend typecheck/build, full desktop/mobile Playwright suite, screenshots/console inspection and code review. Record exact evidence before marking work complete.
+
+Implementation and verification: #9–19 are implemented/documented locally. Final checks: 430 backend tests passed with five existing skips; 82 Playwright checks passed across desktop/mobile; typecheck and production build passed. The budget-guard mutation was caught and restored. Source/acceptance details and screenshots are in [`docs/cui-v2-delivery.md`](../docs/cui-v2-delivery.md).
+
+#20 has a runnable system, silent recordings, a reproducible demo script and timed presentation notes. Team narration/rehearsal, historical-deck validation and the final course submission remain human deliverables. #21–24 remain the separate pre-recruitment gate. GitHub issue states are not changed by this local implementation record.
+
 ## Final demo and study plan
 
 - [#4 Fix hard-constraint state when switching brief fields](https://github.com/BuffWuff1712/CS3249_Final_Project/issues/4) — S · 2 files.
@@ -57,4 +71,4 @@ Publication verified: 21 open task issues plus the tracking issue.
 
 ## Publication record
 
-The prepared scope is in `docs/github-issues/cui-v2-issue-plan.json`. Verified URLs are in `docs/github-issues/cui-v2-publication.json`. GitHub status is the task source of truth. No application changes, commits or branch operations were performed.
+The original prepared scope is in `docs/github-issues/cui-v2-issue-plan.json`. Verified publication URLs are in `docs/github-issues/cui-v2-publication.json`; their saved open states describe publication time. GitHub status is the task source of truth. That initial publication did not change application code; the implementation pass above records subsequent delivery.

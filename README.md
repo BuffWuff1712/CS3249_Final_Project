@@ -4,6 +4,16 @@ Beany is a Conversational User Interface designed for agentic shopping and comme
 
 An LLM model interprets conversations; Python controls permissions, product search, policy decisions and simulated checkout. Every product and merchant is fictional. No payment or real shopping service is connected.
 
+## Current CUI demo
+
+Open **http://localhost:3000/shop** for the PRD v2 experience: headphones and running shoes, a compact editable needs summary, personalised comparative reasoning, optional source evidence, priority correction, exact-product seller changes, visible payment cautions and explicit offer selection. You can finish without opening evidence or entering checkout. All records are fictional.
+
+This route runs entirely in the frontend with a bounded deterministic interpreter and the versioned `beany-cui-v3.0` fixtures in `frontend/src/lib/shoppingFixtures.ts`. No backend or API credentials are required. Run `npm install`, `npm run build` and `npm run start` from `frontend`, then open `/shop`; for development use `npm run dev`. It is a working interaction prototype, not open-ended LLM conversation or live web research.
+
+Needs, the last request and any selected offer are stored in this browser. Refresh rechecks the offer against the current fixture and needs. Editing needs clears selection; `Start fresh` clears only this CUI decision. Storage failures are visible. Unsupported categories and USD requests ask for clarification, and budgets never silently increase.
+
+The `/` route remains the classic backend-connected simulation described below. Its SQLite sessions, research exports, cart and receipts are independent of `/shop`. See the [demo/presentation script](docs/final-demo.md), [study protocol](docs/evaluation-guide.md), and [CUI delivery and verification notes](docs/cui-v2-delivery.md).
+
 ## Requirements
 
 Python 3.11+, Node.js 20.9+ (Node 22 recommended), npm. Run one backend worker for local studies.
@@ -60,9 +70,9 @@ For offline testing set `BEANY_LLM_MODE=mock`. This mode is visibly labelled and
 
 Start with a prompt or free text. Vague requests can trigger a clarification; specific requests search immediately. The brief records confirmed, suggested and unspecified values. Edit/remove preferences directly. Currency accepts SGD/USD; category accepts Running shoes, Headphones, Backpacks; list fields use commas. A hard budget is never bypassed by approval.
 
-Permissions are changed explicitly through their own form. Guided mode always asks for approval. Balanced mode can perform simulated checkout automatically only when approval is disabled and every policy rule returns ALLOW. Missing budgets and unverified fictional merchants require review by default.
+Permissions in the classic interface are changed explicitly through their own form. Missing budgets and unverified fictional merchants require review by default. Even ALLOW proposals wait for explicit checkout; adding an item to the cart is not approval.
 
-Any brief/permission edit supersedes pending proposals. Ask for options again to search with the new state. Approvals bind to a proposal ID and a hash of its complete product/payment/data-sharing details. Reject, request an alternative, refine through chat, or cancel. Receipts and state survive refresh/restart. Fresh session deletes the current session; export study logs first.
+Any classic brief/permission edit supersedes pending proposals. Ask for options again to search with the new state. Approvals bind to a proposal ID and a hash of its complete product/payment/data-sharing details. Reject, request an alternative, refine through chat, or cancel. Receipts and state survive refresh/restart. A fresh classic session retains prior server sessions; export study logs before any explicit deletion.
 
 ## Tests
 
