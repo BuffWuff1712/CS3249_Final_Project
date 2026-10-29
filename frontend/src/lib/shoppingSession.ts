@@ -1,12 +1,13 @@
 import type { Fact } from "./beany";
-import type { ComparisonResult, NeedKey, Needs, Priority, SellerChoice, ShoppingDecision } from "./decision";
+import type { ComparisonActivity, ComparisonResult, NeedKey, Needs, Priority, SellerChoice, ShoppingDecision } from "./decision";
 import { interpretPurchase, sellerPreferenceFrom, type IntentResult } from "./purchaseIntent";
 import { answerShoppingQuestion, comparisonReply, isShoppingQuestion, type ShoppingAnswer } from "./shoppingAnswers";
 import { compareNeeds } from "./shoppingScenario";
 import { SCENARIO_VERSION, shoppingScenario } from "./shoppingFixtures";
 import { categoryOf, priorities, validateNeed } from "./shoppingNeeds";
 
-export type ShoppingMessage = { id: string; role: "user" | "assistant"; text: string; evidence: string[] };
+export type ShoppingComparison = { activity: ComparisonActivity[]; excludedCount: number; summary: string };
+export type ShoppingMessage = { id: string; role: "user" | "assistant"; text: string; evidence: string[]; comparison?: ShoppingComparison };
 const MAX_MESSAGES = 60;
 
 export type ShoppingState = {
@@ -40,7 +41,14 @@ function respond(state: ShoppingState, answer: ShoppingAnswer): ShoppingState {
 }
 function comparisonResponse(state: ShoppingState): ShoppingState {
   const decision = state.result?.decision;
-  return respond(state, decision ? comparisonReply(decision, state.change) : { text: state.result?.message || "No comparison is available.", evidence: [] });
+  const response = respond(state, decision ? comparisonReply(decision, state.change) : { text: state.result?.message || "No comparison is available.", evidence: [] });
+  if (!state.result) return response;
+  const comparison: ShoppingComparison = {
+    activity: state.result.activity,
+    excludedCount: decision?.concerns.filter(concern => concern.blocked).length || 0,
+    summary: decision ? ["comparison", "seller"].map(id => decision.reasons.find(reason => reason.id === id)?.text).filter(Boolean).join(" ") : "",
+  };
+  return { ...response, messages: response.messages.map((message, index) => index === response.messages.length - 1 ? { ...message, comparison } : message) };
 }
 
 function explainChange(previous: ShoppingDecision | null | undefined, next: ShoppingDecision | null): string {
@@ -147,7 +155,17 @@ function readMessages(value: unknown): ShoppingMessage[] {
     const id = Number(message.id.replace("message-", ""));
     if (!Number.isSafeInteger(id + MAX_MESSAGES + 1) || id <= previousId) throw new Error("Invalid conversation order");
     previousId = id; seen.add(message.id);
-    return { id: message.id, role: message.role as ShoppingMessage["role"], text: message.text, evidence: [...new Set(message.evidence as string[])] };
+    let comparison: ShoppingComparison | undefined;
+    if (message.comparison !== undefined) {
+      const snapshot = message.comparison;
+      if (message.role !== "assistant" || !isRecord(snapshot) || !Array.isArray(snapshot.activity) || snapshot.activity.length > 10 || !Number.isSafeInteger(snapshot.excludedCount) || Number(snapshot.excludedCount) < 0 || Number(snapshot.excludedCount) > shoppingScenario.offers.length || typeof snapshot.summary !== "string" || snapshot.summary.length > 2000) throw new Error("Invalid comparison history");
+      const activity = snapshot.activity.map(step => {
+        if (!isRecord(step) || typeof step.id !== "string" || step.id.length > 50 || typeof step.label !== "string" || step.label.length > 1000 || !["completed", "unavailable"].includes(String(step.state)) || !Array.isArray(step.evidence) || step.evidence.length > evidenceIds.size || step.evidence.some(id => typeof id !== "string" || !evidenceIds.has(id))) throw new Error("Invalid comparison activity");
+        return { id: step.id, label: step.label, state: step.state as ComparisonActivity["state"], evidence: [...new Set(step.evidence as string[])] };
+      });
+      comparison = { activity, excludedCount: Number(snapshot.excludedCount), summary: snapshot.summary };
+    }
+    return { id: message.id, role: message.role as ShoppingMessage["role"], text: message.text, evidence: [...new Set(message.evidence as string[])], ...(comparison ? { comparison } : {}) };
   });
 }
 function readNeeds(value: unknown): Needs | null {

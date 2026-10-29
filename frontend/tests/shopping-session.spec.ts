@@ -89,3 +89,31 @@ test("seller-only preferences preserve the explicit product lock through chat, e
   expect(state.result?.decision?.offer.id).toBe("echo-quiet-everyday");
   expect(restoreShoppingState(saveShoppingState(state)).choice?.productId).toBe("echo-quiet");
 });
+
+test("comparison history survives follow-ups and refresh without reusing later comparison evidence", () => {
+  const first = shoppingReducer(initialShoppingState, { type: "send", text: request });
+  const snapshot = first.messages.at(-1)!.comparison!;
+  expect(snapshot.activity).toEqual(first.result!.activity);
+  expect(snapshot.summary).toContain("Echo Quiet");
+  const question = shoppingReducer(first, { type: "send", text: "What do reviews say?" });
+  expect(question.messages.filter(message => message.comparison)).toHaveLength(1);
+  const next = shoppingReducer(question, { type: "send", text: "Actually, comfort matters more" });
+  const restored = restoreShoppingState(saveShoppingState(next));
+  const comparisons = restored.messages.filter(message => message.comparison);
+  expect(comparisons).toHaveLength(2);
+  expect(comparisons[0].comparison).toEqual(snapshot);
+  expect(comparisons[1].comparison!.summary).toContain("Luma Air");
+  const legacy = JSON.parse(saveShoppingState(first));
+  legacy.messages.forEach((message: { comparison?: unknown }) => delete message.comparison);
+  expect(restoreShoppingState(JSON.stringify(legacy)).result!.decision!.product.id).toBe(first.result!.decision!.product.id);
+});
+
+test("unrecognized evidence in stored comparison history is rejected", () => {
+  const state = shoppingReducer(initialShoppingState, { type: "send", text: request });
+  const saved = JSON.parse(saveShoppingState(state));
+  saved.messages.at(-1).comparison.activity[0].evidence = ["invented-record"];
+  const restored = restoreShoppingState(JSON.stringify(saved));
+  expect(restored.messages).toEqual([]);
+  expect(restored.selected).toBe(false);
+  expect(restored.notice).toContain("invalid");
+});

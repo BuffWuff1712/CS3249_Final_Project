@@ -14,7 +14,7 @@ async function send(page: Page, value = request) {
 }
 
 test("comparison stages reveal in order while the composer and frame stay steady", async ({ page }, testInfo) => {
-  await page.setViewportSize({ width: testInfo.project.name === "mobile" ? 390 : 1487, height: 1058 });
+  await page.setViewportSize({ width: testInfo.project.name === "mobile" ? 320 : 1487, height: 1058 });
   await open(page);
   const composer = page.getByLabel("Describe your purchase", { exact: true });
   const panel = page.getByLabel("Current decision", { exact: true });
@@ -41,6 +41,8 @@ test("comparison stages reveal in order while the composer and frame stay steady
   await page.clock.runFor(1);
   await expect(page.getByRole("article", { name: "Current recommendation" })).toContainText("Echo Quiet");
   await expect(progress).toHaveCount(0);
+  await page.clock.runFor(200);
+  await page.screenshot({ path: testInfo.outputPath("comparison-final.png"), animations: "disabled" });
   const after = await composer.boundingBox(); const panelAfter = await panel.boundingBox();
   const needsAfter = await page.getByLabel("Purchase needs", { exact: true }).boundingBox();
   expect(Math.abs(needsAfter!.width - needsBefore!.width)).toBeLessThanOrEqual(2);
@@ -162,4 +164,27 @@ test("follow-up answer starts inside the chat viewport above older comparison ac
   expect(geometry.top).toBeGreaterThanOrEqual(-2);
   expect(geometry.top).toBeLessThan(geometry.height);
   expect(geometry.bottom).toBeGreaterThan(0);
+});
+
+
+test("completed checks stay collapsed between the request and answer across follow-ups and refresh", async ({ page }) => {
+  await open(page); await send(page); await page.clock.runFor(2200);
+  const activity = page.getByLabel("Comparison activity", { exact: true });
+  await expect(activity).toHaveCount(1);
+  const summary = activity.locator("summary");
+  await expect(summary).toHaveText("Compared 2 models · Checked 3 sellers · Excluded 1");
+  expect(await activity.locator("details").getAttribute("open")).toBeNull();
+  expect(await activity.evaluate(element => ({
+    previous: element.previousElementSibling?.textContent, next: element.nextElementSibling?.textContent,
+  }))).toEqual({ previous: expect.stringContaining(request), next: expect.stringContaining("I compared 2 fictional") });
+  await summary.focus(); await page.keyboard.press("Enter");
+  await expect(activity).toContainText("Compared supplied return periods and payment terms");
+  await summary.press("Enter");
+  await send(page, "What do reviews say?"); await page.clock.runFor(300);
+  await expect(activity).toHaveCount(1);
+  await page.reload(); await expect(activity).toHaveCount(1);
+  await expect(summary).toHaveText("Compared 2 models · Checked 3 sellers · Excluded 1");
+  await send(page, "Actually, comfort matters more"); await page.clock.runFor(2200);
+  await expect(page.getByLabel("Comparison activity", { exact: true })).toHaveCount(2);
+  await expect(page.getByRole("article", { name: "Current recommendation" })).toContainText("Luma Air");
 });

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { Fragment, useEffect, useReducer, useRef, useState } from "react";
 import type { NeedKey } from "@/lib/decision";
 import { restoreShoppingState, saveShoppingState, type ShoppingAction } from "@/lib/shoppingSession";
 import { initialPresentationState, presentationReducer, presentationSchedule, presentationStatus } from "@/lib/shoppingPresentation";
@@ -48,7 +48,8 @@ export function ShoppingWorkspace() {
   useEffect(() => {
     const container = history.current;
     if (!container) return;
-    const target = busy ? container.querySelector(".cui-progress") : container.querySelector(".cui-conversation-history .cui-turn:last-child");
+    let target = busy ? container.querySelector(".cui-progress") : container.querySelector(".cui-conversation-history .cui-turn:last-child");
+    if (!busy && target?.previousElementSibling?.classList.contains("cui-activity")) target = target.previousElementSibling;
     if (target) container.scrollTop += target.getBoundingClientRect().top - container.getBoundingClientRect().top;
     else container.scrollTop = 0;
   }, [state.messages.at(-1)?.id, pending?.step]);
@@ -83,18 +84,19 @@ export function ShoppingWorkspace() {
             {storageNotice && <p className="cui-notice cui-notice--review">{storageNotice}</p>}
             {state.notice && <p className="cui-notice">{state.notice}</p>}
           <div className="cui-conversation-history">
-            {state.messages.map(message => <div key={message.id} className={`cui-turn cui-turn--${message.role}`}>
+            {state.messages.map(message => <Fragment key={message.id}>
+              {message.comparison && <ComparisonActivity activity={message.comparison.activity} excludedCount={message.comparison.excludedCount} />}
+              <div className={`cui-turn cui-turn--${message.role}`}>
               <span className="cui-avatar" aria-hidden="true">{message.role === "user" ? <UserCircleIcon weight="fill" /> : "b."}</span>
               <div className="cui-turn-body"><span className="sr-only">{message.role === "user" ? "You" : "Beany"}</span><p>{message.text}</p>
                 {message.id === latestReply?.id && !!message.evidence.length && <div className="cui-message-sources">{message.evidence.filter(id => sourceIds.has(id) && !stale).map(id => <button key={id} className="cui-link" disabled={busy} onClick={() => setSource({ id })}>View {decision?.comparedProducts.find(product => product.id === id)?.name || decision?.comparedOffers.find(offer => offer.id === id)?.merchant} evidence</button>)}</div>}
+                {message.comparison?.summary && <div className="cui-comparison-story">{message.comparison.summary}</div>}
               </div>
-            </div>)}
+            </div></Fragment>)}
           </div>
           {busy && <ComparisonProgress presentation={presentation} />}
-          {!busy && decision && !stale && <p className="cui-comparison-story">{decision.reasons.find(reason => reason.id === "comparison")?.text} {decision.reasons.find(reason => reason.id === "seller")?.text}</p>}
           {!busy && state.clarification && <section aria-label="Purchase clarification" className="cui-clarification"><p>{state.clarification.reply}</p><div className="cui-actions">{state.clarification.options.map(option => <button key={option} onClick={() => send(option)}>{option}</button>)}</div></section>}
           {!busy && state.change && !stale && <section aria-label="What changed" className="cui-change"><p>{state.change}</p></section>}
-          {!busy && state.result && !stale && <ComparisonActivity activity={state.result.activity} excludedCount={decision?.concerns.filter(concern => concern.blocked).length || 0} />}
           {!busy && decision && !stale && <div className="cui-participate"><InfoIcon weight="fill" aria-hidden="true" /><p>{decision.needs.sellerPreference?.value === "lowest price" ? "Price comes first. You can choose longer returns instead." : "Longer returns are the current tie-breaker. You can put price first."}</p><button onClick={() => send(decision.needs.sellerPreference?.value === "lowest price" ? "Longer returns first" : "Prefer lowest price")}>{decision.needs.sellerPreference?.value === "lowest price" ? "Prefer longer returns" : "Prefer lowest price"}</button></div>}
           </div>
           <PurchaseComposer busy={busy} text={text} setText={setText} send={send} loaded={loaded} started={started} />
