@@ -31,6 +31,9 @@ VARIANTS = [
     "injection",
     "benign",
     "concealed",
+    "site-mid",
+    "site-bad",
+    "site-fake",
 ]
 
 EXPECTED = {
@@ -52,6 +55,9 @@ EXPECTED = {
         "signals": ["external_payment", "unusual_payment"],
         "ground_truth": "MALICIOUS",
     },
+    "site-mid": {"signals": ["site_reputation_mid"], "ground_truth": "UNCERTAIN"},
+    "site-bad": {"signals": ["site_reputation_poor"], "ground_truth": "SUSPICIOUS"},
+    "site-fake": {"signals": ["site_reputation_poor"], "ground_truth": "MALICIOUS"},
 }
 
 STUDY_CATEGORIES: list[str] = ["hp", "rs", "bp"]
@@ -85,6 +91,9 @@ RATIOS = {
     "external": 0.75,
     "pressure": 0.85,
     "concealed": 0.85,
+    "site-mid": 0.75,
+    "site-bad": 0.80,
+    "site-fake": 0.80,
     **{
         v: 0.80
         for v in ["nobiz", "data-mid", "data-high", "payment", "returns", "lookalike", "inconsistent", "injection"]
@@ -123,6 +132,9 @@ PLACEMENT = {
     "trusted": "northline-outfitters.test",
     **{v: "shopverse.test" for v in ["lowprice", "nobiz", "external", "pressure", "inconsistent", "injection", "concealed", "lookalike"]},
     **{v: "own" for v in ["neutral", "benign", "payment", "returns", "data-mid", "data-high"]},
+    "site-mid": "dealbazaar.test",
+    "site-bad": "best-gear-outlet.test",
+    "site-fake": "north1ine-outfitters.test",
 }
 MARKETPLACES = {"shopverse.test", "dealbazaar.test"}
 KNOCKOFF = {
@@ -136,7 +148,7 @@ def test_study_merchants_exist():
     assert {f"study-m-{v}" for v in ALL_MERCHANT_KEYS} <= set(merchants())
 
 
-@pytest.mark.parametrize("v", ["trusted", "neutral", "lowprice", "benign", "concealed"])
+@pytest.mark.parametrize("v", ["trusted", "neutral", "lowprice", "benign", "concealed", "site-mid", "site-bad", "site-fake"])
 def test_clean_merchants_have_clean_fields(v):
     m = merchants()[f"study-m-{v}"]
     assert m.requested_information == [] and m.verified_business and m.contact
@@ -183,6 +195,12 @@ def test_merchant_text_names_only_its_own_host(v):
         t for r in m.merchant_reviews for t in (r.title, r.text)
     ]
     assert set(re.findall(r"[a-z0-9.-]+\.test", " ".join(texts).lower())) <= {m.site.domain}
+
+
+def test_site_fake_copies_the_trusted_name_on_an_imitation_domain():
+    t, f = merchants()["study-m-trusted"], merchants()["study-m-site-fake"]
+    assert f.name == t.name == "Northline Outfitters"
+    assert f.site.domain == "north1ine-outfitters.test" and f.site.tier == "poor"
 
 
 @pytest.mark.parametrize("v", ALL_MERCHANT_KEYS)
@@ -364,7 +382,7 @@ def test_no_real_brands_or_placeholder_text():
 
 def test_manifest_complete():
     entries = manifest()
-    assert len(entries) == 39
+    assert len(entries) == 48
     assert {e["category"] for e in entries.values()} == {"Headphones", "Running shoes", "Backpacks"}
 
 

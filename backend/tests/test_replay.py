@@ -93,7 +93,7 @@ def test_replay_search_is_offline_and_filtered(replay):
     s = headphones()
     found = shopping_tools.search_products(s)
     assert found and all(p.source == "browser_use" and p.source_url.startswith("https://") for p in found)
-    assert len(s.live_products) == 21
+    assert len(s.live_products) == 24
     assert json.loads(s.events[-1].detail)["run_id"].startswith("replay-")
     assert not shopping_tools.search_products(s, "nonexistentword")
 

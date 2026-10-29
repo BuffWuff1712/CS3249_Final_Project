@@ -72,6 +72,14 @@
   "summary": "Registered small business; Small Business Verified."
  },
  {
+  "domain": "north1ine-outfitters.test",
+  "name": "North1ine Outfitters",
+  "kind": "independent",
+  "tier": "poor",
+  "label": "Imitation website",
+  "summary": "This website imitates Northline Outfitters and is not registered to that business."
+ },
+ {
   "domain": "best-gear-outlet.test",
   "name": "Best Gear Outlet",
   "kind": "independent",

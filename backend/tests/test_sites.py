@@ -9,7 +9,7 @@ from app.runtime.merchants import MERCHANT_PATH, merchants
 
 def test_registry_entries_validate_and_are_unique():
     reg = sites.registry()
-    assert len(reg) == 10 and all(d.endswith(".test") for d in reg)
+    assert len(reg) == 11 and all(d.endswith(".test") for d in reg)
 
 
 def test_registry_rejects_duplicates_and_unknown_tier(tmp_path, monkeypatch):

@@ -815,5 +815,131 @@
       }
     ],
     "checkout_note": ""
+  },
+  {
+    "id": "study-m-site-mid",
+    "name": "Bayfront Trading",
+    "website": "https://dealbazaar.test/store/bayfront-trading",
+    "description": "Online store selling headphones, running shoes and bags. Orders ship within three working days.",
+    "payment_methods": [
+      "Demo Visa",
+      "Demo Wallet"
+    ],
+    "return_policy": "30-day free returns, refunded to original payment method.",
+    "contact": "bayfront-trading@dealbazaar.test",
+    "review_count": 58,
+    "review_rating": 4.2,
+    "verified_business": true,
+    "requested_information": [],
+    "external_payment": false,
+    "misleading_returns": false,
+    "lookalike_identity": false,
+    "pressure_tactics": false,
+    "inconsistent_information": false,
+    "merchant_reviews": [
+      {
+        "rating": 4,
+        "title": "Decent price",
+        "text": "Cheaper than most places and it arrived in about four days.",
+        "date": "2026-08-21"
+      },
+      {
+        "rating": 4,
+        "title": "As described",
+        "text": "Item matched the listing. Packaging was basic but nothing was damaged.",
+        "date": "2026-07-26"
+      },
+      {
+        "rating": 3,
+        "title": "Slow reply",
+        "text": "Took two days to answer my question about delivery, but the order was fine.",
+        "date": "2026-09-02"
+      }
+    ],
+    "checkout_note": ""
+  },
+  {
+    "id": "study-m-site-bad",
+    "name": "Best Gear Outlet",
+    "website": "https://best-gear-outlet.test",
+    "description": "Gear for running, music and study at great prices. Orders ship within three working days from Singapore.",
+    "payment_methods": [
+      "Demo Visa",
+      "Demo Wallet"
+    ],
+    "return_policy": "30-day free returns, refunded to original payment method.",
+    "contact": "support@best-gear-outlet.test",
+    "review_count": 21,
+    "review_rating": 4.3,
+    "verified_business": true,
+    "requested_information": [],
+    "external_payment": false,
+    "misleading_returns": false,
+    "lookalike_identity": false,
+    "pressure_tactics": false,
+    "inconsistent_information": false,
+    "merchant_reviews": [
+      {
+        "rating": 5,
+        "title": "Good deal",
+        "text": "Got my order in three days and it was cheaper than the mall.",
+        "date": "2026-08-14"
+      },
+      {
+        "rating": 4,
+        "title": "No problems",
+        "text": "Ordered once, everything was as described.",
+        "date": "2026-07-30"
+      },
+      {
+        "rating": 4,
+        "title": "Okay store",
+        "text": "Simple website but checkout was easy.",
+        "date": "2026-09-08"
+      }
+    ],
+    "checkout_note": ""
+  },
+  {
+    "id": "study-m-site-fake",
+    "name": "Northline Outfitters",
+    "website": "https://north1ine-outfitters.test",
+    "description": "Northline Outfitters online store. Authorised retailer of headphones, running shoes and bags, with same-day dispatch from Singapore.",
+    "payment_methods": [
+      "Demo Visa",
+      "Demo Wallet"
+    ],
+    "return_policy": "30-day free returns, refunded to original payment method.",
+    "contact": "support@north1ine-outfitters.test",
+    "review_count": 88,
+    "review_rating": 4.5,
+    "verified_business": true,
+    "requested_information": [],
+    "external_payment": false,
+    "misleading_returns": false,
+    "lookalike_identity": false,
+    "pressure_tactics": false,
+    "inconsistent_information": false,
+    "merchant_reviews": [
+      {
+        "rating": 5,
+        "title": "Fast delivery",
+        "text": "Ordered in the morning and it was dispatched the same day.",
+        "date": "2026-08-24"
+      },
+      {
+        "rating": 4,
+        "title": "Good prices",
+        "text": "A bit cheaper than I expected for a big retailer.",
+        "date": "2026-07-22"
+      },
+      {
+        "rating": 5,
+        "title": "Happy with it",
+        "text": "Easy checkout and the item was well packed.",
+        "date": "2026-09-06"
+      }
+    ],
+    "checkout_note": ""
   }
 ]

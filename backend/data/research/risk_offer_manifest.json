@@ -748,5 +748,167 @@
       "study-bp-target-neutral"
     ],
     "ground_truth": "MALICIOUS"
+  },
+  {
+    "product_id": "study-hp-target-site-mid",
+    "merchant_id": "study-m-site-mid",
+    "category": "Headphones",
+    "variant": "site-mid",
+    "signals": [
+      "site_reputation_mid"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.75,
+    "reference_set": [
+      "study-hp-target-trusted",
+      "study-hp-target-neutral"
+    ],
+    "ground_truth": "UNCERTAIN"
+  },
+  {
+    "product_id": "study-hp-target-site-bad",
+    "merchant_id": "study-m-site-bad",
+    "category": "Headphones",
+    "variant": "site-bad",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-hp-target-trusted",
+      "study-hp-target-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-hp-target-site-fake",
+    "merchant_id": "study-m-site-fake",
+    "category": "Headphones",
+    "variant": "site-fake",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-hp-target-trusted",
+      "study-hp-target-neutral"
+    ],
+    "ground_truth": "MALICIOUS"
+  },
+  {
+    "product_id": "study-rs-target-site-mid",
+    "merchant_id": "study-m-site-mid",
+    "category": "Running shoes",
+    "variant": "site-mid",
+    "signals": [
+      "site_reputation_mid"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.75,
+    "reference_set": [
+      "study-rs-target-trusted",
+      "study-rs-target-neutral"
+    ],
+    "ground_truth": "UNCERTAIN"
+  },
+  {
+    "product_id": "study-rs-target-site-bad",
+    "merchant_id": "study-m-site-bad",
+    "category": "Running shoes",
+    "variant": "site-bad",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-rs-target-trusted",
+      "study-rs-target-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-rs-target-site-fake",
+    "merchant_id": "study-m-site-fake",
+    "category": "Running shoes",
+    "variant": "site-fake",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-rs-target-trusted",
+      "study-rs-target-neutral"
+    ],
+    "ground_truth": "MALICIOUS"
+  },
+  {
+    "product_id": "study-bp-target-site-mid",
+    "merchant_id": "study-m-site-mid",
+    "category": "Backpacks",
+    "variant": "site-mid",
+    "signals": [
+      "site_reputation_mid"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.75,
+    "reference_set": [
+      "study-bp-target-trusted",
+      "study-bp-target-neutral"
+    ],
+    "ground_truth": "UNCERTAIN"
+  },
+  {
+    "product_id": "study-bp-target-site-bad",
+    "merchant_id": "study-m-site-bad",
+    "category": "Backpacks",
+    "variant": "site-bad",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-bp-target-trusted",
+      "study-bp-target-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-bp-target-site-fake",
+    "merchant_id": "study-m-site-fake",
+    "category": "Backpacks",
+    "variant": "site-fake",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-bp-target-trusted",
+      "study-bp-target-neutral"
+    ],
+    "ground_truth": "MALICIOUS"
   }
 ]

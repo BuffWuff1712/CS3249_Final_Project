@@ -3767,5 +3767,497 @@
         "date": "2026-05-06"
       }
     ]
+  },
+  {
+    "id": "study-hp-target-site-mid",
+    "name": "Lumen Hush ANC",
+    "category": "Headphones",
+    "brand": "Lumen",
+    "price": 133.9,
+    "currency": "SGD",
+    "merchant": "Bayfront Trading",
+    "merchant_id": "study-m-site-mid",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with three modes for transit, outdoors and the office",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "App": "Companion app for EQ and noise-cancelling modes",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Good on the bus",
+        "text": "Noise cancelling makes my bus ride a lot calmer. The app takes a while to connect though.",
+        "date": "2026-08-03"
+      },
+      {
+        "rating": 5,
+        "title": "Battery for days",
+        "text": "I charge them about once a week with daily commuting. Battery life is excellent.",
+        "date": "2026-08-19"
+      },
+      {
+        "rating": 5,
+        "title": "Huge bass upgrade",
+        "text": "A big step up from my old gaming headset. You don't realise how much bass you were missing until you try these.",
+        "date": "2026-04-27"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-site-bad",
+    "name": "Lumen Hush ANC",
+    "category": "Headphones",
+    "brand": "Lumen",
+    "price": 142.9,
+    "currency": "SGD",
+    "merchant": "Best Gear Outlet",
+    "merchant_id": "study-m-site-bad",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with three modes for transit, outdoors and the office",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "App": "Companion app for EQ and noise-cancelling modes",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Clear calls",
+        "text": "People say I sound clear on calls even in the office. A little heavy after a few hours.",
+        "date": "2026-08-11"
+      },
+      {
+        "rating": 5,
+        "title": "Office mode is great",
+        "text": "The office noise-cancelling mode blocks out the aircon hum and chatter.",
+        "date": "2026-08-28"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "More comfortable than my previous premium pair, and a lot cheaper. I keep them as my daily commuting headphones.",
+        "date": "2026-05-19"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-target-site-fake",
+    "name": "Lumen Hush ANC",
+    "category": "Headphones",
+    "brand": "Lumen",
+    "price": 142.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-fake",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "bluetooth",
+      "hi-res",
+      "commuting"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, closed back",
+      "Noise control": "Active noise cancelling with three modes for transit, outdoors and the office",
+      "Connectivity": "Bluetooth 5.0 with hi-res codec; 3.5 mm cable included",
+      "Battery": "Up to 40 hours with noise cancelling on",
+      "Microphones": "4 beamforming microphones for calls",
+      "App": "Companion app for EQ and noise-cancelling modes",
+      "Weight": "272 g"
+    },
+    "rating": 4.6,
+    "rating_count": 2310,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Cable is handy",
+        "text": "Used the 3.5 mm cable on a flight when the battery ran low. Sound is still great wired.",
+        "date": "2026-08-07"
+      },
+      {
+        "rating": 4,
+        "title": "Solid headphones",
+        "text": "Good sound and noise cancelling. The earcups get warm on hot days.",
+        "date": "2026-08-31"
+      },
+      {
+        "rating": 5,
+        "title": "As good as any I've tried",
+        "text": "Noise cancelling is awesome and sound quality is well above average. Glad I did not go for one of the high-priced pairs.",
+        "date": "2026-05-30"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-site-mid",
+    "name": "Vela Tempo Daily",
+    "category": "Running shoes",
+    "brand": "Vela",
+    "price": 118.9,
+    "currency": "SGD",
+    "merchant": "Bayfront Trading",
+    "merchant_id": "study-m-site-mid",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with soft, balanced foam that cushions every landing. A segmented rubber outsole helps you roll smoothly from heel to toe, and a snug knit upper holds your foot in place on daily training runs.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Soft, balanced foam midsole",
+      "Upper": "Snug knit upper",
+      "Outsole": "Segmented rubber for smooth heel-to-toe roll",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Comfortable daily trainer",
+        "text": "Soft enough for my morning 5 km runs. The knit upper fits snugly without rubbing.",
+        "date": "2026-08-05"
+      },
+      {
+        "rating": 3,
+        "title": "Runs a bit small",
+        "text": "Had to swap for half a size up, but the cushioning is nice once the fit is right.",
+        "date": "2026-08-22"
+      },
+      {
+        "rating": 5,
+        "title": "Great for sore feet",
+        "text": "Good fit and support. I have arthritis in both feet and this is my third pair.",
+        "date": "2026-04-22"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-site-bad",
+    "name": "Vela Tempo Daily",
+    "category": "Running shoes",
+    "brand": "Vela",
+    "price": 126.9,
+    "currency": "SGD",
+    "merchant": "Best Gear Outlet",
+    "merchant_id": "study-m-site-bad",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with soft, balanced foam that cushions every landing. A segmented rubber outsole helps you roll smoothly from heel to toe, and a snug knit upper holds your foot in place on daily training runs.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Soft, balanced foam midsole",
+      "Upper": "Snug knit upper",
+      "Outsole": "Segmented rubber for smooth heel-to-toe roll",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Smooth ride",
+        "text": "The outsole rolls smoothly on pavement and my calves feel fine after long runs.",
+        "date": "2026-08-12"
+      },
+      {
+        "rating": 4,
+        "title": "Good value runner",
+        "text": "Neutral shoe that does the job for road training. Grip is fine in light rain.",
+        "date": "2026-08-29"
+      },
+      {
+        "rating": 5,
+        "title": "Son loves them",
+        "text": "My son uses them for his long-distance runs and loves them.",
+        "date": "2026-05-15"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-target-site-fake",
+    "name": "Vela Tempo Daily",
+    "category": "Running shoes",
+    "brand": "Vela",
+    "price": 126.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-fake",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "breathable",
+      "daily-training"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Neutral road-running shoe with soft, balanced foam that cushions every landing. A segmented rubber outsole helps you roll smoothly from heel to toe, and a snug knit upper holds your foot in place on daily training runs.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, daily training",
+      "Cushioning": "Soft, balanced foam midsole",
+      "Upper": "Snug knit upper",
+      "Outsole": "Segmented rubber for smooth heel-to-toe roll",
+      "Support": "Neutral"
+    },
+    "rating": 4.6,
+    "rating_count": 1980,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Light and soft",
+        "text": "Feels light on my feet and the foam is soft on landing.",
+        "date": "2026-08-08"
+      },
+      {
+        "rating": 4,
+        "title": "Nice for easy runs",
+        "text": "Great for easy road runs. For faster sessions I prefer something firmer.",
+        "date": "2026-09-01"
+      },
+      {
+        "rating": 5,
+        "title": "Great running shoes",
+        "text": "I run 5-6 km three or four times a week on pavement and have no knee or shin pain in these.",
+        "date": "2026-05-03"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-site-mid",
+    "name": "Atlas Scholar 30",
+    "category": "Backpacks",
+    "brand": "Atlas",
+    "price": 73.9,
+    "currency": "SGD",
+    "merchant": "Bayfront Trading",
+    "merchant_id": "study-m-site-mid",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps with sternum strap, rounded back panel",
+      "Pockets": "Front organiser pocket, fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Fits my laptop",
+        "text": "My 15-inch laptop fits in the padded sleeve with room for chargers.",
+        "date": "2026-08-04"
+      },
+      {
+        "rating": 4,
+        "title": "Good bottle pockets",
+        "text": "The stretch mesh pockets hold my big water bottle without it falling out.",
+        "date": "2026-08-20"
+      },
+      {
+        "rating": 5,
+        "title": "Very comfortable",
+        "text": "Great looking and comfortable. The chest strap takes the weight off my back.",
+        "date": "2026-04-25"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-site-bad",
+    "name": "Atlas Scholar 30",
+    "category": "Backpacks",
+    "brand": "Atlas",
+    "price": 78.9,
+    "currency": "SGD",
+    "merchant": "Best Gear Outlet",
+    "merchant_id": "study-m-site-bad",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps with sternum strap, rounded back panel",
+      "Pockets": "Front organiser pocket, fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Light rain no problem",
+        "text": "Walked to class in a drizzle and everything inside stayed dry.",
+        "date": "2026-08-13"
+      },
+      {
+        "rating": 4,
+        "title": "Comfortable straps",
+        "text": "The sternum strap helps when I carry heavy books. Wish the front pocket was bigger.",
+        "date": "2026-08-30"
+      },
+      {
+        "rating": 5,
+        "title": "Great stitching",
+        "text": "Excellent quality and stitching. My husband uses it every day.",
+        "date": "2026-05-17"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-target-site-fake",
+    "name": "Atlas Scholar 30",
+    "category": "Backpacks",
+    "brand": "Atlas",
+    "price": 78.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-fake",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "campus",
+      "padded-straps",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "30 L",
+      "Laptop sleeve": "Padded, fits up to 15-inch laptops",
+      "Material": "Water-resistant polyester with water-repellent finish",
+      "Suspension": "Articulated shoulder straps with sternum strap, rounded back panel",
+      "Pockets": "Front organiser pocket, fleece-lined stash pocket, two stretch mesh bottle pockets",
+      "Dimensions": "49 x 33 x 18 cm"
+    },
+    "rating": 4.7,
+    "rating_count": 1720,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Good for campus",
+        "text": "Holds my books, binder and laptop easily. The back panel is comfortable.",
+        "date": "2026-08-09"
+      },
+      {
+        "rating": 4,
+        "title": "Handy stash pocket",
+        "text": "The fleece-lined pocket is perfect for my glasses and phone.",
+        "date": "2026-09-02"
+      },
+      {
+        "rating": 5,
+        "title": "Replaced my old travel pack",
+        "text": "My old backpack finally fell apart after 15 years of travel. This one has lots of great compartments and I'm very happy with it.",
+        "date": "2026-05-28"
+      }
+    ]
   }
 ]
