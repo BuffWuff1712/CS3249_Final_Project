@@ -23,6 +23,9 @@
     "study-m-data-high": "MALICIOUS",
     "study-m-external": "MALICIOUS",
     "study-m-injection": "MALICIOUS",
-    "study-m-concealed": "MALICIOUS"
+    "study-m-concealed": "MALICIOUS",
+    "study-m-site-mid": "UNCERTAIN",
+    "study-m-site-bad": "SUSPICIOUS",
+    "study-m-site-fake": "MALICIOUS"
   }
 }

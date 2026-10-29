@@ -1,5 +1,5 @@
 "use client";
-import { Action } from "@/lib/beany";
+import { Action, Site } from "@/lib/beany";
 function RiskNotice({ action }: { action: Action }) {
   const r = action.risk;
   if (!r || !r.evidence.length) return null;
@@ -77,6 +77,30 @@ function LiveEvidence({ action }: { action: Action }) {
     </details>
   );
 }
+export function websiteHost(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
+}
+const TIERS = { poor: ["Poor", 1], mid: ["Mid", 2], good: ["Good", 3] } as const;
+function SiteReputation({ site }: { site: Site }) {
+  const [word, filled] = TIERS[site.tier];
+  return (
+    <>
+      <p className="site-reputation">
+        <strong>Website reputation:</strong> {word}
+        <span className={`site-meter ${site.tier}`} aria-hidden="true">
+          {[1, 2, 3].map((i) => (
+            <span key={i} className={i <= filled ? "filled" : undefined} />
+          ))}
+        </span>
+      </p>
+      <p>{site.label}</p>
+    </>
+  );
+}
 export function MerchantDetails({ action }: { action: Action }) {
   const m = action.merchant_details,
     r = action.risk;
@@ -114,8 +138,9 @@ export function MerchantDetails({ action }: { action: Action }) {
       <details>
         <summary>Review merchant details: {m.name}</summary>
         <p>
-          <strong>Simulated website:</strong> {m.website} · never visited
+          <strong>Simulated website:</strong> {websiteHost(m.website)}
         </p>
+        {m.site && <SiteReputation site={m.site} />}
         <p>{m.description}</p>
         <dl>
           <dt>Business contact</dt>

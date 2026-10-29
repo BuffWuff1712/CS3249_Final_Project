@@ -2,7 +2,7 @@
 
 import csv, io, json
 from .policy import ROOT
-from .merchant_risk import RiskConfig, load_config, digest
+from .merchant_risk import RiskConfig, load_config, digest, stored_config
 from .schemas import Model, Field
 
 TRUTH_PATH = ROOT / "data/research/merchant_ground_truth.json"
@@ -94,6 +94,20 @@ def evaluate_rows(rows):
     }
 
 
+def profile_for(s, config_hash):
+    """Profile of the configuration that produced config_hash, including pre-upgrade snapshots."""
+    history = s.experiment.get("configuration_history", {})
+    if config_hash in history:
+        return history[config_hash].get("profile")
+    for entry in history.values():
+        try:
+            if digest(stored_config(entry["risk_config"])) == config_hash:
+                return entry.get("profile")
+        except (KeyError, ValueError):
+            continue
+    return None
+
+
 def report(s):
     truth = json.loads(TRUTH_PATH.read_text(encoding="utf-8-sig"))
     rows = []
@@ -119,11 +133,11 @@ def report(s):
                 "proposal_id": pid,
                 "product_id": data["product_id"],
                 "merchant_id": data["merchant_id"],
-                "profile": s.experiment.get("configuration_history", {})
-                .get(risk["config_hash"] if risk else "", {})
-                .get("profile"),
+                "profile": profile_for(s, risk["config_hash"]) if risk else None,
                 "configuration_version": risk["config_version"] if risk else None,
                 "configuration_hash": risk["config_hash"] if risk else None,
+                "risk_detection": s.risk_detection,
+                "risk_basis": risk.get("basis", "rules") if risk else None,
                 "predicted_risk": predicted,
                 "ground_truth": label,
                 "triggered_rules": [e["rule_id"] for e in risk["evidence"]]

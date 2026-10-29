@@ -25,9 +25,16 @@ Report a finding only when the supplied text directly shows the signal. Each fin
 quote (copied exactly from one supplied listing field, at most 300 characters) and a short plain-English reason.
 Empty strings and empty lists mean the detail was not visible on the page. Never treat a blank field
 as a risk signal or as evidence of safety, and never report missing information as a finding.
+Some listings also carry product_reviews, seller_reviews, specifications and product_rating. When present:
+- specifications and product_rating are listing text like the description; specifications may show inconsistent.
+- product_reviews and seller_reviews are buyer reports. Quote a review only when it reports concrete seller
+  conduct that matches a signal, such as being asked to pay by bank transfer, a refund given only as store
+  credit, being asked for an ID document, or local dispatch claimed but shipped from overseas. Start the
+  reason with "Buyer report:". Product quality, opinions, delivery speed and price comments are never findings.
 Signals:
 - missing_business: page content that undermines the seller's identity, such as a statement or badge that
-  the seller is unverified, or business details that are explicitly withheld.
+  the seller is unverified (for example an "Unverified seller" badge), a notice such as
+  "No seller contact details listed", or business details that are explicitly withheld.
 - excessive_data: buyers must provide documents or personal information beyond normal delivery details,
   such as ID numbers, passwords, bank logins or card details outside checkout.
 - unusual_payment: payment channels unusual for retail checkout, such as gift cards, cryptocurrency or
@@ -35,8 +42,7 @@ Signals:
 - external_payment: instructions to pay or order outside the site's own checkout, such as bank transfer
   to a personal account or ordering through messaging apps.
 - misleading_returns: refund or money-back promises that conflict with the stated return policy.
-- lookalike: seller names or badges imitating an official brand or store that differs from the listed
-  brand or retailer.
+- lookalike: product names or brands imitating a well-known brand (knockoff products).
 - pressure: countdowns, extreme scarcity or deadline claims pushing an immediate purchase.
 - inconsistent: details that contradict each other, such as brand, name, description, seller location
   or shipping origin disagreeing.

@@ -1,5 +1,5 @@
 {
-  "version": "risk-v1",
+  "version": "risk-v2",
   "weights": {
     "low_price": 1,
     "missing_business": 2,
@@ -10,7 +10,9 @@
     "lookalike": 4,
     "pressure": 1,
     "inconsistent": 3,
-    "injection": 6
+    "injection": 6,
+    "site_reputation_mid": 1,
+    "site_reputation_poor": 4
   },
   "medium": 2,
   "high": 5,

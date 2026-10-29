@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from urllib.parse import urlparse
 from .schemas import Merchant
+from .sites import registry, site_for
 
 ROOT = Path(__file__).resolve().parents[2]
 MERCHANT_PATH = ROOT / "data/merchants/merchants.json"
@@ -21,7 +22,8 @@ def merchants():
             raise ValueError(
                 "Simulated merchant websites must use reserved .test domains"
             )
-    return {m.id: m for m in records}
+    sites = registry()
+    return {m.id: m.model_copy(update={"site": site_for(m.website, sites)}) for m in records}
 
 
 def merchant_for(product, session=None):

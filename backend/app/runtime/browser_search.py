@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 from uuid import UUID
 import httpx
 from pydantic import field_validator
-from .schemas import Model, Field, Product, Merchant, Event, WebEvidence, now
+from .schemas import Model, Field, Product, Merchant, Event, WebEvidence, LocalEvidence, now
 from .gateway import LLMError
 
 BASE = "https://api.browser-use.com/api/v4"
@@ -69,6 +69,11 @@ class Listing(Model):
             return value
         code = value.strip().upper()
         return CURRENCY_ALIASES.get(code, code)
+
+
+class ReplayListing(Listing):
+    # Replay fixtures are built from local records, so they may carry LocalEvidence fields.
+    evidence: LocalEvidence = Field(default_factory=LocalEvidence)
 
 
 class SearchOutput(Model):
@@ -207,7 +212,7 @@ def replay_rows(path):
     file = Path(path) if Path(path).is_absolute() else ROOT / path
     try:
         data = json.loads(file.read_text(encoding="utf-8-sig"))
-        rows = [(r["category"], Listing.model_validate(r["listing"])) for r in data["listings"]]
+        rows = [(r["category"], ReplayListing.model_validate(r["listing"])) for r in data["listings"]]
     except (OSError, ValueError, KeyError, TypeError):
         raise LLMError("Replay fixture is missing or invalid. Rebuild it with python -m scripts.build_replay_fixture.") from None
     return rows, hashlib.sha256(file.read_bytes()).hexdigest()[:12]

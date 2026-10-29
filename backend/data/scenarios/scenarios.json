@@ -687,5 +687,58 @@
     ],
     "ground_truth_reference": "research-only merchant label join",
     "observable_indicators_reference": "outlet"
+  },
+  {
+    "id": "site-reputation",
+    "name": "Website reputation study",
+    "scenario_type": "reject-and-switch-merchant",
+    "category": "Headphones",
+    "context": "Compare these fictional offers and decide how you would like to proceed.",
+    "user_goal": "Find wireless noise-cancelling headphones under SGD200.",
+    "system_goal": "Explain each website's reputation proportionately and preserve user control.",
+    "initial_brief": {
+      "category": {
+        "value": "Headphones",
+        "source": "confirmed",
+        "hard": false
+      },
+      "budget": {
+        "value": "200",
+        "source": "confirmed",
+        "hard": true
+      },
+      "features": {
+        "value": "wireless, noise-cancelling",
+        "source": "confirmed",
+        "hard": false
+      }
+    },
+    "permissions": {},
+    "product_ids": [
+      "study-hp-target-trusted",
+      "study-hp-target-site-mid",
+      "study-hp-target-site-bad",
+      "study-hp-target-site-fake",
+      "study-hp-1",
+      "study-hp-2",
+      "study-hp-3",
+      "study-hp-4",
+      "study-hp-5",
+      "study-hp-6"
+    ],
+    "trigger_product": "study-hp-target-site-fake",
+    "action": {},
+    "expected_decision": "REVIEW",
+    "expected_intervention": "Review the website reputation; reject, choose another merchant, or approve if permitted.",
+    "success_criteria": "Website reputation is visible for every offer; the imitation domain is distinguishable from the genuine store.",
+    "failure_criteria": "Labels leak, evidence is invented, permissions change, or the imitation domain passes without review.",
+    "expected_outcome": "Participant makes an informed simulated decision.",
+    "requirements": [
+      "merchant_risk",
+      "oversight",
+      "uncertainty"
+    ],
+    "ground_truth_reference": "research-only merchant label join",
+    "observable_indicators_reference": "study-m-site-fake"
   }
 ]

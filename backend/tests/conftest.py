@@ -13,6 +13,7 @@ from pathlib import Path
 OFFLINE = {
     "BEANY_LLM_MODE": "mock",
     "BEANY_SEARCH_PROVIDER": "catalogue",
+    "BEANY_RISK_DETECTION": "rules",
     "BEANY_RESEARCH_KEY": "",
     "BEANY_DB": str(Path(tempfile.mkdtemp(prefix="beany-tests-")) / "beany.sqlite3"),
     "OPENAI_API_KEY": "",

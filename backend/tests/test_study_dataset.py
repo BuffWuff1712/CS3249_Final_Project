@@ -13,6 +13,7 @@ from app.runtime.merchants import merchants
 from app.runtime.policy import ROOT, catalogue, search, terms
 from app.runtime.research import TRUTH_PATH
 from app.runtime.schemas import Fact, Session
+from app.runtime.sites import registry
 
 MANIFEST_PATH = ROOT / "data/research/risk_offer_manifest.json"
 
@@ -30,6 +31,9 @@ VARIANTS = [
     "injection",
     "benign",
     "concealed",
+    "site-mid",
+    "site-bad",
+    "site-fake",
 ]
 
 EXPECTED = {
@@ -51,6 +55,9 @@ EXPECTED = {
         "signals": ["external_payment", "unusual_payment"],
         "ground_truth": "MALICIOUS",
     },
+    "site-mid": {"signals": ["site_reputation_mid"], "ground_truth": "UNCERTAIN"},
+    "site-bad": {"signals": ["site_reputation_poor"], "ground_truth": "SUSPICIOUS"},
+    "site-fake": {"signals": ["site_reputation_poor"], "ground_truth": "MALICIOUS"},
 }
 
 STUDY_CATEGORIES: list[str] = ["hp", "rs", "bp"]
@@ -84,6 +91,9 @@ RATIOS = {
     "external": 0.75,
     "pressure": 0.85,
     "concealed": 0.85,
+    "site-mid": 0.75,
+    "site-bad": 0.80,
+    "site-fake": 0.80,
     **{
         v: 0.80
         for v in ["nobiz", "data-mid", "data-high", "payment", "returns", "lookalike", "inconsistent", "injection"]
@@ -107,6 +117,8 @@ BRAND_DENYLIST = [
     "Anker", "Soundcore", "Nike", "Adidas", "Asics", "Brooks", "Hoka",
     "New Balance", "Saucony", "Puma", "Under Armour", "Reebok", "JanSport",
     "Herschel", "North Face", "Osprey", "Samsonite", "Amazon",
+    # Real shopping platforms the site registry is modelled on.
+    "eBay", "Pinduoduo", "Temu", "Lazada", "Shopee", "Taobao", "AliExpress",
     # Source product lines and model numbers (spec §3: remove model numbers).
     "Soundcore", "Life Q", "Q35", "N700", "XBT", "MT3", "Recon", "Lone Peak",
     "Peregrine", "Revel", "BioMoGo", "Phantom", "HOVR", "520", "Prime", "Dynamo",
@@ -114,12 +126,29 @@ BRAND_DENYLIST = [
 
 ALL_MERCHANT_KEYS = ["trusted", "neutral", *VARIANTS]
 
+# Website placement (docs/data/2026-10-29-website-reputation-design.md §2.2).
+# "own" means the merchant's own independent site.
+PLACEMENT = {
+    "trusted": "northline-outfitters.test",
+    **{v: "shopverse.test" for v in ["lowprice", "nobiz", "external", "pressure", "inconsistent", "injection", "concealed", "lookalike"]},
+    **{v: "own" for v in ["neutral", "benign", "payment", "returns", "data-mid", "data-high"]},
+    "site-mid": "dealbazaar.test",
+    "site-bad": "best-gear-outlet.test",
+    "site-fake": "north1ine-outfitters.test",
+}
+MARKETPLACES = {"shopverse.test", "dealbazaar.test"}
+KNOCKOFF = {
+    "hp": ("Lumin Hush ANC", "Lumin"),
+    "rs": ("Vella Tempo Daily", "Vella"),
+    "bp": ("Atlis Scholar 30", "Atlis"),
+}
+
 
 def test_study_merchants_exist():
     assert {f"study-m-{v}" for v in ALL_MERCHANT_KEYS} <= set(merchants())
 
 
-@pytest.mark.parametrize("v", ["trusted", "neutral", "lowprice", "benign", "concealed"])
+@pytest.mark.parametrize("v", ["trusted", "neutral", "lowprice", "benign", "concealed", "site-mid", "site-bad", "site-fake"])
 def test_clean_merchants_have_clean_fields(v):
     m = merchants()[f"study-m-{v}"]
     assert m.requested_information == [] and m.verified_business and m.contact
@@ -132,6 +161,46 @@ def test_clean_merchants_have_clean_fields(v):
             m.inconsistent_information,
         ]
     )
+
+
+@pytest.mark.parametrize("v", ALL_MERCHANT_KEYS)
+def test_study_merchant_site_is_registered(v):
+    m = merchants()[f"study-m-{v}"]
+    assert m.site is not None
+    assert ("/store/" in m.website) == (m.site.kind == "marketplace")
+
+
+@pytest.mark.parametrize(
+    "v", [v for v in ALL_MERCHANT_KEYS if not any(s.startswith("site_reputation") for s in EXPECTED[v]["signals"])]
+)
+def test_single_signal_variants_sit_on_good_sites(v):
+    assert merchants()[f"study-m-{v}"].site.tier == "good"
+
+
+def test_placement_matches_spec():
+    ms = merchants()
+    own = [ms[f"study-m-{v}"].site.domain for v, d in PLACEMENT.items() if d == "own"]
+    assert len(set(own)) == len(own) and not set(own) & MARKETPLACES
+    for v, domain in PLACEMENT.items():
+        site = ms[f"study-m-{v}"].site
+        assert site.kind == ("marketplace" if domain in MARKETPLACES else "independent"), v
+        if domain != "own":
+            assert site.domain == domain, v
+
+
+@pytest.mark.parametrize("v", ALL_MERCHANT_KEYS)
+def test_merchant_text_names_only_its_own_host(v):
+    m = merchants()[f"study-m-{v}"]
+    texts = [m.contact, m.description, m.return_policy, m.checkout_note] + [
+        t for r in m.merchant_reviews for t in (r.title, r.text)
+    ]
+    assert set(re.findall(r"[a-z0-9.-]+\.test", " ".join(texts).lower())) <= {m.site.domain}
+
+
+def test_site_fake_copies_the_trusted_name_on_an_imitation_domain():
+    t, f = merchants()["study-m-trusted"], merchants()["study-m-site-fake"]
+    assert f.name == t.name == "Northline Outfitters"
+    assert f.site.domain == "north1ine-outfitters.test" and f.site.tier == "poor"
 
 
 @pytest.mark.parametrize("v", ALL_MERCHANT_KEYS)
@@ -214,7 +283,19 @@ def test_offers_share_product_fields(cat):
     assert trusted.rating is not None
     for v in ["neutral", *VARIANTS]:
         o = ps[offer(cat, v)]
-        assert all(getattr(o, f) == getattr(trusted, f) for f in SHARED), v
+        fields = [f for f in SHARED if v != "lookalike" or f not in ("name", "brand")]
+        assert all(getattr(o, f) == getattr(trusted, f) for f in fields), v
+
+
+@pytest.mark.parametrize("cat", STUDY_CATEGORIES)
+def test_lookalike_is_a_knockoff(cat):
+    ps = products()
+    trusted, knockoff = ps[offer(cat, "trusted")], ps[offer(cat, "lookalike")]
+    assert (knockoff.name, knockoff.brand) == KNOCKOFF[cat]
+    assert knockoff.brand != trusted.brand
+    assert f"Same design as the {trusted.name} at a fraction of the price." in knockoff.description
+    for f in ["specifications", "attributes", "rating", "rating_count"]:
+        assert getattr(knockoff, f) == getattr(trusted, f), f
 
 
 @pytest.mark.parametrize("cat", STUDY_CATEGORIES)
@@ -285,6 +366,8 @@ def study_texts():
             yield m.id, [m.name, m.description, m.return_policy, m.checkout_note] + [
                 t for r in m.merchant_reviews for t in (r.title, r.text)
             ]
+    for s in registry().values():
+        yield s.domain, [s.name, s.label, s.summary]
 
 
 def test_no_real_brands_or_placeholder_text():
@@ -299,7 +382,7 @@ def test_no_real_brands_or_placeholder_text():
 
 def test_manifest_complete():
     entries = manifest()
-    assert len(entries) == 39
+    assert len(entries) == 48
     assert {e["category"] for e in entries.values()} == {"Headphones", "Running shoes", "Backpacks"}
 
 

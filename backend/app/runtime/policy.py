@@ -1,9 +1,10 @@
 import hashlib, json
 from pathlib import Path
-from .schemas import Product, Rule
+from .schemas import Product, Rule, Event
 from .merchants import merchant_for
-from .merchant_risk import assess, assess_live, session_config
+from .merchant_risk import assess, assess_live, safeguard_block, session_config
 from .risk_agent import snapshot
+from .local_evidence import review_view
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = json.loads((ROOT / "config/policy.json").read_text(encoding="utf-8-sig"))
@@ -176,6 +177,7 @@ def evaluate(s, a):
             cached = s.live_risk.get(p.id)
             if cached and cached.snapshot == snapshot(p):
                 a.risk = assess_live(p, merchant, catalogue(s), config, cached)
+                a.risk.basis = "ai"
             else:
                 a.risk = None
                 rule("risk_review_unavailable", "REVIEW", "merchant_risk",
@@ -185,6 +187,20 @@ def evaluate(s, a):
                  "This is an unverified web snapshot, not a merchant safety assessment. Prices and stock may change. Refresh searches older than 30 minutes. Checkout is simulated only.")
             if re.search(r"ignore.{0,60}(rules|instructions|preferences)|reveal.{0,30}(key|password)|disregard.{0,40}(policy|rules)|enable.{0,40}personal data", p.description, re.I):
                 rule("injection", "BLOCK", "source", "The listing contains instructions aimed at changing assistant behaviour. Choose another listing.")
+        elif s.risk_detection == "ai":
+            # AI is primary for local products; the rules engine is the fallback.
+            view = review_view(p, merchant)
+            cached = s.live_risk.get(p.id)
+            if cached and cached.snapshot == snapshot(view):
+                # The record's safeguards still hard-block whatever the model reported.
+                a.risk = assess_live(view, merchant, catalogue(s), session_config(s), cached,
+                                     force_block=safeguard_block(p, merchant))
+                a.risk.basis = "ai"
+            else:
+                a.risk = assess(p, merchant, catalogue(s), session_config(s))
+                a.risk.basis = "rules_fallback"
+                if not any(e.kind == "risk_agent_fallback" and e.detail == p.id for e in s.events):
+                    s.events.append(Event(kind="risk_agent_fallback", detail=p.id))
         else:
             a.risk = assess(p, merchant, catalogue(s), session_config(s))
         if a.risk and a.risk.recommended_decision != "ALLOW":

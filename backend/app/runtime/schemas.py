@@ -42,6 +42,16 @@ class Review(Model):
     date: str  # ISO date, fictional
 
 
+class Site(Model):
+    """A registered website and its reputation; looked up by exact host."""
+    domain: str
+    name: str
+    kind: Literal["marketplace", "independent"]
+    tier: Literal["good", "mid", "poor"]
+    label: str = Field(max_length=40)
+    summary: str = Field(max_length=200)
+
+
 class Merchant(Model):
     id: str
     name: str
@@ -61,6 +71,7 @@ class Merchant(Model):
     inconsistent_information: bool = False
     merchant_reviews: list[Review] = Field(default_factory=list)
     checkout_note: str = ""
+    site: Site | None = None  # attached from the site registry, never stored in merchants.json
 
 
 class RiskEvidence(Model):
@@ -78,6 +89,8 @@ class RiskAssessment(Model):
     explanation: str
     config_version: str
     config_hash: str
+    # Which detector produced the evidence; older stored assessments were all rules-based.
+    basis: Literal["rules", "ai", "rules_fallback"] = "rules"
 
 
 class Observed(Model):
@@ -132,6 +145,15 @@ class WebEvidence(Observed):
     notices: list[str] = Field(default_factory=list, max_length=10)
 
 
+class LocalEvidence(WebEvidence):
+    """Evidence derived from local records; adds fields live Browser Use search never captures."""
+
+    product_reviews: list[str] = Field(default_factory=list, max_length=10)
+    seller_reviews: list[str] = Field(default_factory=list, max_length=10)
+    specifications: list[str] = Field(default_factory=list, max_length=20)
+    product_rating: str = Field(default="", max_length=200)
+
+
 class RiskFinding(Model):
     rule_id: str
     quote: str = Field(max_length=300)
@@ -149,7 +171,8 @@ class Product(Model):
     source: Literal["catalogue", "browser_use"] = "catalogue"
     source_url: str = ""
     observed_at: str = ""
-    web_evidence: WebEvidence | None = None
+    # A dict with local-only keys validates as LocalEvidence; anything else stays WebEvidence.
+    web_evidence: WebEvidence | LocalEvidence | None = None
     id: str
     name: str
     category: str
@@ -237,6 +260,8 @@ class CartCheckout(Model):
 
 class Session(Model):
     search_provider: Literal["catalogue", "browser_use"] = "catalogue"
+    # Who finds risk signals in local products; fixed per session like the search provider.
+    risk_detection: Literal["rules", "ai"] = "rules"
     live_products: dict[str, Product] = Field(default_factory=dict)
     live_merchants: dict[str, Merchant] = Field(default_factory=dict)
     live_risk: dict[str, LiveRiskReview] = Field(default_factory=dict)
