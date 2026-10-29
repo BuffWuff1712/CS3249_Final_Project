@@ -1215,12 +1215,12 @@
   },
   {
     "id": "study-hp-target-lookalike",
-    "name": "Lumen Hush ANC",
+    "name": "Lumin Hush ANC",
     "category": "Headphones",
-    "brand": "Lumen",
+    "brand": "Lumin",
     "price": 142.9,
     "currency": "SGD",
-    "merchant": "Northl1ne Outfitters",
+    "merchant": "Brightway Goods",
     "merchant_id": "study-m-lookalike",
     "attributes": [
       "wireless",
@@ -1232,7 +1232,7 @@
     ],
     "sizes": [],
     "stock": true,
-    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls.",
+    "description": "Over-ear wireless headphones with multi-mode active noise cancelling. Custom silk-diaphragm drivers cover a wide frequency range with low distortion, and a hi-res Bluetooth codec carries more detail than standard Bluetooth. Memory-foam earcups for all-day wear and four beamforming microphones for clear calls. Same design as the Lumen Hush ANC at a fraction of the price.",
     "trust": "established",
     "specifications": {
       "Type": "Over-ear, closed back",
@@ -2358,12 +2358,12 @@
   },
   {
     "id": "study-rs-target-lookalike",
-    "name": "Vela Tempo Daily",
+    "name": "Vella Tempo Daily",
     "category": "Running shoes",
-    "brand": "Vela",
+    "brand": "Vella",
     "price": 126.9,
     "currency": "SGD",
-    "merchant": "Northl1ne Outfitters",
+    "merchant": "Brightway Goods",
     "merchant_id": "study-m-lookalike",
     "attributes": [
       "running",
@@ -2384,7 +2384,7 @@
       "45"
     ],
     "stock": true,
-    "description": "Neutral road-running shoe with soft, balanced foam that cushions every landing. A segmented rubber outsole helps you roll smoothly from heel to toe, and a snug knit upper holds your foot in place on daily training runs.",
+    "description": "Neutral road-running shoe with soft, balanced foam that cushions every landing. A segmented rubber outsole helps you roll smoothly from heel to toe, and a snug knit upper holds your foot in place on daily training runs. Same design as the Vela Tempo Daily at a fraction of the price.",
     "trust": "established",
     "specifications": {
       "Use": "Road running, daily training",
@@ -3464,12 +3464,12 @@
   },
   {
     "id": "study-bp-target-lookalike",
-    "name": "Atlas Scholar 30",
+    "name": "Atlis Scholar 30",
     "category": "Backpacks",
-    "brand": "Atlas",
+    "brand": "Atlis",
     "price": 78.9,
     "currency": "SGD",
-    "merchant": "Northl1ne Outfitters",
+    "merchant": "Brightway Goods",
     "merchant_id": "study-m-lookalike",
     "attributes": [
       "laptop",
@@ -3480,7 +3480,7 @@
     ],
     "sizes": [],
     "stock": true,
-    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles.",
+    "description": "Campus backpack with a padded laptop sleeve, a large main compartment for books and binders, and a water-resistant shell. Articulated shoulder straps and a rounded back panel keep heavy loads comfortable, and two stretch mesh pockets hold water bottles. Same design as the Atlas Scholar 30 at a fraction of the price.",
     "trust": "established",
     "specifications": {
       "Capacity": "30 L",

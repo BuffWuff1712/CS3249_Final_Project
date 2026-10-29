@@ -124,7 +124,7 @@ def test_replayed_offer_reaches_risk_agent(replay):
     service.propose(s, p)
     a = s.proposals[-1]
     assert a.decision == "BLOCK" and a.risk.evidence[0].rule_id == "external_payment"
-    assert a.merchant_details.name == "Quickpay Deals (quickpay-deals.test)"
+    assert a.merchant_details.name == "Quickpay Deals (shopverse.test)"
 
 
 def test_full_replay_flow_to_simulated_receipt(replay):
