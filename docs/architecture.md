@@ -1,5 +1,19 @@
 # Architecture
 
+## PRD v2 CUI at `/shop`
+
+The current two-category CUI is a deterministic frontend prototype, independently of the classic API flow below. `shoppingFixtures.ts` owns versioned fictional product/variant and seller-offer records. `purchaseIntent.ts` interprets the supported needs and asks bounded clarifications. `shoppingNeeds.ts` is the shared validation boundary for the editor, storage and comparison.
+
+`shoppingScenario.ts` compares eligible products using category-specific authored priorities, then ranks offers by a disclosed returns tie-breaker or the user's price preference. A spending ceiling is always enforced. Merchant cautions come from visible payment/return fields; low price and small review history alone are not blocks. Comparisons emit completed/unavailable record activity, not claims of website visits or asynchronous work.
+
+`shoppingSession.ts` owns atomic transitions: draft/clarification → current comparison or no-match/error → selected → finished. Each input/edit invalidates prior selection. Seller changes lock the exact product/variant; retry retains that lock, while switching products is explicit. Editing without comparing leaves the old recommendation visibly previous and unselectable. Final selection rechecks the current revision, offer identity and price against current fixtures.
+
+`ShoppingWorkspace` composes the needs editor, recommendation/trace, source disclosures, caution and selection recap. One polite live region announces meaningful updates. Evidence is optional; material cautions are visible before selection. Browser storage contains validated needs, the last request, comparison intent, scenario version and a selection reference. Restore recomputes from trusted local fixtures rather than trusting serialized recommendation text; a version mismatch clears selection. No `/shop` action contacts FastAPI, creates a receipt or requests credentials.
+
+The CUI's fixed dataset contains four product variants and twelve offers, two models and three offers per model in each category. It is distinct from the larger classic backend catalogue. No study condition assignment or participant analytics is claimed for this route. See [evaluation protocol](evaluation-guide.md) for the future study gate.
+
+## Classic backend-connected simulation
+
 ```mermaid
 flowchart LR
  UI[Next.js conversation / brief / oversight] --> API[FastAPI]

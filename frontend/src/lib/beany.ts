@@ -1,3 +1,4 @@
+export type Review = { rating: number; title: string; text: string; date: string };
 export type Merchant = {
   id: string;
   name: string;
@@ -11,6 +12,8 @@ export type Merchant = {
   verified_business: boolean;
   requested_information: string[];
   external_payment: boolean;
+  merchant_reviews?: Review[];
+  checkout_note?: string;
 };
 export type MerchantRisk = {
   merchant_id: string;
@@ -79,6 +82,9 @@ export type Product = {
   sizes: string[];
   description: string;
   trust: string;
+  rating?: number | null;
+  rating_count?: number;
+  reviews?: Review[];
 };
 export type Action = {
   id: string;

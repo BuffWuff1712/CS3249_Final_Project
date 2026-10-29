@@ -1,0 +1,112 @@
+.cui-shell {
+  --cui-danger: #b42318;
+  --cui-danger-text: #7a271a;
+  --cui-danger-surface: #fff1f0;
+  --cui-review: #a15c07;
+  --cui-review-surface: #fff8e8;
+  max-width: 1120px;
+}
+.cui-shell header { gap: 16px; }
+.cui-shell nav { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.cui-shell nav a { color: var(--ink); text-underline-offset: 4px; }
+.cui-workspace { display: block; max-width: 832px; margin: 32px auto 64px; }
+.cui-workspace h1 { font-size: 32px; letter-spacing: -1px; max-width: 24ch; }
+.cui-workspace h2 { font-size: 24px; }
+.cui-workspace h3 { font-size: 16px; margin: 20px 0 12px; }
+.cui-workspace p, .cui-workspace li, .cui-workspace dd { overflow-wrap: anywhere; }
+.cui-workspace button, .cui-workspace summary, .cui-shell nav button { min-height: 44px; }
+.cui-workspace summary { display: list-item; align-content: center; cursor: pointer; font-weight: 600; line-height: 1.5; padding: 8px 0; }
+.cui-purpose { color: var(--muted); max-width: 66ch; line-height: 1.7; font-size: 16px; }
+.cui-source { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.cui-result, .cui-entry, .cui-needs { background: white; border: 1px solid var(--line); border-radius: 12px; padding: 24px; margin: 24px 0; }
+.cui-result p { line-height: 1.6; }
+.cui-section-heading { display: flex; align-items: center; gap: 12px; }
+.cui-section-heading h2, .cui-section-heading .eyebrow { margin: 0; }
+.cui-step-number { display: inline-grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; background: #e5efff; color: #2457a6; font-weight: 700; }
+.cui-entry .cui-section-heading h2, .cui-needs .cui-section-heading h2 { font-size: 18px; }
+.cui-entry > p, .cui-section-intro { line-height: 1.6; color: var(--muted); }
+.cui-entry { border-color: #a9c6f8; }
+.cui-composer { margin: 20px 0 16px; }
+.cui-composer label { margin-bottom: 8px; }
+.cui-compose-row { display: flex; gap: 12px; align-items: stretch; }
+.cui-compose-row textarea { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: 12px; font-size: 16px; line-height: 1.6; resize: vertical; background: #f9fbff; }
+.cui-compose-row button { align-self: flex-end; min-height: 44px; }
+.cui-examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.cui-examples > span { color: var(--muted); font-size: 12px; }
+.cui-examples button { font-size: 12px; padding: 8px 12px; }
+.cui-intent-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.cui-intent-grid > div { padding: 16px; background: #f5f8fd; border: 1px solid var(--line); border-radius: 8px; }
+.cui-intent-grid dt { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+.cui-intent-grid dd { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.5; }
+.cui-intent-grid small { display: block; margin-top: 8px; font-size: 11px; }
+.cui-intent-grid .cui-intent-priority { border-color: #a9c6f8; background: #edf4ff; }
+.cui-needs form { max-width: 400px; margin-top: 16px; }
+.cui-needs form .cui-source { margin-bottom: 16px; }
+.cui-needs label.check { min-height: 44px; margin-bottom: 0; }
+.cui-request { padding: 12px 16px; border-left: 3px solid var(--line); line-height: 1.6; white-space: pre-wrap; font-size: 13px; }
+.cui-result > h2 { margin-top: 16px; }
+.cui-result .cui-offer { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.cui-fit-label { color: #255b40; background: #edf8f0; display: inline-block; padding: 8px 12px; border-radius: 6px; font-size: 12px; }
+.cui-fit-label--unknown { background: var(--cui-review-surface); color: #70410a; }
+.cui-reasoning { margin: 16px 0 24px; }
+.cui-reasoning > div { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 16px; border-top: 1px solid var(--line); padding: 16px 0; }
+.cui-reasoning dt { font-weight: 700; font-size: 12px; line-height: 1.7; }
+.cui-reasoning dd { margin: 0; line-height: 1.7; }
+.cui-reasoning .cui-reason-tradeoff { background: var(--cui-review-surface); padding: 16px; border: 1px solid #ead8ac; border-radius: 8px; color: #70410a; }
+.cui-workspace .cui-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+.cui-change { border-left: 3px solid var(--blue); background: #eaf2ff; padding: 12px 16px; margin: 24px 0; line-height: 1.6; }
+.cui-change p { margin: 0; }
+.cui-updated-label { display: inline-block; font-size: 11px; padding: 4px 8px; margin-left: 8px; background: #e5efff; color: #2457a6; border-radius: 4px; vertical-align: middle; }
+.cui-activity { border-block: 1px solid var(--line); padding: 8px 0; margin: 24px 0; color: var(--muted); }
+.cui-activity ol { padding-left: 20px; line-height: 1.7; }
+.cui-activity li { margin: 12px 0; }
+.cui-activity small { display: block; font-size: 11px; }
+.cui-flag { padding: 20px; margin: 24px 0; border: 1px solid; border-left-width: 6px; border-radius: 8px; }
+.cui-flag--danger { border-color: var(--cui-danger); background: var(--cui-danger-surface); color: var(--cui-danger-text); }
+.cui-flag--review { border-color: var(--cui-review); background: var(--cui-review-surface); color: #70410a; }
+.cui-flag-heading { display: flex; align-items: flex-start; gap: 12px; }
+.cui-flag-heading h3 { margin: 8px 0 0; font-size: 18px; line-height: 1.4; }
+.cui-flag .cui-flag-label { margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+.cui-flag-icon { display: grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; background: var(--cui-danger); color: white; border-radius: 6px; font-size: 20px; font-weight: 800; }
+.cui-flag--review .cui-flag-icon { background: var(--cui-review); }
+.cui-flag-offer { font-size: 16px; }
+.cui-flag-facts { margin: 16px 0; }
+.cui-flag-facts > div { margin: 12px 0; }
+.cui-flag-facts dt { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+.cui-flag-facts dd { margin: 0; line-height: 1.6; }
+.cui-flag-scope { border-top: 1px solid #e9b4af; padding-top: 12px; }
+.cui-alternative-action { border-color: var(--cui-danger); background: white; }
+.cui-flag-source { font-size: 12px; margin-top: 12px; }
+.cui-decision-error, .cui-input-error { border: 1px solid var(--cui-danger); border-left-width: 6px; background: var(--cui-danger-surface); color: var(--cui-danger-text); }
+.cui-input-error { padding: 12px; border-radius: 6px; line-height: 1.6; }
+.cui-error-label { color: var(--cui-danger); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+.cui-stale, .cui-notice.cui-notice--review { background: var(--cui-review-surface); color: #70410a; padding: 12px; border-left: 4px solid var(--cui-review); border-radius: 4px; }
+.cui-evidence { margin-top: 20px; }
+.cui-source-record { border-bottom: 1px solid var(--line); padding: 16px 0; scroll-margin-top: 16px; }
+.cui-source-record h4 { font-size: 15px; margin: 8px 0; }
+.cui-source-record dt { font-weight: 600; }
+.cui-source-record dd { margin: 4px 0 12px; }
+.cui-source-record blockquote { margin: 12px 0; padding-left: 16px; border-left: 2px solid var(--line); }
+.cui-source-record small { font-size: 12px; overflow-wrap: anywhere; }
+.cui-source-record:focus { outline: 3px solid var(--blue); outline-offset: 4px; }
+.cui-trace { padding-left: 24px; }
+.cui-trace li { padding: 8px 0 16px; }
+.cui-trace h3 { margin-top: 8px; }
+.cui-selection { border-color: #39835a; background: #f5fbf6; }
+.cui-notice { background: #e5efff; padding: 12px 16px; border-radius: 8px; line-height: 1.6; }
+@media (max-width: 480px) {
+  .cui-workspace { margin-top: 24px; }
+  .cui-workspace h1 { font-size: 28px; }
+  .cui-result, .cui-entry, .cui-needs { padding: 16px; }
+  .cui-compose-row { flex-direction: column; gap: 8px; }
+  .cui-compose-row button { align-self: stretch; }
+  .cui-shell nav { gap: 8px; }
+  .cui-shell nav a { font-size: 12px; }
+  .cui-intent-grid { grid-template-columns: 1fr; }
+  .cui-workspace .cui-actions button { flex-grow: 1; }
+  .cui-reasoning > div { grid-template-columns: 1fr; gap: 8px; }
+  .cui-flag { padding: 16px; }
+  .cui-flag-heading h3 { font-size: 16px; }
+  .cui-trace { padding-left: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .cui-workspace button { transition: none; } }
