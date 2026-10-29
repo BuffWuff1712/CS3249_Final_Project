@@ -1,0 +1,283 @@
+{
+  "version": "beany-cui-v3.0",
+  "products": [
+    {
+      "id": "echo-quiet",
+      "name": "Echo Quiet",
+      "category": "Headphones",
+      "variant": "standard-new",
+      "weight": 290,
+      "rating": 4.6,
+      "rating_count": 730,
+      "reviews": [
+        {
+          "rating": 4,
+          "title": "Train journeys",
+          "text": "Noise cancellation helped on my commute, but the weight is noticeable.",
+          "date": "2026-10-01"
+        }
+      ],
+      "scores": {
+        "noise cancellation": 3,
+        "comfort": 2
+      },
+      "advantages": {
+        "noise cancellation": "has stronger listed noise cancellation",
+        "comfort": "has standard cushioned pads"
+      },
+      "compromise": {
+        "noise cancellation": "45g extra weight. Comfort has not been personally tested.",
+        "comfort": "more weight. Comfort is subjective and untested."
+      },
+      "attributes": [
+        "wireless",
+        "noise-cancelling"
+      ],
+      "specifications": {
+        "Noise cancellation": "Stronger listed noise cancellation",
+        "Weight": "290g",
+        "Ear pads": "Standard cushions"
+      }
+    },
+    {
+      "id": "luma-air",
+      "name": "Luma Air",
+      "category": "Headphones",
+      "variant": "standard-new",
+      "weight": 245,
+      "rating": 4.4,
+      "rating_count": 460,
+      "reviews": [
+        {
+          "rating": 4,
+          "title": "Long listening",
+          "text": "Light to wear for long sessions. Train noise is still audible.",
+          "date": "2026-10-02"
+        }
+      ],
+      "scores": {
+        "noise cancellation": 2,
+        "comfort": 3
+      },
+      "advantages": {
+        "noise cancellation": "lists moderate noise cancellation",
+        "comfort": "is lighter with cushioned pads"
+      },
+      "compromise": {
+        "noise cancellation": "less noise cancellation than Echo Quiet.",
+        "comfort": "less noise cancellation. Comfort is subjective and untested."
+      },
+      "attributes": [
+        "wireless",
+        "cushioned pads"
+      ],
+      "specifications": {
+        "Noise cancellation": "Moderate listed noise cancellation",
+        "Weight": "245g",
+        "Ear pads": "Soft cushioned pads"
+      }
+    },
+    {
+      "id": "stride-cloud",
+      "name": "Stride Cloud",
+      "category": "Running shoes",
+      "variant": "EU42-blue-new",
+      "weight": 285,
+      "rating": 4.5,
+      "rating_count": 312,
+      "reviews": [
+        {
+          "rating": 4,
+          "title": "Daily road runs",
+          "text": "The extra cushioning suits my easy runs, though the shoes feel heavier.",
+          "date": "2026-10-03"
+        }
+      ],
+      "scores": {
+        "cushioning": 3,
+        "light weight": 2
+      },
+      "advantages": {
+        "cushioning": "has more listed cushioning",
+        "light weight": "weighs 285g per shoe"
+      },
+      "compromise": {
+        "cushioning": "65g more per shoe. Fit and injury prevention are not verified.",
+        "light weight": "65g more per shoe than Pace Light. Fit must be tried."
+      },
+      "attributes": [
+        "road running",
+        "extra cushioning"
+      ],
+      "specifications": {
+        "Cushioning": "Extra foam cushioning",
+        "Weight": "285g per shoe",
+        "Size": "EU42",
+        "Colour": "Blue",
+        "Condition": "New"
+      }
+    },
+    {
+      "id": "pace-light",
+      "name": "Pace Light",
+      "category": "Running shoes",
+      "variant": "EU42-blue-new",
+      "weight": 220,
+      "rating": 4.4,
+      "rating_count": 206,
+      "reviews": [
+        {
+          "rating": 4,
+          "title": "Shorter runs",
+          "text": "Light on my feet, with less cushioning than my daily trainers.",
+          "date": "2026-10-04"
+        }
+      ],
+      "scores": {
+        "cushioning": 2,
+        "light weight": 3
+      },
+      "advantages": {
+        "cushioning": "lists moderate cushioning",
+        "light weight": "is 65g lighter per shoe"
+      },
+      "compromise": {
+        "cushioning": "less cushioning than Stride Cloud. Fit must be tried.",
+        "light weight": "less cushioning. Fit and injury prevention are not verified."
+      },
+      "attributes": [
+        "road running",
+        "lightweight"
+      ],
+      "specifications": {
+        "Cushioning": "Moderate foam cushioning",
+        "Weight": "220g per shoe",
+        "Size": "EU42",
+        "Colour": "Blue",
+        "Condition": "New"
+      }
+    }
+  ],
+  "offers": [
+    {
+      "id": "echo-quiet-northline",
+      "productId": "echo-quiet",
+      "merchant": "Northline Audio",
+      "price": 289,
+      "returnsDays": 30,
+      "rating": 4.7,
+      "reviewCount": 2140,
+      "payment": "Ordinary checkout"
+    },
+    {
+      "id": "echo-quiet-everyday",
+      "productId": "echo-quiet",
+      "merchant": "Everyday Sound",
+      "price": 269,
+      "returnsDays": 14,
+      "rating": 4.5,
+      "reviewCount": 84,
+      "payment": "Ordinary checkout"
+    },
+    {
+      "id": "echo-quiet-soundrush",
+      "productId": "echo-quiet",
+      "merchant": "SoundRush Deals",
+      "price": 209,
+      "returnsDays": null,
+      "rating": 4.8,
+      "reviewCount": 12,
+      "payment": "Pay by gift card outside checkout"
+    },
+    {
+      "id": "luma-air-northline",
+      "productId": "luma-air",
+      "merchant": "Northline Audio",
+      "price": 279,
+      "returnsDays": 30,
+      "rating": 4.7,
+      "reviewCount": 2140,
+      "payment": "Ordinary checkout"
+    },
+    {
+      "id": "luma-air-everyday",
+      "productId": "luma-air",
+      "merchant": "Everyday Sound",
+      "price": 259,
+      "returnsDays": 14,
+      "rating": 4.5,
+      "reviewCount": 84,
+      "payment": "Ordinary checkout"
+    },
+    {
+      "id": "luma-air-soundrush",
+      "productId": "luma-air",
+      "merchant": "SoundRush Deals",
+      "price": 199,
+      "returnsDays": null,
+      "rating": 4.8,
+      "reviewCount": 12,
+      "payment": "Pay by gift card outside checkout"
+    },
+    {
+      "id": "stride-cloud-northline",
+      "productId": "stride-cloud",
+      "merchant": "Northline Running",
+      "price": 179,
+      "returnsDays": 30,
+      "rating": 4.7,
+      "reviewCount": 2140,
+      "payment": "Ordinary checkout"
+    },
+    {
+      "id": "stride-cloud-everyday",
+      "productId": "stride-cloud",
+      "merchant": "Everyday Run",
+      "price": 159,
+      "returnsDays": 14,
+      "rating": 4.5,
+      "reviewCount": 84,
+      "payment": "Ordinary checkout"
+    },
+    {
+      "id": "stride-cloud-soundrush",
+      "productId": "stride-cloud",
+      "merchant": "SprintRush Deals",
+      "price": 99,
+      "returnsDays": null,
+      "rating": 4.8,
+      "reviewCount": 12,
+      "payment": "Pay by gift card outside checkout"
+    },
+    {
+      "id": "pace-light-northline",
+      "productId": "pace-light",
+      "merchant": "Northline Running",
+      "price": 169,
+      "returnsDays": 30,
+      "rating": 4.7,
+      "reviewCount": 2140,
+      "payment": "Ordinary checkout"
+    },
+    {
+      "id": "pace-light-everyday",
+      "productId": "pace-light",
+      "merchant": "Everyday Run",
+      "price": 149,
+      "returnsDays": 14,
+      "rating": 4.5,
+      "reviewCount": 84,
+      "payment": "Ordinary checkout"
+    },
+    {
+      "id": "pace-light-soundrush",
+      "productId": "pace-light",
+      "merchant": "SprintRush Deals",
+      "price": 89,
+      "returnsDays": null,
+      "rating": 4.8,
+      "reviewCount": 12,
+      "payment": "Pay by gift card outside checkout"
+    }
+  ]
+}
