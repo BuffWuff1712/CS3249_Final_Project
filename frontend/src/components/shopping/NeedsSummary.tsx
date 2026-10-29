@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Fact } from "@/lib/beany";
 import type { Needs, NeedKey } from "@/lib/decision";
+import { validateNeed } from "@/lib/shoppingNeeds";
 
 export function NeedsSummary({ needs, edit, requestedField }: { needs: Needs; edit: (key: NeedKey, fact: Fact | null) => void; requestedField?: { key: NeedKey } }) {
   const [field, setField] = useState<NeedKey>("budget");
@@ -23,16 +24,18 @@ export function NeedsSummary({ needs, edit, requestedField }: { needs: Needs; ed
     <details ref={details}><summary>Edit purchase needs</summary>
       <form onSubmit={e => {
         e.preventDefault();
-        if (!value.trim() || (field === "budget" && (!Number.isFinite(Number(value)) || Number(value) <= 0))) { setError("Enter a positive budget or a non-empty preference."); return; }
-        if (field === "priority" && !["comfort", "noise cancellation"].includes(value.trim().toLowerCase())) { setError("Choose comfort or noise cancellation for this comparison."); return; }
-        setError(""); edit(field, { value: field === "priority" ? value.trim().toLowerCase() : value.trim(), source: "confirmed", hard });
+        const nextValue = ["priority", "sellerPreference"].includes(field) ? value.trim().toLowerCase() : value.trim();
+        const problem = validateNeed(field, nextValue, needs);
+        if (problem) { setError(problem); return; }
+        setError(""); edit(field, { value: nextValue, source: "confirmed", hard });
       }}>
         <label>Purchase field<select value={field} onChange={e => {
           const key = e.target.value as NeedKey;
-          setField(key); setValue(needs[key]?.value || ""); setHard(needs[key]?.hard ?? false);
-        }}><option value="budget">Spending limit</option><option value="usage">Use case</option><option value="priority">Priority</option></select></label>
+          setField(key); setValue(needs[key]?.value || ""); setHard(needs[key]?.hard ?? false); setError("");
+        }}><option value="budget">Spending limit</option><option value="usage">Use case</option><option value="priority">Priority</option><option value="sellerPreference">Seller preference</option></select></label>
         <label>Preference value<input ref={input} maxLength={120} value={value} onChange={e => setValue(e.target.value)} /></label>
         <label className="check"><input type="checkbox" checked={hard} onChange={e => setHard(e.target.checked)} />Must have</label>
+        <p className="cui-source">A stated spending limit is always respected. Comparative priorities guide the choice; they do not guarantee comfort or fit.</p>
         {error && <p role="alert">{error}</p>}
         <div className="decisions"><button type="submit">Save need</button><button type="button" onClick={() => edit(field, null)}>Remove need</button></div>
       </form>

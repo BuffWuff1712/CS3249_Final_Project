@@ -6,3 +6,23 @@
 .cui-trace{padding-left:24px}.cui-trace li{padding:8px 0 16px}.cui-trace h3{margin-top:8px}.cui-source-record:focus{outline:3px solid var(--blue);outline-offset:4px}
 .cui-composer{margin:24px 0}.cui-composer label{margin-bottom:8px}.cui-compose-row{display:flex;gap:12px;align-items:stretch}.cui-compose-row textarea{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:16px;resize:vertical}.cui-compose-row button{align-self:flex-end;min-height:44px}
 @media(max-width:480px){.cui-workspace{margin-top:24px}.cui-workspace h1{font-size:28px}.cui-result{padding:16px}.cui-compose-row{gap:8px}}
+
+.cui-shell nav{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.cui-shell nav a{color:var(--ink);text-underline-offset:4px}
+.cui-workspace button,.cui-workspace summary,.cui-shell nav button{min-height:44px}
+.cui-workspace summary{display:list-item;align-content:center;cursor:pointer;font-weight:600;line-height:1.5;padding:8px 0}
+.cui-workspace p,.cui-workspace li,.cui-workspace dd{overflow-wrap:anywhere}
+.cui-workspace .cui-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.cui-plan{color:var(--muted);line-height:1.6;max-width:66ch}
+.cui-change{border-left:3px solid var(--blue);padding:0 16px;margin:24px 0;line-height:1.6}
+.cui-updated-label{display:inline-block;font-size:11px;padding:4px 8px;margin-left:8px;background:#e5efff;color:#2457a6;border-radius:4px;vertical-align:middle}
+.cui-activity{border-block:1px solid var(--line);padding:8px 0;margin:24px 0}
+.cui-activity ol{padding-left:20px;line-height:1.7}.cui-activity li{margin:12px 0}
+.cui-activity small{display:block;font-size:11px}
+.cui-caution{border:1px solid #e8d3a4;background:#fff7e6;color:#664812;border-radius:8px;padding:16px;margin:20px 0}
+.cui-caution h3{margin:0 0 8px}.cui-caution .cui-source{color:#725721}
+.cui-selection{border-color:var(--blue)}
+.cui-notice{background:#e5efff;padding:12px 16px;border-radius:8px;line-height:1.6}
+.cui-needs form .cui-source{margin-bottom:16px}.cui-needs label.check{min-height:44px;margin-bottom:0}
+@media(max-width:480px){.cui-shell nav{gap:8px}.cui-shell nav a{font-size:12px}.cui-workspace .cui-actions button{flex-grow:1}.cui-trace{padding-left:20px}}
+@media(prefers-reduced-motion:reduce){.cui-workspace button{transition:none}}
