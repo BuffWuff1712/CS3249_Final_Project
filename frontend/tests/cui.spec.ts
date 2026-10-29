@@ -2,6 +2,21 @@ import { test, expect } from "@playwright/test";
 
 const request = "Headphones for my daily train commute, under SGD300. Noise cancellation matters more than weight.";
 
+test("expanded reasoning links five decision steps to evidence and editable priorities", async ({ page }) => {
+  await page.goto("/shop");
+  await page.getByRole("textbox", { name: "Message Beany" }).fill(request);
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+  const control = page.getByText("How I reached this recommendation", { exact: true });
+  await expect(control).toBeVisible();
+  await control.click();
+  await expect(page.getByRole("list", { name: "Decision steps" }).getByRole("listitem")).toHaveCount(5);
+  await page.getByRole("button", { name: "Inspect product comparison" }).click();
+  await expect(page.getByLabel("Comparison and sources")).toBeVisible();
+  await page.getByRole("button", { name: "Change this priority" }).click();
+  await expect(page.getByLabel("Purchase field")).toHaveValue("priority");
+  await expect(page.getByLabel("Preference value")).toBeFocused();
+});
+
 test("source evidence is optional and separates product reviews from seller reputation", async ({ page }) => {
   await page.goto("/shop");
   await page.getByRole("textbox", { name: "Message Beany" }).fill(request);

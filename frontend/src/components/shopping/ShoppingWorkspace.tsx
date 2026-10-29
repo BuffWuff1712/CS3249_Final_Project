@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { ShoppingDecision, Needs } from "@/lib/decision";
+import type { ShoppingDecision, Needs, NeedKey } from "@/lib/decision";
 import { createDecision } from "@/lib/shoppingScenario";
 import { interpretPurchase } from "@/lib/purchaseIntent";
 import { Recommendation } from "./Recommendation";
@@ -14,6 +14,7 @@ export function ShoppingWorkspace() {
   const [needs, setNeeds] = useState<Needs>({});
   const [revision, setRevision] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const [requestedField, setRequestedField] = useState<{ key: NeedKey }>();
   const [questions, setQuestions] = useState(0);
   const [clarification, setClarification] = useState<{ reply: string; options: string[] } | null>(null);
   function send(value: string) {
@@ -48,7 +49,7 @@ export function ShoppingWorkspace() {
       <h1>A considered choice, less research.</h1>
       <p className="muted">Tell me what matters. I’ll compare options and explain the choice for you.</p>
       <p className="cui-source">Fictional catalogue · No websites visited · No real orders or payments</p>
-      {!!Object.keys(needs).length && <NeedsSummary key={revision} needs={needs} edit={(key, fact) => {
+      {!!Object.keys(needs).length && <NeedsSummary key={revision} needs={needs} requestedField={requestedField} edit={(key, fact) => {
         const next = { ...needs }; if (fact) next[key] = fact; else delete next[key];
         setNeeds(next); setRevision(revision + 1);
       }} />}
@@ -57,7 +58,7 @@ export function ShoppingWorkspace() {
         <p role="status">{clarification.reply}</p>
         <div className="decisions">{clarification.options.map(option => <button key={option} onClick={() => send(option)}>{option}</button>)}</div>
       </section>}
-      {decision && <Recommendation decision={decision} stale={decision.revision !== revision} />}
+      {decision && <Recommendation key={decision.revision} decision={decision} stale={decision.revision !== revision} edit={key => setRequestedField({ key })} />}
       {revision > 0 && decision?.revision !== revision && <button onClick={() => setDecision(createDecision(needs, revision))}>Compare current needs</button>}
       <form className="cui-composer" onSubmit={e => {
         e.preventDefault();

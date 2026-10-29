@@ -1,17 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Fact } from "@/lib/beany";
 import type { Needs, NeedKey } from "@/lib/decision";
 
-export function NeedsSummary({ needs, edit }: { needs: Needs; edit: (key: NeedKey, fact: Fact | null) => void }) {
+export function NeedsSummary({ needs, edit, requestedField }: { needs: Needs; edit: (key: NeedKey, fact: Fact | null) => void; requestedField?: { key: NeedKey } }) {
   const [field, setField] = useState<NeedKey>("budget");
   const [value, setValue] = useState(needs.budget?.value || "");
   const [hard, setHard] = useState(needs.budget?.hard ?? false);
   const [error, setError] = useState("");
+  const details = useRef<HTMLDetailsElement>(null);
+  const input = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!requestedField) return;
+    const key = requestedField.key;
+    setField(key); setValue(needs[key]?.value || ""); setHard(needs[key]?.hard ?? false);
+    if (details.current) details.current.open = true;
+    input.current?.focus();
+  }, [requestedField, needs]);
   return <section className="cui-needs" aria-label="Purchase needs">
     <h2>What I understand</h2>
     <p>{Object.entries(needs).map(([key, fact]) => <span className="tag" key={key}>{key === "budget" ? `Up to SGD${fact.value}` : fact.value}{fact.source !== "confirmed" ? ` (${fact.source})` : ""} </span>)}</p>
-    <details><summary>Edit purchase needs</summary>
+    <details ref={details}><summary>Edit purchase needs</summary>
       <form onSubmit={e => {
         e.preventDefault();
         if (!value.trim() || (field === "budget" && (!Number.isFinite(Number(value)) || Number(value) <= 0))) { setError("Enter a positive budget or a non-empty preference."); return; }
@@ -22,7 +31,7 @@ export function NeedsSummary({ needs, edit }: { needs: Needs; edit: (key: NeedKe
           const key = e.target.value as NeedKey;
           setField(key); setValue(needs[key]?.value || ""); setHard(needs[key]?.hard ?? false);
         }}><option value="budget">Spending limit</option><option value="usage">Use case</option><option value="priority">Priority</option></select></label>
-        <label>Preference value<input maxLength={120} value={value} onChange={e => setValue(e.target.value)} /></label>
+        <label>Preference value<input ref={input} maxLength={120} value={value} onChange={e => setValue(e.target.value)} /></label>
         <label className="check"><input type="checkbox" checked={hard} onChange={e => setHard(e.target.checked)} />Must have</label>
         {error && <p role="alert">{error}</p>}
         <div className="decisions"><button type="submit">Save need</button><button type="button" onClick={() => edit(field, null)}>Remove need</button></div>
