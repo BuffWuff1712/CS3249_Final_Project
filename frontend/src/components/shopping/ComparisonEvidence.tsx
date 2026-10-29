@@ -29,7 +29,7 @@ export function ComparisonEvidence({ decision, focus }: { decision: ShoppingDeci
         {decision.needs.budget && offer.price > Number(decision.needs.budget.value) && <p><strong>Above your spending limit.</strong> This offer cannot be selected unless you explicitly change the limit.</p>}
         <p>{offer.rating ?? "Unknown rating"} / 5 · {offer.reviewCount.toLocaleString("en-SG")} seller reviews</p>
         <dl><div><dt>Return period</dt><dd>{offer.returnsDays === null ? "Unknown; not supplied" : `${offer.returnsDays} days`}</dd></div><div><dt>Payment terms</dt><dd>{offer.payment || "Unknown; not supplied"}</dd></div></dl>
-        {merchantConcern(offer) && <MerchantCaution concern={merchantConcern(offer)!} label={`Source caution for ${offer.merchant}`} />}
+        {merchantConcern(offer) && <MerchantCaution concern={merchantConcern(offer)!} flaggedOffer={offer} label={`Source caution for ${offer.merchant}`} />}
         <small>Catalogue record: {offer.id}</small>
       </section>)}
     </section>

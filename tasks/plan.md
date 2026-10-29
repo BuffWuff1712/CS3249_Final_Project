@@ -25,6 +25,8 @@ Continue the existing CUI work on `feat/cui-v2-issues`. Keep the generated `fron
 
 Implementation and verification: #9–19 are implemented/documented locally. Final checks: 430 backend tests passed with five existing skips; 82 Playwright checks passed across desktop/mobile; typecheck and production build passed. The budget-guard mutation was caught and restored. Source/acceptance details and screenshots are in [`docs/cui-v2-delivery.md`](../docs/cui-v2-delivery.md).
 
+UI clarity follow-up: labelled purchase intent and four explicit reasoning areas, prominent red blocked-offer/error flags, distinct amber uncertainty/trade-offs, default disclosure of encountered blocked sellers and a guarded alternative-offer action. Ninety desktop/mobile Playwright checks pass after this follow-up. Review [`docs/cui-v2-change-list.md`](../docs/cui-v2-change-list.md) on the feature branch before merging PR #25.
+
 #20 has a runnable system, silent recordings, a reproducible demo script and timed presentation notes. Team narration/rehearsal, historical-deck validation and the final course submission remain human deliverables. #21–24 remain the separate pre-recruitment gate. GitHub issue states are not changed by this local implementation record.
 
 ## Final demo and study plan

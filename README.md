@@ -14,6 +14,8 @@ Needs, the last request and any selected offer are stored in this browser. Refre
 
 The `/` route remains the classic backend-connected simulation described below. Its SQLite sessions, research exports, cart and receipts are independent of `/shop`. See the [demo/presentation script](docs/final-demo.md), [study protocol](docs/evaluation-guide.md), and [CUI delivery and verification notes](docs/cui-v2-delivery.md).
 
+The [complete change list and pre-merge review checklist](docs/cui-v2-change-list.md) explains the intent → reasoning → flagged concern → decision flow. Blocked seller offers use a prominent red flag with the affected seller/price, evidence, consequence and an action to select the recommended alternative. Missing information remains a separate caution; colour never substitutes for the reason or next action.
+
 ## Requirements
 
 Python 3.11+, Node.js 20.9+ (Node 22 recommended), npm. Run one backend worker for local studies.

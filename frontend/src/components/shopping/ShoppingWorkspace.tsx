@@ -6,6 +6,7 @@ import { SCENARIO_VERSION } from "@/lib/shoppingFixtures";
 import { Recommendation } from "./Recommendation";
 import { NeedsSummary } from "./NeedsSummary";
 import { ComparisonActivity } from "./ComparisonActivity";
+import { PurchaseComposer } from "./PurchaseComposer";
 import "./shopping.css";
 
 export function ShoppingWorkspace() {
@@ -16,6 +17,7 @@ export function ShoppingWorkspace() {
   const [requestedField, setRequestedField] = useState<{ key: NeedKey }>();
   const decision = state.result?.decision;
   const stale = state.comparedRevision !== state.revision;
+  const hasBlockedOffer = !stale && decision?.concerns.some(concern => concern.blocked);
   function send(value: string) {
     dispatch({ type: "send", text: value });
     setText("");
@@ -38,13 +40,14 @@ export function ShoppingWorkspace() {
   return <div className="shell cui-shell">
     <header><a className="brand" href="/shop">beany.</a><nav aria-label="Shopping navigation"><a href="/">Classic simulation</a><button onClick={() => { dispatch({ type: "reset" }); setRequestedField(undefined); setText(""); }}>Start fresh</button></nav></header>
     <main className="cui-workspace" id="shopping-main">
-      <h1>A considered choice, less research.</h1>
-      <p className="muted">Tell me what matters. I’ll compare options and explain the choice for you.</p>
+      <p className="eyebrow">SHOPPING DECISION ASSISTANT</p>
+      <h1>Choose a product. Understand the decision.</h1>
+      <p className="cui-purpose">Tell me your purchase intent. I’ll compare the product fit, spending limit and seller terms, explain the trade-off, and flag offers you should avoid.</p>
       <p className="cui-source">Fictional catalogue · No websites visited · No real orders or payments</p>
-      <p className="cui-plan">I’ll compare models against your priorities and spending limit, then review seller terms. Comparisons run locally; there is no live browsing.</p>
-      {storageNotice && <p className="cui-notice">{storageNotice}</p>}
+      <PurchaseComposer text={text} setText={setText} send={send} loaded={loaded} />
+      {storageNotice && <p className="cui-notice cui-notice--review">{storageNotice}</p>}
       {state.notice && <p className="cui-notice">{state.notice}</p>}
-      <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">{state.notice || (state.clarification ? state.clarification.reply : stale && state.result ? "Your needs changed. Compare again to update this recommendation." : state.change || (decision ? `Recommendation ready: ${decision.product.name} from ${decision.offer.merchant}.` : state.result?.message || "Ready to compare headphones or running shoes."))}</p>
+      <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">{state.notice || (state.clarification ? state.clarification.reply : stale && state.result ? "Your needs changed. Compare again to update this recommendation." : state.change || (decision ? `Recommendation ready: ${decision.product.name} from ${decision.offer.merchant}.` : state.result?.message || "Ready to compare headphones or running shoes."))}{hasBlockedOffer ? " A seller offer was blocked for an outside-checkout payment request. The recommended offer remains selectable." : ""}</p>
       {!!Object.keys(state.needs).length && <NeedsSummary key={state.revision} needs={state.needs} requestedField={requestedField} edit={(key, fact) => {
         dispatch({ type: "edit", key, fact }); setRequestedField(undefined);
       }} />}
@@ -55,7 +58,8 @@ export function ShoppingWorkspace() {
       </section>}
       {state.change && !stale && <section aria-label="What changed" className="cui-change"><p>{state.change}</p></section>}
       {state.result && !stale && <ComparisonActivity activity={state.result.activity} />}
-      {state.result && !decision && !stale && <section className="cui-result" aria-label={state.result.status === "error" ? "Comparison unavailable" : "No matching offer"}>
+      {state.result && !decision && !stale && <section className="cui-result cui-decision-error" data-severity="error" aria-label={state.result.status === "error" ? "Comparison unavailable" : "No matching offer"}>
+        <p className="cui-error-label">{state.result.status === "error" ? "Comparison failed" : "Decision blocked · constraints conflict"}</p>
         <h2>{state.result.status === "error" ? "Comparison unavailable" : "No matching offer"}</h2><p>{state.result.message}</p>
         <div className="cui-actions">
           <button onClick={() => dispatch({ type: "compare" })}>Retry comparison</button>
@@ -74,10 +78,6 @@ export function ShoppingWorkspace() {
         <div className="cui-actions">{!state.finished && <button className="primary" onClick={() => dispatch({ type: "finish" })}>Finish decision</button>}<button onClick={() => edit("priority")}>Revise needs</button></div>
       </section>}
       {state.revision > 0 && stale && <button onClick={() => dispatch({ type: "compare" })}>Compare current needs</button>}
-      <form className="cui-composer" onSubmit={event => { event.preventDefault(); send(text); }}>
-        <label htmlFor="cui-message">Message Beany</label>
-        <div className="cui-compose-row"><textarea id="cui-message" rows={2} maxLength={2000} value={text} onChange={event => setText(event.target.value)} required disabled={!loaded} placeholder="Headphones for my train commute, under SGD300. Noise cancellation first." /><button className="primary" disabled={!loaded}>Send</button></div>
-      </form>
       <p className="cui-source">Scenario {SCENARIO_VERSION}. Headphone standard/new and running-shoe EU42/blue/new variants only. No fit, authenticity or safety certification is implied.</p>
     </main>
   </div>;

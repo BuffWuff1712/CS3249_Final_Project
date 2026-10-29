@@ -63,7 +63,7 @@ function runComparison(needs: Needs, revision: number, choice: SellerChoice | un
     : cheaper && offer.returnsDays !== null && cheaper.returnsDays !== null
       ? `I favoured ${offer.merchant}'s ${offer.returnsDays}-day returns over ${cheaper.merchant}'s ${cheaper.returnsDays} days, for SGD${offer.price - cheaper.price} more. Longer returns are ${needs.sellerPreference?.source === "confirmed" ? "your preference" : "my editable tie-breaker"}.`
       : `${offer.merchant} fits your limit with ${terms}. A smaller review history alone is not a warning.`;
-  const concerns = comparedOffers.map(merchantConcern).filter((concern): concern is MerchantConcern => !!concern && (concern.offerId === offer.id || lowestPrice && concern.blocked)).map(concern => concern.blocked ? { ...concern, nextStep: `I recommend ${offer.merchant} at SGD${offer.price}, using ordinary checkout instead.` } : concern);
+  const concerns = comparedOffers.map(merchantConcern).filter((concern): concern is MerchantConcern => !!concern && (concern.offerId === offer.id || concern.blocked)).map(concern => concern.blocked ? { ...concern, nextStep: `I recommend ${offer.merchant} at SGD${offer.price}, using ordinary checkout instead.` } : concern);
   const missingEvidence = comparedOffers.some(candidate => candidate.returnsDays === null || !candidate.payment) || products.some(candidate => !candidate.reviews?.length);
   activity.push(
     { id: "sellers", label: `Reviewed ${comparedOffers.length} seller records for ${product.name}, variant ${product.variant}.`, state: "completed", evidence: comparedOffers.map(candidate => candidate.id) },

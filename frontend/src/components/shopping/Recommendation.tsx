@@ -11,16 +11,18 @@ export function Recommendation({ decision, stale = false, edit, select, selected
   updatedSteps?: string[];
 }) {
   const [focus, setFocus] = useState<{ id: string }>();
+  const reasonLabels: Record<string, string> = { needs: "Your intent", comparison: "Model choice", seller: "Seller choice", tradeoff: "Trade-off" };
   return <article className="cui-result" aria-label={stale ? "Previous recommendation" : "Current recommendation"}>
-    {stale && <p>Previous recommendation · Compare again using your updated needs.</p>}
-    <p className="eyebrow">RECOMMENDED FOR YOUR NEEDS</p>
+    {stale && <p className="cui-stale">Previous recommendation · Compare again using your updated needs.</p>}
+    <div className="cui-section-heading"><span className="cui-step-number">3</span><p className="eyebrow">{stale ? "PREVIOUS OPTION" : "RECOMMENDED FOR YOUR INTENT"}</p></div>
     <h2>{decision.product.name}</h2>
     <p className="cui-offer">SGD{decision.offer.price} · {decision.offer.merchant}</p>
+    <p className={`cui-fit-label ${decision.needs.budget ? "" : "cui-fit-label--unknown"}`}>{decision.needs.budget ? `Within your ${decision.needs.currency?.value || "SGD"}${decision.needs.budget.value} spending limit` : "Spending limit not confirmed"} · {decision.product.variant}</p>
     <section aria-label="Why I recommend this for you">
       <h3>Why I recommend this for you</h3>
-      {decision.reasons.map(reason => <p key={reason.id}>{reason.text}</p>)}
+      <dl className="cui-reasoning">{decision.reasons.map(reason => <div key={reason.id} className={reason.id === "tradeoff" ? "cui-reason-tradeoff" : undefined}><dt>{reasonLabels[reason.id]}</dt><dd>{reason.text}</dd></div>)}</dl>
     </section>
-    {decision.concerns.map(concern => <MerchantCaution key={concern.offerId} concern={concern} />)}
+    {decision.concerns.map(concern => <MerchantCaution key={concern.offerId} concern={concern} flaggedOffer={decision.comparedOffers.find(offer => offer.id === concern.offerId)} alternative={decision.offer} useAlternative={!stale && !selected ? select : undefined} />)}
     <div className="cui-actions">
       {!selected && <button className="primary" disabled={stale} onClick={select}>Select this offer</button>}
       <button disabled={stale} onClick={() => edit("priority")}>Change priorities</button>
