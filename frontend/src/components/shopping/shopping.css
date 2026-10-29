@@ -226,3 +226,57 @@
 .cui-conversation { gap: 16px; }
 .cui-activity-details > summary { min-height: 28px; }
 .cui-comparison-story { line-height: 1.6; }
+
+/* One persistent chat frame: only the conversation and decision contents scroll. */
+.cui-shell { height: 100dvh; display: flex; flex-direction: column; }
+.cui-shell header { flex-shrink: 0; }
+.cui-workspace { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: stretch; margin: 0; }
+.cui-needs { flex-shrink: 0; }
+.cui-intent-grid .cui-fact-status { min-height: 14px; line-height: 14px; margin-top: 4px; }
+.cui-need-chip { height: 54px; }
+.cui-need-chip > span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+.cui-need-chip--empty:disabled { opacity: 1; color: var(--muted); font-weight: 400; cursor: default; background: #f9fbff; }
+.cui-needs summary[aria-disabled="true"] { color: var(--muted); cursor: default; }
+.cui-columns { flex: 1; min-height: 0; align-items: stretch; }
+.cui-conversation { min-height: 0; height: 100%; padding-block: 24px 16px; gap: 16px; }
+.cui-chat-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; padding: 4px 8px 12px 0; }
+.cui-conversation-history { max-height: none; overflow: visible; padding: 0; }
+.cui-chat-scroll > .cui-comparison-story, .cui-chat-scroll > .cui-change, .cui-chat-scroll > .cui-clarification, .cui-chat-scroll > .cui-activity, .cui-chat-scroll > .cui-participate { margin-top: 24px; }
+.cui-chat-scroll > .cui-examples { margin: 0 0 24px 72px; }
+.cui-entry { margin: 0; flex-shrink: 0; }
+.cui-compose-row textarea { max-height: 140px; }
+.cui-decision-column { height: 100%; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; display: flex; flex-direction: column; padding-block: 24px 16px; }
+.cui-decision-frame { flex: 1 0 auto; min-height: calc(100% - 62px); background: white; border: 0; border-radius: 10px; margin: 0; padding: 20px 28px; }
+.cui-decision-empty { padding: 0; min-height: 0; }
+.cui-decision-empty h2 { margin: 0 0 28px; }
+.cui-recommendation { padding: 0; background: transparent; animation: cui-reveal .16s ease-out; }
+.cui-disclosure { flex-shrink: 0; margin: 16px 0 0; }
+.cui-progress-label { display: flex; align-items: center; gap: 12px; color: var(--muted); }
+.cui-typing { color: var(--blue); animation: cui-typing 1s ease-in-out infinite alternate; }
+.cui-progress small { display: block; margin-top: 8px; font-size: 11px; }
+.cui-progress-steps { list-style: none; margin: 12px 0 0; padding: 0; font-size: 13px; line-height: 1.6; }
+.cui-progress-steps li { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; }
+.cui-progress-steps svg { width: 18px; height: 18px; color: var(--blue); margin-top: 2px; }
+@keyframes cui-typing { from { opacity: .45; } to { opacity: 1; } }
+@keyframes cui-reveal { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 1100px) and (min-width: 761px) { .cui-decision-frame { padding-inline: 18px; } }
+@media (max-width: 760px) {
+  .cui-shell { height: auto; min-height: 100dvh; }
+  .cui-workspace { flex: none; }
+  .cui-mobile-jumps { flex-shrink: 0; }
+  .cui-columns { flex: none; }
+  .cui-conversation { height: 500px; min-height: 420px; max-height: calc(100svh - 200px); padding: 20px 0 16px; }
+  .cui-chat-scroll > .cui-examples { margin-left: 48px; }
+  .cui-decision-column { height: auto; overflow: visible; display: block; padding: 24px 0; }
+  .cui-decision-frame { min-height: 360px; padding: 16px; }
+  .cui-recommendation { padding: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .cui-typing, .cui-recommendation { animation: none; } }
+
+/* An expanded needs form must not squeeze the chat out of short viewports. */
+@media (min-width: 761px) {
+  .cui-shell:has(.cui-needs details[open]) { height: auto; min-height: 100dvh; }
+  .cui-workspace:has(.cui-needs details[open]) .cui-columns { flex: none; }
+  .cui-workspace:has(.cui-needs details[open]) .cui-conversation,
+  .cui-workspace:has(.cui-needs details[open]) .cui-decision-column { height: max(420px, calc(100dvh - 240px)); }
+}

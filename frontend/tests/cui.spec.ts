@@ -48,7 +48,7 @@ test("purchase needs can be edited without inheriting a constraint and survive r
   await page.goto("/shop");
   await page.getByRole("textbox", { name: "Message Beany" }).fill(request);
   await page.getByRole("button", { name: "Send", exact: true }).click();
-  await expect(page.getByLabel("Purchase needs")).toBeVisible();
+  await expect(page.getByRole("article", { name: "Current recommendation" })).toBeVisible();
   await page.getByText("Edit purchase needs", { exact: true }).click();
   await page.getByLabel("Purchase field").selectOption("budget");
   await page.getByLabel("Preference value").fill("280");

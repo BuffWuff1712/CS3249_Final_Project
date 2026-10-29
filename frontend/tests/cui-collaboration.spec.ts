@@ -80,7 +80,10 @@ test("a capped conversation still scrolls to the newest answer", async ({ page }
   await send(page, "What do the product reviews say?");
   const history = page.getByRole("region", { name: "Conversation history" });
   await expect(history).toContainText("1 supplied review excerpt");
-  await expect.poll(() => history.evaluate(element => element.scrollHeight - element.clientHeight - element.scrollTop)).toBeLessThanOrEqual(1);
+  await expect.poll(() => history.evaluate(element => {
+    const reply = element.querySelector(".cui-conversation-history .cui-turn:last-child")!;
+    return Math.abs(reply.getBoundingClientRect().top - element.getBoundingClientRect().top);
+  })).toBeLessThanOrEqual(2);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("beany-cui-needs")!).messages.length)).toBe(60);
 });
 
