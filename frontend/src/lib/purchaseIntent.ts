@@ -7,6 +7,12 @@ export type IntentResult = {
   seller?: "another" | "cheapest"; newTask: boolean;
 };
 
+export function sellerPreferenceFrom(text: string): string | undefined {
+  if (/cheapest|lowest price|save.{0,8}(?:money|SGD|\$)|price first/i.test(text)) return "lowest price";
+  if (/longer returns|return.{0,12}(?:first|more|important)|flexible returns/i.test(text)) return "longer returns";
+  return undefined;
+}
+
 export function interpretPurchase(text: string, current: Needs, questions: number): IntentResult {
   const headphones = /headphone/i.test(text);
   const shoes = /running shoes|\btrainers\b|\bshoes\b/i.test(text);
@@ -59,8 +65,8 @@ export function interpretPurchase(text: string, current: Needs, questions: numbe
     return ask(`These models trade ${preferred[0]} against ${preferred[1]}. Which priority should decide?`, preferred.map(priority => `${priority[0].toUpperCase()}${priority.slice(1)} first`));
   }
   if (explicit || mentioned.length === 1) set("priority", explicit || mentioned[0]);
-  if (/cheapest|lowest price|save.{0,8}(?:money|SGD|\$)|price first/i.test(text)) set("sellerPreference", "lowest price");
-  else if (/longer returns|return.{0,12}(?:first|more|important)|flexible returns/i.test(text)) set("sellerPreference", "longer returns");
+  const sellerPreference = sellerPreferenceFrom(text);
+  if (sellerPreference) set("sellerPreference", sellerPreference);
   if (needs.currency?.value === "USD") return ask("This catalogue is priced in SGD. I kept your stated amount and needs; use that amount in SGD or enter a different SGD budget. No conversion is performed.", ["Use SGD"]);
   if (!activeCategory) return ask("What would you like to compare?", ["Headphones", "Running shoes"]);
   const browse = /show (?:me )?options|browse|not sure|don't know|no budget|any is fine|skip/i.test(text);

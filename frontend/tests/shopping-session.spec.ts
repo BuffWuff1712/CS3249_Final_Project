@@ -72,3 +72,20 @@ test("a model change caused by budget or an explicit product request never claim
   expect(state.result?.decision?.reasons.find(reason => reason.id === "comparison")?.text).toContain("Luma Air ranks higher");
   expect(state.change).toContain("requested this model");
 });
+
+test("seller-only preferences preserve the explicit product lock through chat, editor and refresh", () => {
+  let state = shoppingReducer(initialShoppingState, { type: "send", text: "Headphones for commuting under SGD300, comfort first" });
+  state = shoppingReducer(state, { type: "send", text: "Find the cheapest Echo Quiet offer" });
+  expect(state.result?.decision?.product.id).toBe("echo-quiet");
+  state = shoppingReducer(state, { type: "send", text: "Longer returns first" });
+  expect(state.choice?.productId).toBe("echo-quiet");
+  expect(state.result?.decision?.product.id).toBe("echo-quiet");
+  expect(state.result?.decision?.offer.id).toBe("echo-quiet-northline");
+  state = shoppingReducer(state, { type: "send", text: "Longer returns first" });
+  expect(state.choice?.productId).toBe("echo-quiet");
+  expect(state.result?.decision?.product.id).toBe("echo-quiet");
+  state = shoppingReducer(state, { type: "edit", key: "sellerPreference", fact: { value: "lowest price", source: "confirmed", hard: false } });
+  state = shoppingReducer(state, { type: "compare" });
+  expect(state.result?.decision?.offer.id).toBe("echo-quiet-everyday");
+  expect(restoreShoppingState(saveShoppingState(state)).choice?.productId).toBe("echo-quiet");
+});
