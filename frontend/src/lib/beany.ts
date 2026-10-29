@@ -1,4 +1,12 @@
 export type Review = { rating: number; title: string; text: string; date: string };
+export type Site = {
+  domain: string;
+  name: string;
+  kind: "marketplace" | "independent";
+  tier: "good" | "mid" | "poor";
+  label: string;
+  summary: string;
+};
 export type Merchant = {
   id: string;
   name: string;
@@ -14,6 +22,7 @@ export type Merchant = {
   external_payment: boolean;
   merchant_reviews?: Review[];
   checkout_note?: string;
+  site?: Site | null;
 };
 export type MerchantRisk = {
   merchant_id: string;

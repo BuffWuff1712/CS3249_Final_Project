@@ -27,3 +27,4 @@
 summary{width:fit-content;max-width:100%;min-height:44px;padding:10px 14px;border:1px solid #a9c6f8;border-radius:8px;background:#edf4ff;color:#2457a6;font-weight:600;line-height:1.5;cursor:pointer;overflow-wrap:anywhere;transition:background .15s}
 summary:hover{background:#dbeafe}
 details[open]>summary{margin-bottom:12px;background:#dbeafe}
+.site-reputation{display:flex;align-items:center;gap:8px;margin-bottom:0}.site-meter{display:inline-flex;gap:2px;padding:2px;width:72px;height:14px;border:1px solid #111;border-radius:7px;background:#fff}.site-meter span{flex:1;background:#e5e7eb}.site-meter span:first-child{border-radius:4px 0 0 4px}.site-meter span:last-child{border-radius:0 4px 4px 0}.site-meter.good .filled{background:#639922}.site-meter.mid .filled{background:#ef9f27}.site-meter.poor .filled{background:#e24b4a}
