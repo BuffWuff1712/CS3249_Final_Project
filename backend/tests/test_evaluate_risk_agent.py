@@ -7,6 +7,10 @@ def test_compare_ignores_low_price():
     assert ev.compare({"pressure", "low_price"}, {"pressure"}) == {"hits": ["pressure"], "misses": [], "false_positives": []}
 
 
+def test_compare_ignores_site_reputation():
+    assert ev.compare({"site_reputation_poor", "site_reputation_mid"}, set())["false_positives"] == []
+
+
 def test_compare_reports_misses_and_false_positives():
     assert ev.compare({"injection"}, {"lookalike"}) == {"hits": [], "misses": ["lookalike"], "false_positives": ["injection"]}
 

@@ -174,6 +174,9 @@ def test_prompt_covers_local_fields():
                  "Unverified seller", "No seller contact details listed"):
         assert text in risk_agent.INSTRUCTIONS, text
     assert "website reputation" in risk_agent.INSTRUCTIONS
+    assert "- lookalike: product names or brands imitating a well-known brand (knockoff products)." in risk_agent.INSTRUCTIONS
+    assert "seller names or badges imitating" not in risk_agent.INSTRUCTIONS
+    assert not {"site_reputation_mid", "site_reputation_poor"} & set(risk_agent.AGENT_RULES)
 
 
 def test_quote_from_seller_review_is_grounded():

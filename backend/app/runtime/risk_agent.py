@@ -42,8 +42,7 @@ Signals:
 - external_payment: instructions to pay or order outside the site's own checkout, such as bank transfer
   to a personal account or ordering through messaging apps.
 - misleading_returns: refund or money-back promises that conflict with the stated return policy.
-- lookalike: seller names or badges imitating an official brand or store that differs from the listed
-  brand or retailer.
+- lookalike: product names or brands imitating a well-known brand (knockoff products).
 - pressure: countdowns, extreme scarcity or deadline claims pushing an immediate purchase.
 - inconsistent: details that contradict each other, such as brand, name, description, seller location
   or shipping origin disagreeing.

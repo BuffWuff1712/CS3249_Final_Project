@@ -2,7 +2,7 @@
 
 Researcher tool, not a test: it calls the configured model (paid) unless a chooser
 is supplied. Each run uses a fresh session, so no cached review is reused.
-low_price is ignored on both sides because code, not the agent, computes it.
+low_price and website reputation are ignored on both sides because code, not the agent, computes them.
 """
 
 import argparse
@@ -21,8 +21,11 @@ DEFAULT_ONLY = "study-hp-target-,study-rs-target-,study-bp-target-"
 OUTPUT = ROOT / "data/raw/risk_agent_eval.json"
 
 
+CODE_RULES = {"low_price", "site_reputation_mid", "site_reputation_poor"}
+
+
 def compare(found, expected):
-    found, expected = set(found) - {"low_price"}, set(expected) - {"low_price"}
+    found, expected = set(found) - CODE_RULES, set(expected) - CODE_RULES
     return {
         "hits": sorted(found & expected),
         "misses": sorted(expected - found),
@@ -54,7 +57,7 @@ def evaluate(product_ids, repeat, chooser=None):
                 "run": run,
                 "error": out is None,
                 "found": found,
-                "expected": sorted(want - {"low_price"}),
+                "expected": sorted(want - CODE_RULES),
                 **compare(found, want),
             })
     return rows

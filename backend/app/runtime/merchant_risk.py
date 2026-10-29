@@ -20,7 +20,10 @@ RULES = {
     "pressure",
     "inconsistent",
     "injection",
+    "site_reputation_mid",
+    "site_reputation_poor",
 }
+SITE_RULES = {"mid": "site_reputation_mid", "poor": "site_reputation_poor"}
 
 
 class RiskConfig(Model):
@@ -61,11 +64,12 @@ def digest(config):
 def session_config(s):
     # Invalid current config blocks checkout even when an older snapshot exists.
     current = load_config()
-    return (
-        RiskConfig.model_validate(s.experiment["risk_config"])
-        if s.experiment.get("risk_config")
-        else current
-    )
+    snapshot = s.experiment.get("risk_config")
+    if not snapshot:
+        return current
+    # Snapshots taken before website reputation existed keep their behaviour: those rules score 0.
+    weights = {rule: 0.0 for rule in SITE_RULES.values()} | snapshot["weights"]
+    return RiskConfig.model_validate({**snapshot, "weights": weights})
 
 
 INJECTION = re.compile(
@@ -133,7 +137,7 @@ def assess(product, merchant, comparables, config):
         (
             "lookalike_identity",
             "lookalike",
-            "Merchant identity resembles another business in the fixture.",
+            "The product name and brand imitate another brand.",
         ),
         ("pressure_tactics", "pressure", "The listing uses a high-pressure deadline."),
         (
@@ -150,6 +154,7 @@ def assess(product, merchant, comparables, config):
             "The description contains instructions aimed at changing assistant behaviour; these are treated as untrusted content.",
         )
     # Non-negotiable application safeguards cannot be tuned away.
+    evidence += site_evidence(merchant, config)
     return score(merchant, evidence, config, safeguard_block(product, merchant), "observable simulation signals")
 
 
@@ -190,6 +195,20 @@ def score(merchant, evidence, config, force_block, basis):
     )
 
 
+def site_evidence(merchant, config):
+    """Website reputation from the site registry; computed by code in every detection mode."""
+    site = merchant.site
+    if site is None or site.tier not in SITE_RULES:
+        return []
+    rule = SITE_RULES[site.tier]
+    word = "mixed" if site.tier == "mid" else "poor"
+    return [RiskEvidence(
+        rule_id=rule,
+        evidence=f"{site.name} ({site.domain}) has a {word} website reputation. {site.summary}",
+        weight=config.weights[rule],
+    )]
+
+
 def low_price(product, comparables, config):
     prices = [
         p.price
@@ -219,5 +238,6 @@ def assess_live(product, merchant, comparables, config, review, force_block=Fals
         evidence.append(
             RiskEvidence(rule_id="low_price", evidence=cheap + " Compared with other captured listings only.", weight=config.weights["low_price"])
         )
+    evidence += site_evidence(merchant, config)
     force_block = force_block or any(e.rule_id in ("external_payment", "injection") for e in evidence)
     return score(merchant, evidence, config, force_block, "the captured listing details")
