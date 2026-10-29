@@ -128,7 +128,7 @@ test("keyboard controls, evidence focus and narrow layouts work without console 
   await page.getByRole("button", { name: "Inspect product comparison", exact: true }).focus();
   await page.keyboard.press("Enter");
   await expect(page.getByLabel("Product evidence for Echo Quiet", { exact: true })).toBeFocused();
-  const activity = page.getByText(/^Comparison activity ·/);
+  const activity = page.getByText(/^Compared 2 models · Checked 3 sellers · Excluded 1$/);
   await activity.click();
   await expect(page.getByText(/Compared 2 fictional product records/)).toBeVisible();
   await expect(page.getByText(/Reviewed 3 seller records/)).toBeVisible();
