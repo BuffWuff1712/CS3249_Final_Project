@@ -129,3 +129,16 @@ def test_researcher_config_must_list_site_rules():
     del cfg["weights"]["site_reputation_mid"]
     with pytest.raises(ValidationError):
         RiskConfig.model_validate(cfg)
+
+
+def test_report_keeps_profile_for_session_snapshot_before_site_rules(monkeypatch):
+    from app.runtime import research
+    monkeypatch.delenv("BEANY_RISK_DETECTION", raising=False)
+    old = load_config().model_dump()
+    for rule in ("site_reputation_mid", "site_reputation_poor"):
+        del old["weights"][rule]
+    s = service.create()
+    s.experiment = {"profile": "concise", "risk_config": old, "config_hash": "pre-site-hash",
+                    "configuration_history": {"pre-site-hash": {"profile": "concise", "risk_config": old}}}
+    service.propose(s, neutral_offer())
+    assert research.report(s)["rows"][-1]["profile"] == "concise"

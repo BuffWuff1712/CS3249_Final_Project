@@ -65,8 +65,10 @@ def session_config(s):
     # Invalid current config blocks checkout even when an older snapshot exists.
     current = load_config()
     snapshot = s.experiment.get("risk_config")
-    if not snapshot:
-        return current
+    return stored_config(snapshot) if snapshot else current
+
+
+def stored_config(snapshot):
     # Snapshots taken before website reputation existed keep their behaviour: those rules score 0.
     weights = {rule: 0.0 for rule in SITE_RULES.values()} | snapshot["weights"]
     return RiskConfig.model_validate({**snapshot, "weights": weights})
