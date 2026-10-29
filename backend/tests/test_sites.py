@@ -142,3 +142,15 @@ def test_report_keeps_profile_for_session_snapshot_before_site_rules(monkeypatch
                     "configuration_history": {"pre-site-hash": {"profile": "concise", "risk_config": old}}}
     service.propose(s, neutral_offer())
     assert research.report(s)["rows"][-1]["profile"] == "concise"
+
+
+def test_site_reputation_scenario_recommends_every_site_tier():
+    from app.runtime.policy import search
+    from app.runtime.schemas import Fact
+    specs = json.loads((sites.ROOT / "data/scenarios/scenarios.json").read_text(encoding="utf-8-sig"))
+    spec = next(x for x in specs if x["id"] == "site-reputation")
+    s = service.create(search_provider="catalogue")
+    s.scenario_id = spec["id"]
+    s.brief = {k: Fact.model_validate(v) for k, v in spec["initial_brief"].items()}
+    assert [p.id for p in search(s)] == [f"study-hp-target-{v}" for v in ("site-mid", "site-bad", "site-fake", "trusted")]
+    assert spec["trigger_product"] == "study-hp-target-site-fake"
