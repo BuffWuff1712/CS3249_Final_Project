@@ -103,6 +103,7 @@ Open http://localhost:3000/research and enter the backend researcher key. Start 
 - Conversation instructions: `backend/config/prompts/dialogue.txt`
 - Policy thresholds: `backend/config/policy.json`; rule logic: `backend/app/runtime/policy.py`
 - Products: `backend/data/products/catalogue.json`
+- Merchants: `backend/data/merchants/merchants.json`; website reputation registry: `backend/data/sites/site_registry.json`, matched by exact host in `backend/app/runtime/sites.py`
 - Scenarios: `backend/data/scenarios/scenarios.json`
 - UI: `frontend/src/app/page.tsx`, `frontend/src/components/Brief.tsx`, `frontend/src/app/globals.css`
 - Backend state/orchestration: `backend/app/runtime/`

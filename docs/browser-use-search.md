@@ -80,7 +80,10 @@ fields that live Browser Use search is never asked to capture. Only shopper-visi
 | product rating and count | product rating (`LocalEvidence`) |
 | product name, brand, price, attributes, sizes, description, stock | same listing fields |
 
-The boolean risk flags are never converted: they are not page text. A local record knows when a
+The boolean risk flags are never converted: they are not page text. The site registry is never
+converted either, so the agent does not judge website reputation. For local products, code adds the
+`site_reputation_mid` and `site_reputation_poor` evidence from the registry in both `rules` and `ai`
+mode. Replayed and live listings have no registry entry and never carry a website-reputation signal. A local record knows when a
 detail is absent, so a missing contact or verification becomes explicit text; live listings keep
 "blank means not visible", and blank fields are never evidence. The agent may quote a review only
 when it reports concrete seller conduct, and its reason then starts with "Buyer report:".

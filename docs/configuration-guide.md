@@ -66,6 +66,8 @@ Profiles are in `backend/config/cui_profiles.json`. The standard and concise pro
 
 Append scenarios to `backend/data/scenarios/scenarios.json`. IDs `risk-a` through `risk-i` cover trusted, low-price-plus-other-signals, excessive data, external payment, substitution, injected instructions, benign discount, concealed malicious merchant and rejection/alternative conditions. Each specifies goals, initial brief/permissions, product and merchant availability, trigger action, expected decision/intervention and success/failure criteria. Ground truth is joined by merchant ID in research reports, not copied into participant scenarios or session objects.
 
+`site-reputation` is a study-dataset scenario. It shows the trusted headphones offer and the three website-reputation variants (`site-mid`, `site-bad`, `site-fake`), which exactly fill the recommendation limit of four. In conversation the first proposal is `site-mid`; **Trigger scenario condition** proposes `site-fake`.
+
 The trusted case has no merchant-risk warning, though the user's default approval requirement still yields REVIEW. The concealed malicious case deliberately has LOW predicted risk: the engine cannot see hidden truth. The benign discount has LOW risk because price alone is weak evidence. This makes false-positive and false-negative evaluation meaningful.
 
 ## Research UI and exports

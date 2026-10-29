@@ -69,6 +69,8 @@ Signals are a property of the data. Risk levels, weights, thresholds and the fin
 3. Avoid putting `lowprice` and `benign` in the same scenario: both lower the price median that `low_price` is computed from.
 4. Run the tests. `test_study_scenarios_match_manifest` re-checks every scenario that lists `study-*` products against the manifest.
 
+Search recommends at most four offers (`recommendation_limit` in `config/policy.json`), cheapest first among equal matches. Offers beyond the four cheapest only appear after the participant rejects earlier ones. `site-reputation` is a worked example: it lists `trusted` and the three website-reputation variants, and leaves out `neutral` so all four are recommended.
+
 ## Editing study records
 
 - **Keep reviews consistent with specs.** Review text must match the product it is attached to. Don't praise a feature the specifications don't list.
