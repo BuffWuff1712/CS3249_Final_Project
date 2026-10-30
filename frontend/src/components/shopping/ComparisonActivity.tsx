@@ -5,7 +5,7 @@ export function ComparisonActivity({ activity, excludedCount = 0 }: { activity: 
   const products = activity.find(step => step.id === "products");
   const sellers = activity.find(step => step.id === "sellers");
   const unavailable = activity.filter(step => step.state === "unavailable");
-  const summary = [products && (products.state === "completed" ? `Compared ${products.evidence.length} models` : "Product checks unavailable"), sellers && (sellers.state === "completed" ? `Checked ${sellers.evidence.length} sellers` : "Seller checks unavailable"), !!excludedCount && `Excluded ${excludedCount}`].filter(Boolean).join(" · ") || "Comparison outcome";
+  const summary = [products && (products.state === "completed" ? `Compared ${products.evidence.length} models` : "Product checks unavailable"), sellers && (sellers.state === "completed" ? `Checked ${sellers.evidence.length} sellers` : "Seller checks unavailable"), !!excludedCount && `Excluded ${excludedCount}`].filter(Boolean).join(" · ") || activity.map(step => step.label).join(" · ") || "Comparison outcome";
   return <section className="cui-activity" aria-label="Comparison activity">
     <details className="cui-activity-details"><summary>{summary}</summary>
     <ul className="cui-checks">

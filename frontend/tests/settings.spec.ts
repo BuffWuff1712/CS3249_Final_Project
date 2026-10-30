@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("gear opens session permissions and saves them across navigation", async ({ page, request }) => {
-  await page.goto("/");
+  await page.goto("/shop");
   const gear = page.getByRole("button", { name: "Open settings" });
   await expect(gear).toBeEnabled();
   const id = await page.evaluate(() => localStorage.getItem("beany-session"));
@@ -16,7 +16,7 @@ test("gear opens session permissions and saves them across navigation", async ({
   const saved = await (await request.get(`http://localhost:8100/sessions/${id}`)).json();
   expect(saved.permissions.substitutions).toBe(true);
   expect(saved.permissions.restricted_merchants).toEqual(["Shop A", "Shop B"]);
-  await page.getByRole("button", { name: "Back to shopping" }).click();
+  await page.goto("/shop");
   await expect(gear).toBeEnabled();
   expect(await page.evaluate(() => localStorage.getItem("beany-session"))).toBe(id);
   await gear.click();

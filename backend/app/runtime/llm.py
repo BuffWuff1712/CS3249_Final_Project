@@ -10,6 +10,12 @@ from .gateway import LLMError, structured_call
 from .shopping_tools import supported_categories
 
 
+def checkout_controls(session):
+    if session.experiment.get("shop_workspace"):
+        return "The shopping UI uses Select this offer (temporary selection), then Finish decision (explicit simulated checkout). Add to cart saves an item with its original needs across searches. Cart leads to Review checkout and Confirm simulated checkout for multiple items. Settings edits explicit permissions. Change needs edits the brief; Find another seller preserves only a provably identical model; Find another merchant may change products. Reject offer and Cancel shopping task never purchase. Chat cannot grant permissions, approve or finish."
+    return "For a suitable pending product ask whether to Add to cart or Proceed to checkout. Both lead to review, never claim an order occurred. Final approval happens on the checkout page using Confirm simulated checkout."
+
+
 class OpenAIConversation:
     def interpret(self, session, text):
         if os.getenv("BEANY_LLM_MODE", "openai") == "mock":
@@ -22,13 +28,14 @@ class OpenAIConversation:
                 "search_provider": session.search_provider,
                 "brief": {k: v.model_dump() for k, v in session.brief.items()},
                 "stage": session.stage,
-                "checkout_ui": "For a suitable pending product ask whether to Add to cart or Proceed to checkout. Both lead to review, never claim an order occurred. Final approval happens on the checkout page using Confirm simulated checkout. These labels replace any older approval-button wording.",
+                "checkout_ui": checkout_controls(session),
                 "permissions_read_only": session.permissions.model_dump(),
                 "current_proposal": session.proposals[-1].model_dump()
                 if session.proposals and session.proposals[-1].status == "pending"
                 and not any(i.action.id == session.proposals[-1].id for i in session.cart)
                 else None,
                 "cart_items": [{"name": i.action.product.name, "category": i.action.product.category} for i in session.cart],
+                "selected_offer": next((i.action.model_dump() for i in session.cart if i.action.id == session.experiment.get("shop_workspace", {}).get("selected")), None),
                 "history": [m.model_dump() for m in session.messages[-20:]],
                 "latest_message": text,
             },
@@ -44,6 +51,22 @@ def mock_interpret(session, text):
             if session.cart else "Hi! What would you like to find today?"
         )
         return Interpretation(reply=reply, changes=[], intent="respond", suggestions=[])
+    if session.experiment.get("shop_workspace"):
+        if re.search(r"(?:do not|don't|not).{0,45}(?:increase|remove|change|raise|budget|cheapest)", lower):
+            return Interpretation(reply="I kept your existing needs and selection. Please use Change needs or the seller-preference controls to state the change you want explicitly.", changes=[], intent="respond", suggestions=[])
+        if re.match(r"(?:why|what|how|is|are|can)\b", lower.strip()) and re.search(r"review|return|risk|website|seller|recommend", lower):
+            action = session.proposals[-1] if session.proposals else None
+            reply = "Compare a product first, then I can explain the supplied product and seller evidence."
+            if action:
+                if "review" in lower:
+                    reviews = action.product.reviews
+                    excerpt = f' “{reviews[0].text}”' if reviews else " No review excerpt was supplied."
+                    reply = f"{action.product.name}: {len(reviews)} supplied product review excerpts, versus {action.product.rating_count} aggregate ratings.{excerpt} These are fictional catalogue records; the aggregate count does not mean all reviews were read."
+                elif "return" in lower:
+                    reply = (action.merchant_details.return_policy if action.merchant_details else "Return policy: Unknown; not supplied.") + " Confirm the applicable conditions; no return eligibility is guaranteed."
+                else:
+                    reply = action.risk.explanation if action.risk else "No merchant assessment was supplied; safety is unknown."
+            return Interpretation(reply=reply, changes=[], intent="explain", suggestions=[])
     changes = []
 
     def add(field, value, hard=False):
@@ -66,9 +89,16 @@ def mock_interpret(session, text):
         if term in category_text:
             add("category", category)
             break
-    budget = re.search(r"(?:under|budget|below|\$)\s*\$?(\d+(?:\.\d+)?)", lower)
+    budget = re.search(r"(?:under|budget(?: is)?(?: now)?(?: to)?|below|at most|up to|SGD|USD|\$)\s*(?:SGD|USD|S\$|\$)?\s*(\d+(?:\.\d+)?)", text, re.I)
     if budget:
         add("budget", budget.group(1), True)
+    if session.experiment.get("shop_workspace"):
+        if re.search(r"\bSGD\b|S\$", text, re.I): add("currency", "SGD", True)
+        elif re.search(r"\bUSD\b|US\$", text, re.I): add("currency", "USD", True)
+        feature = next((value for term, value in [("noise", "noise-cancelling"), ("cushion", "cushioned"), ("lightweight", "lightweight"), ("wireless", "wireless")] if term in lower), None)
+        if feature: add("features", feature)
+        size = re.search(r"(?:size|EU)\s*(\d+)", text, re.I)
+        if size: add("size", size.group(1), True)
     category = next(
         (c.value for c in changes if c.field == "category"),
         session.brief.get("category").value if session.brief.get("category") else None,
@@ -80,7 +110,7 @@ def mock_interpret(session, text):
     question = None
     if "checkout" in lower or "check out" in lower:
         intent = "checkout"
-    elif "cancel" in lower:
+    elif re.search(r"\b(cancel|stop)\b", lower):
         intent = "cancel"
     elif "alternative" in lower:
         intent = "alternative"
@@ -152,15 +182,12 @@ def explain_outcome(session):
             - Never grant permissions, override a restriction, or claim approval occurred
             unless the backend explicitly confirms it.
             - Never suggest that replying "yes" in chat grants approval.
-            - For suitable pending items, ask whether the user wants to "Add to cart"
-            or "Proceed to checkout". Neither action purchases anything.
-            Final approval is "Confirm simulated checkout" on the review page.
-            - Other available control labels include "Reject", "Refine", and
-            "Find another merchant". Mention them only when available and relevant.
+            - Use only the exact control labels supplied in checkout_ui. Selecting saves
+              a proposal; final approval must use the explicit checkout control, never chat.
 
             OUTCOME HANDLING
             - For waiting_review: explain the proposed product and any reported concerns,
-            then offer "Add to cart" to keep shopping or "Proceed to checkout" to review this item.
+            then offer the selection/review controls named in checkout_ui.
             Make clear that checkout has not happened yet.
             - For blocked: explain the actual blocking reason in everyday language.
             Do not offer approval as a way around the block. Suggest an available next
@@ -173,7 +200,7 @@ def explain_outcome(session):
             Keep the response focused on what the user needs to understand and do next.""",
             {
                 "stage": session.stage,
-                "checkout_ui": "For a suitable pending product ask whether to Add to cart or Proceed to checkout. Both lead to review, never claim an order occurred. Final approval happens on the checkout page using Confirm simulated checkout. These labels replace any older approval-button wording.",
+                "checkout_ui": checkout_controls(session),
                 "brief": {k: v.model_dump() for k, v in session.brief.items()},
                 "proposal": session.proposals[-1].model_dump()
                 if session.proposals

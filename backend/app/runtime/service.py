@@ -188,7 +188,7 @@ def propose(s, product=None, *, recommendations=None, **kwargs):
         + " ".join(r.explanation for r in a.rules),
     )
     if a.decision != "BLOCK":
-        message(s, "Would you like to add this to your cart or proceed to checkout? You can review your items before confirming simulated checkout.")
+        message(s, "Use Select this offer to save this proposal, then Finish decision to explicitly confirm simulated checkout. Or use Add to cart to save items across searches and review them together in Cart. Nothing has been purchased." if s.experiment.get("shop_workspace") else "Would you like to add this to your cart or proceed to checkout? You can review your items before confirming simulated checkout.")
     if a.decision != "ALLOW":
         s.intervention_count += 1
         event(s, "intervention", a.decision)
@@ -212,8 +212,11 @@ def chat(s, text):
     if result.intent == "checkout":
         s.stage = "cart_review" if s.cart else "ready"
         s.suggestions = []
-        message(s, "Ready when you are. Select Review cart and checkout below to check your items before confirming. Nothing has been purchased yet."
-                if s.cart else "Your cart is empty. Tell me what you'd like to find first.")
+        if s.experiment.get("shop_workspace"):
+            reply = ("Review the selected offer, then use Finish decision for explicit simulated checkout. Nothing has been purchased yet." if s.experiment["shop_workspace"].get("selected") else "Open Cart, then Review checkout to inspect saved items before Confirm simulated checkout. Nothing has been purchased yet.") if s.cart else "Select a current offer or Add to cart before checkout. No order or payment has been created."
+        else:
+            reply = "Ready when you are. Select Review cart and checkout below to check your items before confirming. Nothing has been purchased yet." if s.cart else "Your cart is empty. Tell me what you'd like to find first."
+        message(s, reply)
         event(s, "cart_review_requested", "User requested checkout review; no purchase authorized")
         return s
     # The interpreter decides whether this is a new task, including within one category.
@@ -355,3 +358,14 @@ def decide(s, pid, request):
         message(s, "Rejected. Ask for an alternative or refine your brief.")
         s.suggestions = ["Find an alternative", "Cancel this task"]
     return s
+
+
+def alternative(s):
+    if s.proposals:
+        previous = s.proposals[-1]
+        if previous.status == "pending":
+            previous.status = "rejected"
+        s.rejected_products.append(previous.product.id)
+        s.rejected_merchants.append(previous.product.merchant_id)
+        event(s, "alternative", previous.id)
+    propose(s)

@@ -290,3 +290,32 @@
 .cui-activity-unknown { margin-top: 4px; }
 .cui-turn-body .cui-comparison-story { margin: 12px 0 0; font-size: 13px; line-height: 1.6; }
 @media (max-width: 760px) { .cui-conversation-history > .cui-activity { margin-left: 48px; } }
+
+/* Server-backed evidence: compact rows, clear product hierarchy, safe long-text wrapping. */
+.cui-spec-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; margin: 12px 0 16px; }
+.cui-spec-grid > div { min-width: 0; }
+.cui-source-record h3 { font-size: 20px; line-height: 1.3; margin: 0 0 6px; }
+.cui-source-record h4 { font-size: 15px; margin: 16px 0 8px; }
+.cui-source-record dt { font-size: 12px; color: var(--muted); font-weight: 600; }
+.cui-source-record dd { margin: 3px 0 0; line-height: 1.5; }
+.cui-source-record blockquote { margin: 12px 0; padding: 8px 12px; border-left: 2px solid var(--line); background: #f6f8fd; white-space: normal; overflow-wrap: anywhere; }
+.cui-source-record blockquote p { margin: 6px 0 0; }
+.cui-backend-risk { font-size: 13px; line-height: 1.5; margin: 16px 0; }
+.cui-backend-risk p { margin: 8px 0; }
+.cui-site { padding: 10px 12px; background: #eef3fb; border-radius: 6px; }
+.cui-site .site-meter { margin-left: 8px; }
+.cui-site p { margin: 4px 0 0; color: var(--muted); }
+.cui-policy-block { display: flex; gap: 8px; align-items: center; background: var(--cui-danger-surface); border-left: 3px solid var(--cui-danger); color: var(--cui-danger-text); padding: 10px; }
+.cui-catalogue-offer { border-bottom: 1px solid var(--line); padding: 14px 0; }
+.cui-catalogue-offer h3 { font-size: 17px; margin: 0 0 6px; }
+.cui-catalogue-offer p { font-size: 13px; line-height: 1.5; }
+.cui-history-source { font-size: 12px; }
+.cui-suggestions { margin: 12px 0 0 50px; }
+@media (max-width: 760px) { .cui-spec-grid { grid-template-columns: minmax(0, 1fr); } .cui-suggestions { margin-left: 48px; } }
+
+/* Full shopping navigation remains reachable at narrow widths. */
+@media (max-width: 760px) {
+  .cui-shell header { height: auto; min-height: 64px; flex-wrap: wrap; padding-block: 10px; }
+  .cui-shell header nav { flex-wrap: wrap; gap: 8px 12px; min-width: 0; }
+  .cui-shell header nav a { min-height: 36px; display: inline-flex; align-items: center; }
+}

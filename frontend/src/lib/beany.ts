@@ -25,6 +25,7 @@ export type Merchant = {
   site?: Site | null;
 };
 export type MerchantRisk = {
+  basis: "rules" | "ai" | "rules_fallback";
   merchant_id: string;
   level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   score: number;

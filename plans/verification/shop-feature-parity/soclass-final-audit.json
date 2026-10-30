@@ -1,0 +1,26 @@
+{
+  "session_id": "7488e062-a227-4d06-9150-85296e9eb505",
+  "model": "qwen3.6:35b",
+  "mode": "openai",
+  "product_provider": "catalogue",
+  "risk_mode": "rules",
+  "budget": {
+    "value": "200",
+    "source": "confirmed",
+    "hard": true
+  },
+  "proposals": 2,
+  "selected_product": "offer-benign",
+  "receipts": 1,
+  "browser_use_runs": 0,
+  "latest_answer": "No product review excerpts were supplied for the Echo Study. I will keep your current needs and offer unchanged while you decide.",
+  "last_event_kinds": [
+    "cart_checkout",
+    "search",
+    "policy",
+    "merchant_assessment",
+    "intervention",
+    "user_message",
+    "interpretation"
+  ]
+}

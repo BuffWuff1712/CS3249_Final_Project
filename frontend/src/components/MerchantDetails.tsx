@@ -101,17 +101,17 @@ function SiteReputation({ site }: { site: Site }) {
     </>
   );
 }
-export function MerchantDetails({ action }: { action: Action }) {
+export function MerchantDetails({ action, replay = false }: { action: Action; replay?: boolean }) {
   const m = action.merchant_details,
     r = action.risk;
   if (!m) return null;
   if (action.product.source === "browser_use") return (
     <section className="merchant-details">
       <RiskNotice action={action} />
-      <strong>Live listing · merchant information unverified</strong>
+      <strong>{replay ? "Replayed listing" : "Live listing"} · merchant information unverified</strong>
       <p>Source: <a className="action-link" href={action.product.source_url} target="_blank" rel="noopener noreferrer">{m.name} ↗</a></p>
       <p>Captured: {action.product.observed_at ? new Date(action.product.observed_at).toLocaleString() : "Unknown"}</p>
-      <p>Prices and availability may change. Seller and policy details below were captured from the listing pages and have not been verified. Demo payment options apply only to Beany’s simulated checkout.</p>
+      <p>{replay && "Saved study listing replay; no website was visited in this session. "}Prices and availability may change. Seller and policy details below were captured from the listing pages and have not been verified. Demo payment options apply only to Beany’s simulated checkout.</p>
       <LiveEvidence action={action} />
       {r && (
         <details>
