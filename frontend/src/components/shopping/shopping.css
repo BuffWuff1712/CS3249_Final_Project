@@ -319,3 +319,30 @@
   .cui-shell header nav { flex-wrap: wrap; gap: 8px 12px; min-width: 0; }
   .cui-shell header nav a { min-height: 36px; display: inline-flex; align-items: center; }
 }
+
+/* Each needs card owns a compact editor; opening it keeps the chat in place. */
+.cui-needs--individual { z-index: 5; }
+.cui-need-anchor, .cui-more-needs { position: relative; min-width: 0; }
+.cui-needs .cui-need-editor { position: absolute; z-index: 40; top: calc(100% + 6px); left: 0; width: min(320px, calc(100vw - 32px)); max-height: 65dvh; overflow-y: auto; margin: 0; padding: 16px; background: white; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 12px 32px #14234b24; }
+.cui-need-anchor:last-child .cui-need-editor { left: auto; right: 0; }
+.cui-need-editor fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.cui-need-editor legend { margin-bottom: 12px; font-size: 14px; font-weight: 700; }
+.cui-needs .cui-need-editor label { display: block; margin-bottom: 12px; font-size: 12px; }
+.cui-need-editor input:not([type="checkbox"]), .cui-need-editor select { width: 100%; min-width: 0; min-height: 38px; margin-top: 5px; padding: 8px; font-size: 14px; }
+.cui-needs .cui-need-editor label.check { display: flex; align-items: center; gap: 8px; min-height: 32px; }
+.cui-budget-fields { display: grid; grid-template-columns: minmax(0, 1fr) 90px; gap: 10px; }
+.cui-need-suggestions, .cui-need-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.cui-need-suggestions { margin-bottom: 12px; }
+.cui-need-suggestions button, .cui-need-actions button { min-height: 36px; padding: 7px 10px; font-size: 12px; }
+.cui-need-suggestions button[aria-pressed="true"] { color: var(--blue); border-color: var(--blue); background: #edf2ff; }
+.cui-more-needs { grid-area: editor; align-self: start; }
+.cui-more-needs > button { padding: 4px 0; min-height: 32px; border: 0; background: transparent; color: var(--muted); font-size: 11px; }
+.cui-extra-editor { position: absolute; z-index: 40; top: 100%; left: 0; width: min(320px, calc(100vw - 32px)); padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: 0 12px 32px #14234b24; }
+.cui-extra-editor > label { display: block; font-size: 12px; }
+.cui-extra-editor > label select { width: 100%; margin-top: 5px; padding: 8px; }
+.cui-needs .cui-extra-editor .cui-need-editor { position: static; width: auto; margin-top: 12px; padding: 0; border: 0; box-shadow: none; }
+@media (max-width: 760px) {
+  .cui-more-needs { margin-left: auto; }
+  .cui-extra-editor { left: auto; right: 0; }
+  .cui-need-anchor:nth-child(even) .cui-need-editor { left: auto; right: 0; }
+}
