@@ -3,7 +3,7 @@ import hashlib
 import json
 import re
 from . import service, policy, cart
-from .schemas import Action, Fact, SessionView
+from .schemas import Action, Fact, Message, SessionView
 from .merchants import merchant_for, merchants
 from .shopping_workflow import run_shopping
 
@@ -214,6 +214,7 @@ def propose(s, product_id):
     policy.evaluate(context, checked)
     if checked.decision == "BLOCK":
         raise ValueError("This offer is blocked by the backend policy. " + " ".join(r.explanation for r in checked.rules if r.decision == "BLOCK"))
+    s.messages.append(Message(role="user", text=f"Compare {p.name} from {p.merchant}."))
     clear_selection(s)
     events, proposals = len(s.events), len(s.proposals)
     start = len(s.messages)

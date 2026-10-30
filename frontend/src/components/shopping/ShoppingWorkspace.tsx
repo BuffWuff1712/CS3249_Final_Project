@@ -18,6 +18,15 @@ const examples = [
   ["Try running shoes", "Find cushioned running shoes under SGD200, size 42."],
   ["Try backpacks", "Find a backpack for university under SGD100."],
 ];
+function waitForPresentation(ms: number, signal: AbortSignal) {
+  if (ms <= 0 || signal.aborted) return Promise.resolve();
+  return new Promise<void>(resolve => {
+    const finish = () => { clearTimeout(timer); signal.removeEventListener("abort", finish); resolve(); };
+    const timer = setTimeout(finish, ms);
+    signal.addEventListener("abort", finish, { once: true });
+  });
+}
+
 export function ShoppingWorkspace() {
   const [view, setView] = useState<ShopView | null>(null), [text, setText] = useState(""), [busy, setBusy] = useState(true);
   const [error, setError] = useState(""), [storageNotice, setStorageNotice] = useState(""), [uncertain, setUncertain] = useState(false);
@@ -61,17 +70,23 @@ export function ShoppingWorkspace() {
     if (busy || uncertain || !viewRef.current) return false;
     const before = viewRef.current; const id = ++generation.current;
     const abort = new AbortController(); controller.current = abort;
-    setBusy(true); setLiveSteps([]); setError(""); setHistorical(null); setPendingText(submitted); setRequested(undefined);
+    const compared = path === "propose" ? before.offers.find(offer => offer.product.id === data.product_id) : undefined;
+    const actionText = compared ? `Compare ${compared.product.name} from ${compared.product.merchant}.` : "";
+    let firstActivityAt: number | undefined;
+    setBusy(true); setLiveSteps([]); setError(""); setHistorical(null); setPendingText(submitted || actionText); setRequested(undefined);
     if (submitted) setText("");
     try {
       const body = { ...data, revision: before.revision };
       const next = method === "POST" && ["messages", "compare", "propose", "seller", "alternative"].includes(path)
         ? await shopStream(`/${before.session.id}/${path}`, body, abort.signal, activity => {
           if (id !== generation.current || abort.signal.aborted) return;
+          firstActivityAt ??= performance.now();
           setLiveSteps(previous => previous.some(step => step.id === activity.id) ? previous.map(step => step.id === activity.id ? activity : step) : [...previous, activity]);
         })
         : await shopRequest(`/${before.session.id}/${path}`, method, body, abort.signal);
-      if (id !== generation.current) return false;
+      // Keep genuine checks readable when a local Compare finishes almost instantly.
+      if (path === "propose" && firstActivityAt !== undefined) await waitForPresentation(900 - (performance.now() - firstActivityAt), abort.signal);
+      if (id !== generation.current || abort.signal.aborted) return false;
       keep(next); setUncertain(false); return true;
     } catch (error) {
       if (id === generation.current && !abort.signal.aborted) {
@@ -90,7 +105,7 @@ export function ShoppingWorkspace() {
     const region = history.current;
     if (!region) return;
     if (busy) {
-      const latestStep = region.querySelector(".cui-live-steps > li:last-child");
+      const latestStep = region.querySelector(".cui-progress .cui-live-steps > li:last-child");
       if (latestStep) {
         const overflow = latestStep.getBoundingClientRect().bottom - region.getBoundingClientRect().bottom;
         if (overflow > 0) region.scrollTop += overflow + 12;

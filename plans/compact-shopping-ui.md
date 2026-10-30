@@ -32,3 +32,24 @@ Saved under `plans/verification/compact-shopping/`:
 - `lumen-model-comparison-desktop.png` and `lumen-model-comparison-mobile.png`: product-table view.
 
 The earlier layout review and its before screenshots are retained in `plans/decision-panel-layout-review.md` and `plans/verification/decision-panel-review/`.
+
+## Follow-up: comparison interactions and empty page space
+
+Checkpoint before application changes: `4573c99` (`test: cover product picker and seller comparison interactions`). The earlier full UI implementation remains at `13b84ae`.
+
+- [x] Exercise one enabled seller-table Compare action: same Lumen model, new seller, previous selection cleared.
+- [x] Change the alternative picker and click product Compare: table follows picker and recommendation changes to the chosen model.
+- [x] Explain blocked offers inline using the actual backend BLOCK rules. Replace technical policy label with “Unavailable under your shopping rules”; render privacy field names in plain language.
+- [x] Reproduce and fix desktop blank space. At 1470×735, document height previously reached 1492px while the app frame was 735px. Absolutely positioned accessibility labels lacked containing blocks inside the scroll panels. Positioning those panels relatively retains the labels inside the intended scroll area; final document-height assertion passes at <=736px.
+- [x] Verify the changed interaction and layout cases on desktop/mobile: 4 passed. Existing selection, checkout, follow-up, needs edit, seller preference, rejection, cancellation, cart and permissions cases had passed in the prior regression batch; they were not unnecessarily rerun.
+
+Screenshots: `plans/verification/comparison-interactions/desktop.png` and `mobile.png`. Checks use local mock catalogue/model, with no paid provider requests. UI fixes are included in the follow-up commit with conversational Compare actions.
+
+## Conversational Compare actions
+
+- [x] Show the clicked product and seller immediately as a user message; persist that message on the backend so refresh keeps it once.
+- [x] Keep real streamed checks visible for at least 900ms before revealing an instant local result. Slow operations receive no extra delay after that window. No invented process steps or extra search/API calls.
+- [x] Keep selection disabled during presentation; preserve the composer draft; cancel the presentation timer on reset/unmount through the existing abort signal and generation guard.
+- [x] Verify the Compare conversation on desktop: 1 passed in the final focused run. Screenshot review of the initial run caught scrolling to an older completed step; the selector now targets only the current live progress, and the repeated check asserts that both the user message and real steps are in the viewport. The test clicked a real eligible same-model seller, saw its user message and real checks while the old assistant count remained unchanged, then saw the new answer; it also verified draft preservation, selection disabling and a single persisted user message after refresh.
+
+Screenshot: `plans/verification/comparison-interactions/compare-progress.png`. This test used the mock model and local catalogue, with no paid APIs.

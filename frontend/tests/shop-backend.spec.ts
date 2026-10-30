@@ -74,7 +74,7 @@ test("site reputation comes from backend and blocked offers have disabled select
   await expect(offers.filter({ hasText: "Website reputation: Good" }).first()).toBeVisible();
   await expect(offers.filter({ hasText: "Website reputation: Mid" }).first()).toBeVisible();
   await expect(offers.filter({ hasText: "Website reputation: Poor" }).first()).toBeVisible();
-  const blocked = offers.filter({ hasText: "Blocked by backend policy" }).first();
+  const blocked = offers.filter({ hasText: "Unavailable under your shopping rules" }).first();
   await expect(blocked.getByRole("button", { name: "Compare this offer", exact: true })).toBeDisabled();
   const poor = offers.filter({ hasText: "Website reputation: Poor" }).first();
   await poor.getByRole("button", { name: /^Details for / }).click();
