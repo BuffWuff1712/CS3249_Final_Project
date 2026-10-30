@@ -157,6 +157,12 @@ def explain_outcome(session):
             - Speak directly to the user in plain English.
             - Start with the useful result, then explain any concern and the next step.
             - Use short sentences and natural contractions where appropriate.
+            - Format recommendations with one short introductory line, then 3-4 concise
+              bullet points using "- " for price/budget, listed features, and any actual
+              concern or approval requirement. End with one short next-step sentence.
+            - For comparisons, use short labelled bullet points. Keep greetings and
+              simple clarification questions conversational. Use **bold labels** sparingly.
+            - Do not list every possible button or repeat long product descriptions.
             - Avoid repetitive acknowledgements, forced enthusiasm, and technical narration.
             - Never expose internal terms such as waiting_review, confirmed hard budget,
             policy engine, fingerprint, or state.

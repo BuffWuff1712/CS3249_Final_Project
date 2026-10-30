@@ -56,13 +56,14 @@ test("permissions invalidate current selection and apply to saved cart review", 
 });
 test("saved needs expose hard versus preferred controls and full merchant evidence", async ({ page }) => {
   await ready(page); await send(page, "Find headphones under SGD200");
-  await page.getByRole("button", { name: "Edit spending limit: 200", exact: true }).click();
-  const hard = page.getByRole("checkbox", { name: "Must have", exact: true });
-  await expect(hard).toBeChecked(); await hard.uncheck();
-  await page.getByRole("button", { name: "Save need", exact: true }).click();
-  await page.reload(); await expect(page.getByRole("button", { name: "Edit spending limit: 200", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "Edit spending limit: 200", exact: true }).click(); await expect(hard).not.toBeChecked();
-  await page.getByRole("combobox", { name: "Purchase field" }).selectOption("features"); await expect(hard).not.toBeChecked();
+  await page.getByRole("button", { name: "Edit budget: 200", exact: true }).click();
+  const budgetType = page.getByRole("combobox", { name: "Budget type", exact: true });
+  await expect(budgetType).toHaveValue("maximum"); await budgetType.selectOption("preferred");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.reload(); await expect(page.getByRole("button", { name: "Edit budget: 200", exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "Edit budget: 200", exact: true }).click(); await expect(budgetType).toHaveValue("preferred");
+  await page.getByRole("button", { name: "Edit features / priorities: not set", exact: true }).click();
+  await expect(page.getByRole("checkbox", { name: "Must have", exact: true })).not.toBeChecked();
   await page.getByRole("button", { name: "Compare current needs" }).click();
   const current = page.getByRole("article", { name: "Current recommendation" });
   await current.getByText("View comparison and sources", { exact: true }).click();

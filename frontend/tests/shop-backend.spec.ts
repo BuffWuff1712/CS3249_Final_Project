@@ -39,9 +39,9 @@ test("needs editor uses server fields, clears selection, and impossible budget d
   await ready(page); await send(page, "Find headphones under SGD200");
   await page.getByRole("button", { name: "Select this offer", exact: true }).click();
   await expect(page.getByLabel("Selected offer", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Edit spending limit: 200", exact: true }).click();
-  await page.getByLabel("Preference value", { exact: true }).fill("1");
-  await page.getByRole("button", { name: "Save need", exact: true }).click();
+  await page.getByRole("button", { name: "Edit budget: 200", exact: true }).click();
+  await page.getByLabel("Amount", { exact: true }).fill("1");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByLabel("Selected offer", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Finish decision", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Compare current needs", exact: true }).click();
@@ -70,14 +70,15 @@ test("three local categories and historical comparison evidence remain inspectab
 test("site reputation comes from backend and blocked offers have disabled selection", async ({ page }) => {
   await ready(page); await send(page, "Find headphones under SGD200");
   await page.getByText(/^Compare all \d+ eligible offers$/).click();
-  const offers = page.getByRole("region", { name: /^Catalogue offer / });
+  const offers = page.getByRole("row", { name: /^Catalogue offer / });
   await expect(offers.filter({ hasText: "Website reputation: Good" }).first()).toBeVisible();
   await expect(offers.filter({ hasText: "Website reputation: Mid" }).first()).toBeVisible();
   await expect(offers.filter({ hasText: "Website reputation: Poor" }).first()).toBeVisible();
   const blocked = offers.filter({ hasText: "Blocked by backend policy" }).first();
   await expect(blocked.getByRole("button", { name: "Compare this offer", exact: true })).toBeDisabled();
   const poor = offers.filter({ hasText: "Website reputation: Poor" }).first();
-  await expect(poor).toContainText("uncertain assessment");
+  await poor.getByRole("button", { name: /^Details for / }).click();
+  await expect(page.locator(".cui-expanded-offer")).toContainText("uncertain assessment");
 });
 
 test("a failed mutation retains draft and requires a state reload without resending", async ({ page }) => {
@@ -157,7 +158,7 @@ test("a temporary restore error retains the session ID instead of silently creat
 test("seller changes keep the exact product and invalidate an earlier selection", async ({ page }) => {
   await ready(page); await send(page, "Find headphones under SGD200");
   await page.getByText(/^Compare all \d+ eligible offers$/).click();
-  await page.getByRole("region", { name: "Catalogue offer study-hp-target-trusted", exact: true }).getByRole("button", { name: "Compare this offer", exact: true }).click();
+  await page.getByRole("row", { name: "Catalogue offer study-hp-target-trusted", exact: true }).getByRole("button", { name: "Compare this offer", exact: true }).click();
   await expect((await current(page)).getByRole("heading", { name: "Lumen Hush ANC", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Select this offer", exact: true }).click();
   await expect(page.getByLabel("Selected offer", { exact: true })).toBeVisible();
@@ -174,7 +175,7 @@ test("a vague request asks one clarification without inventing a spending limit"
   await ready(page); await send(page, "shoes");
   const history = page.getByRole("region", { name: "Conversation history", exact: true });
   await expect(history.getByText("Will you use them for running or everyday wear?", { exact: true })).toHaveCount(1);
-  await expect(page.getByLabel("Purchase needs", { exact: true })).toContainText("No spending limit is confirmed");
+  await expect(page.getByLabel("Purchase needs", { exact: true })).toContainText("No budget is confirmed");
   await expect(await current(page)).toHaveCount(0);
   await send(page, "Running shoes under SGD200 size 42");
   await expect(await current(page)).toBeVisible();
