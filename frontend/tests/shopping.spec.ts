@@ -83,12 +83,12 @@ test("study hard block supports reject and refine while preventing checkout and 
 test("keyboard submission and recoverable network errors", async ({ page }, testInfo) => {
   await ready(page);
   const input = page.getByRole("textbox", { name: "Message Beany" });
-  await page.route("**/shop/sessions/*/messages", route => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ detail: "OpenAI temporarily unavailable. Retry your message." }) }));
+  await page.route("**/shop/sessions/*/messages/stream", route => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ detail: "OpenAI temporarily unavailable. Retry your message." }) }));
   await input.fill("Find headphones under SGD150"); await input.press("Enter");
   await expect(page.getByRole("region", { name: "Conversation history", exact: true }).getByRole("alert")).toContainText("OpenAI temporarily unavailable");
   await expect(input).toHaveValue("Find headphones under SGD150");
   await expect(page.getByRole("button", { name: "Send", exact: true })).toBeDisabled();
-  await page.unroute("**/shop/sessions/*/messages");
+  await page.unroute("**/shop/sessions/*/messages/stream");
   await page.getByRole("button", { name: "Reload workspace", exact: true }).click();
   await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
   await input.fill("Find headphones under SGD150");

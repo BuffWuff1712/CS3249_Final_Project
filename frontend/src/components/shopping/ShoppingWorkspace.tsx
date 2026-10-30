@@ -1,10 +1,10 @@
 "use client";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { shopRequest, ShopRequestError, money, rememberShop, type ShopField, type ShopView } from "@/lib/shopBackend";
+import { shopRequest, shopStream, ShopRequestError, money, rememberShop, type LiveShopActivity, type ShopField, type ShopView } from "@/lib/shopBackend";
 import type { Action, Fact } from "@/lib/beany";
 import { BackendNeedsSummary } from "./BackendNeedsSummary";
 import { BackendCurrentOffer, BackendProductEvidence, BackendRisk } from "./BackendOffer";
-import { ComparisonActivity } from "./ComparisonActivity";
+import { ComparisonActivity, ActivitySteps } from "./ComparisonActivity";
 import { PurchaseComposer } from "./PurchaseComposer";
 import { UserCircleIcon } from "./ShoppingIcons";
 import { DotsThreeIcon } from "@phosphor-icons/react/dist/csr/DotsThree";
@@ -20,6 +20,7 @@ export function ShoppingWorkspace() {
   const [view, setView] = useState<ShopView | null>(null), [text, setText] = useState(""), [busy, setBusy] = useState(true);
   const [error, setError] = useState(""), [storageNotice, setStorageNotice] = useState(""), [uncertain, setUncertain] = useState(false);
   const [pendingText, setPendingText] = useState(""), [requested, setRequested] = useState<{ field: ShopField }>();
+  const [liveSteps, setLiveSteps] = useState<LiveShopActivity[]>([]);
   const [allOffersOpen, setAllOffersOpen] = useState(false);
   const [historical, setHistorical] = useState<Action | null>(null), [evidenceId, setEvidenceId] = useState(0);
   const generation = useRef(0), controller = useRef<AbortController | null>(null), viewRef = useRef<ShopView | null>(null);
@@ -32,7 +33,7 @@ export function ShoppingWorkspace() {
   }
   async function load(fresh = false) {
     const id = ++generation.current; controller.current?.abort(); const abort = new AbortController(); controller.current = abort;
-    setBusy(true); setError(""); setPendingText(""); setHistorical(null); setRequested(undefined); if (fresh) setText("");
+    setBusy(true); setLiveSteps([]); setError(""); setPendingText(""); setHistorical(null); setRequested(undefined); if (fresh) setText("");
     try {
       let sid: string | null = null; let legacy = false;
       if (!fresh) {
@@ -58,10 +59,16 @@ export function ShoppingWorkspace() {
     if (busy || uncertain || !viewRef.current) return false;
     const before = viewRef.current; const id = ++generation.current;
     const abort = new AbortController(); controller.current = abort;
-    setBusy(true); setError(""); setHistorical(null); setPendingText(submitted); setRequested(undefined);
+    setBusy(true); setLiveSteps([]); setError(""); setHistorical(null); setPendingText(submitted); setRequested(undefined);
     if (submitted) setText("");
     try {
-      const next = await shopRequest(`/${before.session.id}/${path}`, method, { ...data, revision: before.revision }, abort.signal);
+      const body = { ...data, revision: before.revision };
+      const next = method === "POST" && ["messages", "compare", "propose", "seller", "alternative"].includes(path)
+        ? await shopStream(`/${before.session.id}/${path}`, body, abort.signal, activity => {
+          if (id !== generation.current || abort.signal.aborted) return;
+          setLiveSteps(previous => previous.some(step => step.id === activity.id) ? previous.map(step => step.id === activity.id ? activity : step) : [...previous, activity]);
+        })
+        : await shopRequest(`/${before.session.id}/${path}`, method, body, abort.signal);
       if (id !== generation.current) return false;
       keep(next); setUncertain(false); return true;
     } catch (error) {
@@ -79,10 +86,18 @@ export function ShoppingWorkspace() {
   useEffect(() => {
     const region = history.current;
     if (!region) return;
+    if (busy) {
+      const latestStep = region.querySelector(".cui-live-steps > li:last-child");
+      if (latestStep) {
+        const overflow = latestStep.getBoundingClientRect().bottom - region.getBoundingClientRect().bottom;
+        if (overflow > 0) region.scrollTop += overflow + 12;
+        return;
+      }
+    }
     let target = busy ? region.querySelector(".cui-progress") : region.querySelector(".cui-conversation-history > .cui-turn:last-child");
     if (!busy && target?.previousElementSibling?.classList.contains("cui-activity")) target = target.previousElementSibling;
     if (target) region.scrollTop += target.getBoundingClientRect().top - region.getBoundingClientRect().top;
-  }, [session?.messages.length, busy]);
+  }, [session?.messages.length, busy, liveSteps]);
   useEffect(() => {
     if (view?.current?.id && currentRef.current?.current?.id !== view.current.id && panel.current) panel.current.scrollTop = 0;
     currentRef.current = view;
@@ -124,7 +139,7 @@ export function ShoppingWorkspace() {
           </div>
           {!busy && session?.messages.length === 1 && <div className="cui-examples"><span>Editable examples</span>{examples.map(([label, example]) => <button key={label} disabled={disabled} onClick={() => { setText(example); document.getElementById("cui-message")?.focus(); }}>{label}</button>)}</div>}
           {pendingText && <div className="cui-turn cui-turn--user"><span className="cui-avatar" aria-hidden="true"><UserCircleIcon /></span><div className="cui-turn-body"><span className="sr-only">You</span><p>{pendingText}</p></div></div>}
-          {busy && <div className="cui-turn cui-progress" aria-label="Backend request in progress"><span className="cui-avatar" aria-hidden="true">b.</span><div className="cui-turn-body"><p className="cui-progress-label"><DotsThreeIcon className="cui-typing" aria-hidden="true" />Working on your request…</p><small>Waiting for the backend. Completed checks appear only after it responds.</small></div></div>}
+          {(busy || !!error && !!liveSteps.length) && <div className="cui-turn cui-progress" aria-label="Backend request in progress"><span className="cui-avatar" aria-hidden="true">b.</span><div className="cui-turn-body"><div className="cui-live-activity" aria-live="polite" aria-relevant="additions text">{liveSteps.length ? <ActivitySteps activity={liveSteps} stopped={!busy} /> : <p className="cui-progress-label"><DotsThreeIcon className="cui-typing" aria-hidden="true" />Starting your request…</p>}</div></div></div>}
           {!busy && !!session?.suggestions.length && <div className="cui-actions cui-suggestions" aria-label="Suggested replies">{session.suggestions.map(suggestion => <button key={suggestion} disabled={disabled} onClick={() => void mutate("messages", { text: suggestion }, "POST", suggestion)}>{suggestion}</button>)}</div>}
           {!busy && session && !current && !receipt && !!session.brief.category && <div className="cui-actions"><button disabled={disabled} onClick={() => void mutate("compare")}>Compare current needs</button></div>}
         </div>

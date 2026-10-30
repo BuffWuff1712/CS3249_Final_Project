@@ -82,7 +82,7 @@ test("site reputation comes from backend and blocked offers have disabled select
 
 test("a failed mutation retains draft and requires a state reload without resending", async ({ page }) => {
   await ready(page);
-  await page.route("**/shop/sessions/*/messages", route => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ detail: "Backend temporarily unavailable" }) }));
+  await page.route("**/shop/sessions/*/messages/stream", route => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ detail: "Backend temporarily unavailable" }) }));
   await sendFailure();
   async function sendFailure() {
     await page.getByRole("textbox", { name: "Message Beany" }).fill("Find headphones under SGD200");
@@ -92,7 +92,7 @@ test("a failed mutation retains draft and requires a state reload without resend
     await expect(page.getByRole("textbox", { name: "Message Beany" })).toBeEnabled();
     await expect(page.getByRole("button", { name: "Send", exact: true })).toBeDisabled();
   }
-  await page.unroute("**/shop/sessions/*/messages");
+  await page.unroute("**/shop/sessions/*/messages/stream");
   await page.getByRole("button", { name: "Reload workspace", exact: true }).click();
   await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
   await expect(await current(page)).toHaveCount(0);
@@ -101,10 +101,10 @@ test("a failed mutation retains draft and requires a state reload without resend
 test("reset ignores an old response and truthful pending state never invents completed checks", async ({ page }) => {
   await ready(page);
   let release!: () => void; const gate = new Promise<void>(resolve => { release = resolve; });
-  await page.route("**/shop/sessions/*/messages", async route => { const response = await route.fetch(); await gate; await route.fulfill({ response }); });
+  await page.route("**/shop/sessions/*/messages/stream", async route => { const response = await route.fetch(); await gate; await route.fulfill({ response }); });
   await page.getByRole("textbox", { name: "Message Beany" }).fill("Find headphones under SGD200");
   await page.getByRole("button", { name: "Send", exact: true }).click();
-  await expect(page.getByLabel("Backend request in progress", { exact: true })).toContainText("Waiting for the backend");
+  await expect(page.getByLabel("Backend request in progress", { exact: true })).toContainText("Starting your request");
   await expect(page.getByLabel("Comparison activity", { exact: true })).toHaveCount(0);
   await page.getByRole("textbox", { name: "Message Beany" }).fill("Keep this draft");
   await page.getByRole("button", { name: "Start fresh", exact: true }).click();

@@ -84,8 +84,37 @@ def view(s):
             "current_model_key": model_key(current.product) if current else None,
             "selected": selected.action.model_dump() if selected else None,
             "selection_error": selection_error, "cart_review": cart.review(s),
-            "seller_preference": state["seller_preference"], "history": state["history"]}
+            "seller_preference": state["seller_preference"], "history": friendly_history(s)}
 
+
+
+def friendly_history(s):
+    """Upgrade saved technical activity labels without rewriting saved sessions."""
+    if not meta(s)["history"]:
+        return []
+    rows = []
+    names = {p.id: f"{p.name} · {p.merchant}" for p in policy.catalogue(s)}
+    for row in meta(s)["history"]:
+        action = next((a for a in s.proposals if a.id == row["proposal_id"]), None)
+        activity = []
+        for original in row["activity"]:
+            item = dict(original)
+            count = len(item["evidence"])
+            if item["id"] == "search":
+                item["label"] = f"Found {count} matching offer{'s' if count != 1 else ''}"
+                item["evidence"] = [names.get(value, value if " · " in value else "Previously compared offer") for value in item["evidence"]]
+            elif item["id"] == "inspection":
+                item["label"] = f"Checked {count} product{'s' if count != 1 else ''} and seller terms"
+                item["evidence"] = [names.get(value, value if " · " in value else "Previously checked product") for value in item["evidence"]]
+            elif item["id"] == "policy" and action:
+                item["label"] = "Checked budget and permissions · " + {"ALLOW": "Within your limits", "REVIEW": "Needs your approval", "BLOCK": "Offer blocked"}[action.decision]
+                item["evidence"] = [action.product.name]
+            elif item["id"] == "risk" and action:
+                item["label"] = "Checked seller concerns"
+                item["evidence"] = [action.risk.explanation] if action.risk else []
+            activity.append(item)
+        rows.append({**row, "activity": activity})
+    return rows
 
 def clear_selection(s):
     state = meta(s)

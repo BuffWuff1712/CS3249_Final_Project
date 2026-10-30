@@ -8,6 +8,7 @@ from .merchant_risk import load_config, digest
 from .shopping_workflow import run_shopping
 from .risk_agent import review as review_listing
 from .local_evidence import configured_detection, review_view
+from .progress import step
 
 llm = OpenAIConversation()
 ELICITATION_PATH = Path(__file__).resolve().parents[2] / "config/elicitation.json"
@@ -145,42 +146,45 @@ def propose(s, product=None, *, recommendations=None, **kwargs):
             event(s, "no_match", "No matching products")
             return
         product = s.recommendations[0]
-    merchant = merchant_for(product, s)
-    if product.source == "browser_use":
-        # One cached agent review per snapshot; later policy rechecks reuse it.
-        review_listing(s, product, merchant)
-    elif s.risk_detection == "ai":
-        # Local products are reviewed as the listing a shopper would read.
-        review_listing(s, review_view(product, merchant), merchant)
-    allowed = [
-        m for m in s.permissions.payment_methods if m in merchant.payment_methods
-    ]
-    kwargs.setdefault("payment_method", allowed[0] if allowed else "Demo Visa")
-    kwargs.setdefault("shares_personal_data", bool(merchant.requested_information))
-    a = Action(
-        product=product.model_copy(deep=True),
-        merchant_details=merchant.model_copy(deep=True),
-        **kwargs,
-    )
-    evaluate(s, a)
-    a.fingerprint = fingerprint(a)
-    s.proposals.append(a)
-    event(s, "search", f"Compared {len(s.recommendations)} matches")
-    event(s, "policy", json.dumps([r.model_dump() for r in a.rules]))
-    event(
-        s,
-        "merchant_assessment",
-        json.dumps(
-            {
-                "proposal_id": a.id,
-                "product_id": a.product.id,
-                "merchant_id": a.product.merchant_id,
-                "risk": a.risk.model_dump() if a.risk else None,
-                "decision": a.decision,
-                "warning": " ".join(r.explanation for r in a.rules),
-            }
-        ),
-    )
+    with step(f"Checking {product.name} and {product.merchant}…", "Checked seller terms, budget and permissions") as activity:
+        merchant = merchant_for(product, s)
+        if product.source == "browser_use":
+            # One cached agent review per snapshot; later policy rechecks reuse it.
+            review_listing(s, product, merchant)
+        elif s.risk_detection == "ai":
+            # Local products are reviewed as the listing a shopper would read.
+            review_listing(s, review_view(product, merchant), merchant)
+        allowed = [
+            m for m in s.permissions.payment_methods if m in merchant.payment_methods
+        ]
+        kwargs.setdefault("payment_method", allowed[0] if allowed else "Demo Visa")
+        kwargs.setdefault("shares_personal_data", bool(merchant.requested_information))
+        a = Action(
+            product=product.model_copy(deep=True),
+            merchant_details=merchant.model_copy(deep=True),
+            **kwargs,
+        )
+        evaluate(s, a)
+        a.fingerprint = fingerprint(a)
+        s.proposals.append(a)
+        event(s, "search", f"Compared {len(s.recommendations)} matches")
+        event(s, "policy", json.dumps([r.model_dump() for r in a.rules]))
+        event(
+            s,
+            "merchant_assessment",
+            json.dumps(
+                {
+                    "proposal_id": a.id,
+                    "product_id": a.product.id,
+                    "merchant_id": a.product.merchant_id,
+                    "risk": a.risk.model_dump() if a.risk else None,
+                    "decision": a.decision,
+                    "warning": " ".join(r.explanation for r in a.rules),
+                }
+            ),
+        )
+        activity["evidence"] = [product.name, merchant.name]
+        activity["label"] += {"ALLOW": " · Within your limits", "REVIEW": " · Needs your approval", "BLOCK": " · Offer blocked"}[a.decision]
     s.stage = "blocked" if a.decision == "BLOCK" else "waiting_review"
     message(
         s,
@@ -199,7 +203,8 @@ def chat(s, text):
     if not text:
         raise ValueError("Please enter a message")
     elicitation = json.loads(ELICITATION_PATH.read_text(encoding="utf-8-sig"))
-    result = llm.interpret(s, text)  # Failure leaves persisted state unchanged.
+    with step("Reading your request…", "Read your request"):
+        result = llm.interpret(s, text)  # Failure leaves persisted state unchanged.
     s.messages.append(Message(role="user", text=text))
     event(s, "user_message", "Message received")
     if result.intent in ("respond", "explain"):
@@ -302,11 +307,12 @@ def chat(s, text):
             return s
         first_message = len(s.messages)
         propose(s, outcome.product, recommendations=outcome.candidates)
-        explanation = explain_outcome(s)
-        # One response per shopping turn, including the deterministic fallback.
-        fallback = " ".join(m.text for m in s.messages[first_message:])
-        del s.messages[first_message:]
-        message(s, explanation or fallback)
+        with step("Preparing your recommendation…", "Prepared your recommendation"):
+            explanation = explain_outcome(s)
+            # One response per shopping turn, including the deterministic fallback.
+            fallback = " ".join(m.text for m in s.messages[first_message:])
+            del s.messages[first_message:]
+            message(s, explanation or fallback)
         if explanation:
             event(s, "outcome_explanation", "Explained verified shopping result")
         elif s.mode != "mock":

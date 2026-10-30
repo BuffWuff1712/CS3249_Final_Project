@@ -346,3 +346,15 @@
   .cui-extra-editor { left: auto; right: 0; }
   .cui-need-anchor:nth-child(even) .cui-need-editor { left: auto; right: 0; }
 }
+
+.cui-live-activity { padding: 14px 16px; background: white; border-radius: 12px; }
+.cui-live-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.cui-live-steps > li { display: flex; align-items: flex-start; gap: 10px; margin: 0; }
+.cui-live-steps > li > svg, .cui-step-spinner { flex: 0 0 18px; width: 18px; height: 18px; margin-top: 2px; color: var(--blue); }
+.cui-live-steps strong { display: block; font-size: 13px; line-height: 1.5; font-weight: 500; }
+.cui-live-steps small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+.cui-live-steps .is-unavailable { color: var(--muted); }
+.cui-step-spinner { border: 2px solid #dce5fc; border-top-color: var(--blue); border-radius: 50%; animation: cui-step-spin .8s linear infinite; }
+.cui-activity-details > .cui-live-steps { margin-top: 12px; }
+@keyframes cui-step-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .cui-step-spinner { animation: none; border-color: var(--blue); } }

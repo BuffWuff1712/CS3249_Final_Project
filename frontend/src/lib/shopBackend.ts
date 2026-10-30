@@ -47,3 +47,42 @@ export async function activeShop() {
   rememberShop(view);
   return view;
 }
+
+export type LiveShopActivity = Omit<ShopActivity, "state"> & { state: "running" | "completed" | "unavailable" };
+export async function shopStream(path: string, body: unknown, signal: AbortSignal, onActivity: (activity: LiveShopActivity) => void): Promise<ShopView> {
+  const response = await fetch(`${base}/shop/sessions${path}/stream`, {
+    method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new ShopRequestError(typeof data.detail === "string" ? data.detail : "The request could not start.", response.status);
+  }
+  if (!response.body) throw new Error("Live progress is unavailable. Reload the workspace before trying again.");
+  const reader = response.body.getReader(), decoder = new TextDecoder();
+  let buffer = "", result: ShopView | undefined;
+  function read(line: string) {
+    if (!line.trim()) return;
+    const event = JSON.parse(line);
+    if (event.type === "error") throw new Error(event.message || "The request could not finish.");
+    if (event.type === "activity") {
+      const activity = event.activity;
+      if (typeof activity?.id !== "string" || typeof activity.label !== "string" || !["running", "completed", "unavailable"].includes(activity.state) || !Array.isArray(activity.evidence)) throw new Error("Invalid progress update. Reload the workspace.");
+      onActivity(activity);
+    }
+    if (event.type === "result") {
+      if (!event.view?.session?.id || !Array.isArray(event.view.offers)) throw new Error("Invalid workspace result.");
+      result = event.view;
+    }
+  }
+  try {
+    while (true) {
+      const chunk = await reader.read();
+      buffer += decoder.decode(chunk.value, { stream: !chunk.done });
+      let newline;
+      while ((newline = buffer.indexOf("\n")) >= 0) { read(buffer.slice(0, newline)); buffer = buffer.slice(newline + 1); }
+      if (chunk.done) { read(buffer); break; }
+    }
+    if (!result) throw new Error("The connection ended before a result was confirmed. Reload the workspace before trying again.");
+    return result;
+  } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+}

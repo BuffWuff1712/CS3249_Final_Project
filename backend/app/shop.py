@@ -147,3 +147,77 @@ def remove_cart(sid: str, pid: str, body: Mutation):
 def checkout(sid: str, body: CheckoutMutation):
     from .runtime.schemas import CartCheckout
     return mutate(sid, body, lambda s: shop.checkout_cart(s, CartCheckout(items=body.items)))
+
+
+def stream_mutation(sid, body, work):
+    """Stream observations from the real operation; commit once using the usual lock."""
+    import json
+    import logging
+    from queue import Queue, Empty
+    from threading import Thread, Event
+    from fastapi.responses import StreamingResponse
+    from .runtime.progress import observe
+    from .runtime.gateway import LLMError
+
+    updates = Queue()
+    disconnected = Event()
+
+    def publish(event):
+        if not disconnected.is_set():
+            updates.put(event)
+
+    def run():
+        try:
+            with observe(lambda activity: publish({"type": "activity", "activity": activity})):
+                result = mutate(sid, body, work)
+            publish({"type": "result", "view": result})
+        except (ValueError, LookupError, LLMError) as exc:
+            publish({"type": "error", "message": str(exc)})
+        except Exception:
+            logging.getLogger(__name__).exception("Shopping stream failed")
+            publish({"type": "error", "message": "The request could not finish. Reload the workspace before trying again."})
+        finally:
+            updates.put(None)
+
+    def events():
+        Thread(target=run, daemon=True).start()
+        try:
+            while True:
+                try:
+                    update = updates.get(timeout=5)
+                except Empty:
+                    update = {"type": "ping"}
+                if update is None:
+                    return
+                yield json.dumps(update) + "\n"
+        finally:
+            # A disconnected client cannot safely undo an operation already in progress.
+            # Revision/fingerprint validation still prevents stale approval or retries.
+            disconnected.set()
+
+    return StreamingResponse(events(), media_type="application/x-ndjson", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@router.post('/{sid}/messages/stream')
+def message_stream(sid: str, body: Message):
+    return stream_mutation(sid, body, lambda s: shop.message(s, body.text))
+
+
+@router.post('/{sid}/compare/stream')
+def compare_stream(sid: str, body: Mutation):
+    return stream_mutation(sid, body, shop.compare)
+
+
+@router.post('/{sid}/propose/stream')
+def propose_stream(sid: str, body: Offer):
+    return stream_mutation(sid, body, lambda s: shop.propose(s, body.product_id))
+
+
+@router.post('/{sid}/seller/stream')
+def seller_stream(sid: str, body: Preference):
+    return stream_mutation(sid, body, lambda s: shop.another_seller(s, body.preference))
+
+
+@router.post('/{sid}/alternative/stream')
+def alternative_stream(sid: str, body: Mutation):
+    return stream_mutation(sid, body, shop.alternative)
