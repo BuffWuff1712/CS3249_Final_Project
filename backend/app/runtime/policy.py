@@ -1,7 +1,7 @@
 import hashlib, json
 from pathlib import Path
 from .schemas import Product, Rule, Event
-from .merchants import merchant_for
+from .merchants import merchant_for, merchants
 from .merchant_risk import assess, assess_live, safeguard_block, session_config
 from .risk_agent import snapshot
 from .local_evidence import review_view
@@ -44,8 +44,11 @@ def catalogue(s):
             (ROOT / "data/products/catalogue.json").read_text(encoding="utf-8-sig")
         )
     ]
+    records = merchants()
     for p in products:
-        m = merchant_for(p)
+        m = records.get(p.merchant_id)
+        if m is None:
+            raise ValueError("Unknown merchant: request a fresh catalogue proposal")
         p.merchant = m.name
         p.trust = "established" if m.verified_business else "unverified"
     if s.scenario_id:
@@ -145,7 +148,7 @@ def fingerprint(a):
     ).hexdigest()
 
 
-def evaluate(s, a):
+def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
     rules = []
 
     def rule(id, decision, constraint, explanation):
@@ -162,7 +165,7 @@ def evaluate(s, a):
 
     p = a.product
     try:
-        merchant = merchant_for(p, s)
+        merchant = merchant_for(p, s) if merchant_snapshot is None else merchant_snapshot[p.merchant_id]
         if a.merchant_details is None or merchant != a.merchant_details:
             rule(
                 "merchant_changed",
@@ -176,7 +179,7 @@ def evaluate(s, a):
             config = session_config(s)  # Invalid policy configuration still blocks.
             cached = s.live_risk.get(p.id)
             if cached and cached.snapshot == snapshot(p):
-                a.risk = assess_live(p, merchant, catalogue(s), config, cached)
+                a.risk = assess_live(p, merchant, (catalogue(s) if catalogue_snapshot is None else catalogue_snapshot), config, cached)
                 a.risk.basis = "ai"
             else:
                 a.risk = None
@@ -193,16 +196,16 @@ def evaluate(s, a):
             cached = s.live_risk.get(p.id)
             if cached and cached.snapshot == snapshot(view):
                 # The record's safeguards still hard-block whatever the model reported.
-                a.risk = assess_live(view, merchant, catalogue(s), session_config(s), cached,
+                a.risk = assess_live(view, merchant, (catalogue(s) if catalogue_snapshot is None else catalogue_snapshot), session_config(s), cached,
                                      force_block=safeguard_block(p, merchant))
                 a.risk.basis = "ai"
             else:
-                a.risk = assess(p, merchant, catalogue(s), session_config(s))
+                a.risk = assess(p, merchant, (catalogue(s) if catalogue_snapshot is None else catalogue_snapshot), session_config(s))
                 a.risk.basis = "rules_fallback"
                 if not any(e.kind == "risk_agent_fallback" and e.detail == p.id for e in s.events):
                     s.events.append(Event(kind="risk_agent_fallback", detail=p.id))
         else:
-            a.risk = assess(p, merchant, catalogue(s), session_config(s))
+            a.risk = assess(p, merchant, (catalogue(s) if catalogue_snapshot is None else catalogue_snapshot), session_config(s))
         if a.risk and a.risk.recommended_decision != "ALLOW":
             rule(
                 "merchant_risk",

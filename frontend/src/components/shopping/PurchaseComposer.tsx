@@ -12,8 +12,12 @@ export function PurchaseComposer({ text, setText, send, loaded, started = false,
   return <section className="cui-entry" aria-label="Describe your purchase">
     <form className="cui-composer" onSubmit={event => { event.preventDefault(); if (!busy && text.trim()) send(text); }}>
       <label className="sr-only" htmlFor="cui-message">Message Beany</label>
-      <p className="sr-only" id="cui-intent-help">Describe headphones or running shoes, change your needs, or ask about the current comparison.</p>
-      <div className="cui-compose-row"><textarea id="cui-message" name="message" autoComplete="off" rows={1} maxLength={2000} value={text} onChange={event => setText(event.target.value)} required disabled={!loaded} aria-describedby="cui-intent-help" placeholder={started ? "Change what matters, or ask about a trade-off…" : "Headphones for my train commute, under SGD300…"} /><button className="primary" disabled={!loaded || busy}>Send</button></div>
+      <p className="sr-only" id="cui-intent-help">Describe your purchase, change your needs, or ask about the current comparison. Enter to send; Shift+Enter for a new line.</p>
+      <div className="cui-compose-row"><textarea id="cui-message" name="message" autoComplete="off" rows={1} maxLength={2000} value={text} onChange={event => setText(event.target.value)} required onKeyDown={event => {
+        if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing || event.keyCode === 229) return;
+        event.preventDefault();
+        if (!event.repeat && !busy && loaded && text.trim()) event.currentTarget.form?.requestSubmit();
+      }} disabled={!loaded} aria-describedby="cui-intent-help" placeholder={started ? "Change what matters, or ask about a trade-off…" : "Headphones for my train commute, under SGD300…"} /><button className="primary" disabled={!loaded || busy}>Send</button></div>
     </form>
   </section>;
 }

@@ -77,6 +77,7 @@ export default function Research() {
                 );
                 setSession(result);
                 localStorage.setItem("beany-session", result.id);
+                localStorage.removeItem("beany-shop-backend-session");
               })
             }
           >

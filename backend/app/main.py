@@ -53,11 +53,19 @@ async def missing(request, exc):
     return JSONResponse(status_code=404, content={"detail": str(exc)})
 
 
-def mutate(sid, fn):
+def mutate(sid, fn, *, research_control=False, invalidate_selection=True):
     # Run one Uvicorn worker. The lock prevents lost updates and duplicate checkouts.
     with storage.lock:
         s = storage.load(sid)
+        workspace = s.experiment.get("shop_workspace")
+        if workspace and not research_control:
+            raise ValueError("Use the collaborative workspace controls for this session.")
+        if workspace and invalidate_selection:
+            from .runtime.shop_workspace import clear_selection
+            clear_selection(s)
         fn(s)
+        if workspace:
+            s.experiment["shop_workspace"]["revision"] += 1
         storage.save(s)
         return s
 
@@ -225,7 +233,7 @@ def trigger(sid: str):
         service.propose(s, product, **spec["action"])
         service.event(s, "scenario_trigger", spec["id"])
 
-    return mutate(sid, run)
+    return mutate(sid, run, research_control=True)
 
 
 @app.get("/research/sessions/{sid}/export", dependencies=[Depends(researcher)])
@@ -288,7 +296,7 @@ def research_profiles():
     dependencies=[Depends(researcher)],
 )
 def configure_study(sid: str, body: research.ExperimentUpdate):
-    return mutate(sid, lambda s: research.configure(s, body))
+    return mutate(sid, lambda s: research.configure(s, body), research_control=True)
 
 
 @app.put(
@@ -304,7 +312,7 @@ def observation(sid: str, body: research.Observation):
             body.model_dump()
         )
 
-    return mutate(sid, save)
+    return mutate(sid, save, research_control=True, invalidate_selection=False)
 
 
 @app.get("/research/sessions/{sid}/risk-report", dependencies=[Depends(researcher)])
@@ -325,14 +333,8 @@ def risk_export(sid: str):
 
 @app.post("/sessions/{sid}/alternative", response_model=SessionView)
 def another_merchant(sid: str):
-    def alternative(s):
-        if s.proposals:
-            previous = s.proposals[-1]
-            if previous.status == "pending":
-                previous.status = "rejected"
-            s.rejected_products.append(previous.product.id)
-            s.rejected_merchants.append(previous.product.merchant_id)
-            service.event(s, "alternative", previous.id)
-        service.propose(s)
+    return mutate(sid, service.alternative)
 
-    return mutate(sid, alternative)
+# The participant workspace reuses the configured backend provider.
+from .shop import router as shop_router
+app.include_router(shop_router)
