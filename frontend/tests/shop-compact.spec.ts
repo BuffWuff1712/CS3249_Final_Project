@@ -69,3 +69,30 @@ test("Lumen summary surfaces reviews, return terms and the current seller in com
   await page.getByRole("heading", { name: "Compare products", exact: true }).scrollIntoViewIfNeeded();
   await page.screenshot({ path: testInfo.outputPath("lumen-model-comparison.png"), fullPage: false });
 });
+
+test("comparison picker and seller table switch recommendations and clear selection", async ({ page, request }, testInfo) => {
+  const created = await (await request.post("http://localhost:8100/shop/sessions")).json();
+  const searched = await (await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200" } })).json();
+  await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/propose`, { data: { revision: searched.revision, product_id: "study-hp-target-lowprice" } });
+  await page.addInitScript(id => localStorage.setItem("beany-shop-backend-session", id), created.session.id);
+  await page.setViewportSize({ width: testInfo.project.name === "mobile" ? 320 : 1470, height: 735 });
+  await page.goto("/");
+  const current = page.getByRole("article", { name: "Current recommendation", exact: true });
+  await expect(current).toContainText("Bargain Depot SG");
+  await page.getByRole("button", { name: "Select this offer", exact: true }).click();
+  await expect(page.getByLabel("Selected offer", { exact: true })).toBeVisible();
+  const sellers = page.getByRole("table", { name: "Compare sellers of this model", exact: true });
+  const available = await sellers.getByRole("button", { name: /^Compare offer from/ }).evaluateAll(buttons => buttons.filter(button => !(button as HTMLButtonElement).disabled).map(button => button.textContent!));
+  expect(available.length).toBeGreaterThan(0);
+  await sellers.getByRole("button", { name: available[0], exact: true }).click();
+  await expect(current).toContainText(available[0].replace("Compare offer from ", ""));
+  await expect(current).toContainText("Lumen Hush ANC");
+  await expect(page.getByLabel("Selected offer", { exact: true })).toHaveCount(0);
+  const picker = page.getByRole("combobox", { name: "Compare your match with", exact: true });
+  const choices = await picker.locator("option").evaluateAll(options => options.map(option => ({ id: (option as HTMLOptionElement).value, name: option.textContent! })));
+  const alternative = choices.at(-1)!;
+  await picker.selectOption(alternative.id);
+  await expect(page.getByRole("table", { name: "Listed product features; missing information is not assumed" })).toContainText(alternative.name);
+  await page.getByRole("button", { name: `Compare ${alternative.name}`, exact: true }).click();
+  await expect(current.getByRole("heading", { name: alternative.name, exact: true })).toBeVisible();
+});
