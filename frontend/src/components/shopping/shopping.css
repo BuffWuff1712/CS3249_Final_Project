@@ -244,7 +244,7 @@
 .cui-chat-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; padding: 4px 8px 12px 0; }
 .cui-conversation-history { max-height: none; overflow: visible; padding: 0; }
 .cui-chat-scroll > .cui-comparison-story, .cui-chat-scroll > .cui-change, .cui-chat-scroll > .cui-clarification, .cui-chat-scroll > .cui-activity, .cui-chat-scroll > .cui-participate { margin-top: 16px; }
-.cui-chat-scroll > .cui-examples { margin: 0 0 16px 50px; }
+.cui-chat-scroll > .cui-examples { margin: 16px 0 16px 64px; gap: 10px; }
 .cui-entry { margin: 0; flex-shrink: 0; }
 .cui-compose-row textarea { max-height: 140px; }
 .cui-decision-column { height: 100%; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; display: flex; flex-direction: column; padding-block: 16px 12px; }
@@ -268,7 +268,7 @@
   .cui-mobile-jumps { flex-shrink: 0; }
   .cui-columns { flex: none; }
   .cui-conversation { height: 500px; min-height: 420px; max-height: calc(100svh - 200px); padding: 20px 0 16px; }
-  .cui-chat-scroll > .cui-examples { margin-left: 48px; }
+  .cui-chat-scroll > .cui-examples { margin-left: 60px; }
   .cui-decision-column { height: auto; overflow: visible; display: block; padding: 24px 0; }
   .cui-decision-frame { min-height: 360px; padding: 16px; }
   .cui-recommendation { padding: 0; }
