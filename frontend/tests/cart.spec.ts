@@ -1,19 +1,21 @@
 import { test, expect } from "@playwright/test";
 test("cart survives another search and checkout creates persistent history", async ({ page }) => {
-  await page.goto("/");
+  // Multi-page journey includes cold Next development compilation for cart, checkout and history.
+  test.setTimeout(60000);
+  await page.goto("/shop");
   const input = page.getByRole("textbox", { name: "Message Beany" });
   await expect(input).toBeEnabled();
   await input.fill("Find headphones under $150");
-  await page.getByRole("button", { name: "Send ↗", exact: true }).click();
+  await page.getByRole("button", { name: "Send", exact: true }).click();
   await page.getByRole("button", { name: "Add to cart", exact: true }).click();
   await expect(page.getByRole("link", { name: "Cart (1)" })).toBeVisible();
-  await expect(page.locator(".product-card")).toHaveCount(0);
-  await expect(page.getByText("Tell me what else you'd like to find", { exact: false })).toBeVisible();
+  await expect(page.getByRole("article", { name: "Current recommendation", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Conversation history" }).getByText("Tell me what else you'd like to find", { exact: false })).toBeVisible();
   await page.reload();
   await expect(input).toBeEnabled();
-  await expect(page.locator(".product-card")).toHaveCount(0);
+  await expect(page.getByRole("article", { name: "Current recommendation", exact: true })).toHaveCount(0);
   await input.fill("Find a backpack under $150");
-  await page.getByRole("button", { name: "Send ↗", exact: true }).click();
+  await page.getByRole("button", { name: "Send", exact: true }).click();
   await page.getByRole("button", { name: "Add to cart", exact: true }).click();
   await page.getByRole("link", { name: "Cart (2)" }).click();
   await expect(page.getByRole("heading", { name: "Total (2 items)" })).toBeVisible();
@@ -22,8 +24,8 @@ test("cart survives another search and checkout creates persistent history", asy
   await page.getByRole("link", { name: "View receipts", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Simulated receipt", exact: true })).toHaveCount(2);
   await page.getByRole("link", { name: "Keep shopping" }).click();
-  await page.getByRole("button", { name: "Fresh session" }).click();
-  await expect(page.getByRole("button", { name: "Fresh session" })).toBeEnabled();
+  await page.getByRole("button", { name: "Start fresh" }).click();
+  await expect(page.getByRole("button", { name: "Start fresh" })).toBeEnabled();
   await page.getByRole("link", { name: "Purchase history" }).click();
   await expect(page.getByRole("heading", { name: "Simulated receipt", exact: true })).toHaveCount(2);
 });

@@ -5,6 +5,7 @@ from typing import Literal
 from .gateway import structured_call, LLMError
 from .schemas import Model, Field, Product, Event
 from .shopping_tools import search_products, get_product_details
+from .progress import step as activity_step
 
 MAX_STEPS = 6
 MAX_SEARCHES = 2
@@ -49,7 +50,7 @@ def choose_step(session, history):
     )
 
 
-def run_shopping(session, chooser=None):
+def _run_shopping(session, chooser=None):
     chooser = chooser or choose_step
     history, seen, inspected = [], {}, {}
     searches = 0
@@ -62,7 +63,8 @@ def run_shopping(session, chooser=None):
 
     for _ in range(MAX_STEPS):
         try:
-            step = ShoppingStep.model_validate(chooser(session, history))
+            with activity_step("Preparing your product search…" if not history else "Comparing the available information…", "Prepared the product search" if not history else "Reviewed the available information"):
+                step = ShoppingStep.model_validate(chooser(session, history))
             if step.action == "search_products":
                 if searches >= MAX_SEARCHES:
                     raise ValueError("Search limit reached")
@@ -104,3 +106,7 @@ def run_shopping(session, chooser=None):
             break
     record({"action": "finished", "status": "stopped"})
     return ShoppingResult(status="stopped", candidates=candidates)
+
+
+def run_shopping(session, chooser=None):
+    return _run_shopping(session, chooser)

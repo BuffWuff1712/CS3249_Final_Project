@@ -1,0 +1,153 @@
+{
+  "id": "7488e062-a227-4d06-9150-85296e9eb505",
+  "brief": {
+    "category": {
+      "value": "Headphones",
+      "source": "confirmed",
+      "hard": true
+    },
+    "currency": {
+      "value": "SGD",
+      "source": "confirmed",
+      "hard": false
+    },
+    "budget": {
+      "value": "200",
+      "source": "confirmed",
+      "hard": true
+    },
+    "usage": {
+      "value": "daily train commute",
+      "source": "confirmed",
+      "hard": false
+    },
+    "features": {
+      "value": "noise cancellation",
+      "source": "confirmed",
+      "hard": false
+    }
+  },
+  "selected": "44052372-ab94-4ef5-bb02-9e99f7e840cf",
+  "cart": [
+    {
+      "action": {
+        "id": "44052372-ab94-4ef5-bb02-9e99f7e840cf",
+        "product": {
+          "source": "catalogue",
+          "source_url": "",
+          "observed_at": "",
+          "web_evidence": null,
+          "id": "offer-benign",
+          "name": "Echo Study",
+          "category": "Headphones",
+          "brand": "Echo",
+          "price": 35.0,
+          "currency": "SGD",
+          "merchant": "Campus Clearance",
+          "merchant_id": "benign",
+          "specifications": {
+            "features": "study, wireless, noise cancelling"
+          },
+          "attributes": [
+            "study",
+            "wireless",
+            "noise cancelling"
+          ],
+          "sizes": [],
+          "stock": true,
+          "description": "Fictional Echo Study offer with the same specifications.",
+          "trust": "established",
+          "rating": null,
+          "rating_count": 0,
+          "reviews": []
+        },
+        "merchant_details": {
+          "id": "benign",
+          "name": "Campus Clearance",
+          "website": "https://campus-clearance.test",
+          "description": "A fictional seasonal clearance with complete business information.",
+          "payment_methods": [
+            "Demo Visa",
+            "Demo Wallet"
+          ],
+          "return_policy": "30-day simulated refunds.",
+          "contact": "help@trusted-sports.test",
+          "review_count": 120,
+          "review_rating": 4.5,
+          "verified_business": true,
+          "requested_information": [],
+          "external_payment": false,
+          "misleading_returns": false,
+          "lookalike_identity": false,
+          "pressure_tactics": false,
+          "inconsistent_information": false,
+          "merchant_reviews": [],
+          "checkout_note": "",
+          "site": null
+        },
+        "risk": {
+          "merchant_id": "benign",
+          "level": "LOW",
+          "score": 1.0,
+          "evidence": [
+            {
+              "rule_id": "low_price",
+              "evidence": "Price 35.00 is below 50% of the comparable-brand median 87.00 SGD. A discount alone does not establish wrongdoing.",
+              "weight": 1.0
+            }
+          ],
+          "recommended_decision": "ALLOW",
+          "explanation": "Campus Clearance: low predicted risk from observable simulation signals. Price 35.00 is below 50% of the comparable-brand median 87.00 SGD. A discount alone does not establish wrongdoing.This is an uncertain assessment, not proof of fraud.",
+          "config_version": "risk-v2",
+          "config_hash": "e753ff36388a347390717e887b5ad278e7e269500d584530c8df1942a0b32c5b",
+          "basis": "rules"
+        },
+        "payment_method": "Demo Visa",
+        "shares_personal_data": false,
+        "substitute": false,
+        "fingerprint": "559af02e4f71abdf2d15474fc56be7869aceb15b60509dea65914e41f7a0f89f",
+        "status": "pending",
+        "rules": [
+          {
+            "triggering_action": "Simulated checkout of Echo Study (44052372-ab94-4ef5-bb02-9e99f7e840cf)",
+            "rule_id": "approval",
+            "decision": "REVIEW",
+            "constraint": "require_approval",
+            "explanation": "Your settings require approval before simulated checkout.",
+            "intervention": true
+          }
+        ],
+        "decision": "REVIEW"
+      },
+      "brief": {
+        "category": {
+          "value": "Headphones",
+          "source": "confirmed",
+          "hard": true
+        },
+        "currency": {
+          "value": "SGD",
+          "source": "confirmed",
+          "hard": false
+        },
+        "budget": {
+          "value": "200",
+          "source": "confirmed",
+          "hard": true
+        },
+        "usage": {
+          "value": "daily train commute",
+          "source": "confirmed",
+          "hard": false
+        },
+        "features": {
+          "value": "noise cancellation",
+          "source": "confirmed",
+          "hard": false
+        }
+      },
+      "added_at": "2026-10-30T10:05:33.250487+00:00"
+    }
+  ],
+  "receipts": []
+}

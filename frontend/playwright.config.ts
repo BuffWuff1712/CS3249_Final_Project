@@ -17,6 +17,7 @@ export default defineConfig({
       url: "http://localhost:8100/health",
       env: {
         BEANY_LLM_MODE: "mock",
+        BEANY_RISK_DETECTION: "rules",
         BEANY_SEARCH_PROVIDER: "catalogue",
         BROWSER_USE_API_KEY: "",
         BROWSER_USE_REPLAY: "",
