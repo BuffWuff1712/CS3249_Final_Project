@@ -6,6 +6,7 @@ from .llm import OpenAIConversation, explain_outcome
 from .merchants import merchant_for
 from .merchant_risk import load_config, digest
 from .shopping_workflow import run_shopping
+from .shopping_tools import listed_spelling
 from .risk_agent import review as review_listing
 from .local_evidence import configured_detection, review_view
 from .progress import step
@@ -60,6 +61,7 @@ def edit(s, field, fact):
     validate_fact(field, fact)
     invalidate(s)
     if fact:
+        fact.value = listed_spelling(s, field, fact.value)
         s.brief[field] = fact
     else:
         s.brief.pop(field, None)
