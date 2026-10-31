@@ -200,6 +200,7 @@ The visible counts and activity states must agree with the scenario data. A pref
 
 Clearly label fictional data and simulated transactions. Study participants should understand that the prototype represents an interaction concept. Results can speak to comprehension, perceived credibility, effort and choice within the simulation; they cannot establish real merchant legitimacy or the factual reliability of a production agent.
 
+
 ## 9 Evaluation plan
 
 ### Research questions
