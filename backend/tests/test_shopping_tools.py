@@ -145,3 +145,65 @@ def test_injection_offer_still_blocked_after_agent_selection(session, monkeypatc
     assert not session.receipts
     with pytest.raises(ValueError):
         get_product_details(session, "study-hp-target-trusted")
+
+
+def test_search_vocabulary_lists_catalogue_spellings(session):
+    from app.runtime.shopping_tools import search_vocabulary
+    vocab = search_vocabulary(session)
+    assert set(vocab) == {"Backpacks", "Headphones", "Running shoes"}
+    assert "noise-cancelling" in vocab["Headphones"]["features"]
+    assert "water-resistant" in vocab["Backpacks"]["features"]
+    assert "42" in vocab["Running shoes"]["sizes"] and not vocab["Headphones"]["sizes"]
+
+
+def test_search_vocabulary_follows_scenario_scope(session):
+    from app.runtime.shopping_tools import search_vocabulary
+    session.scenario_id = "site-reputation"
+    vocab = search_vocabulary(session)
+    assert set(vocab) == {"Headphones"}
+    assert "study" not in vocab["Headphones"]["features"]  # Old-fixture tag outside the scenario.
+
+
+def test_search_vocabulary_is_empty_for_open_web_search(session):
+    from app.runtime.shopping_tools import search_vocabulary
+    session.search_provider = "browser_use"
+    assert search_vocabulary(session) == {}
+
+
+def test_interpreter_receives_search_vocabulary(session, monkeypatch):
+    from app.runtime import llm
+    from app.runtime.shopping_tools import search_vocabulary
+    captured = {}
+    def fake(schema, prompt, payload):
+        captured.update(payload, prompt=prompt)
+        return Interpretation(reply="Which budget?", changes=[], intent="clarify", suggestions=[])
+    monkeypatch.setattr(llm, "structured_call", fake)
+    monkeypatch.setenv("BEANY_LLM_MODE", "openai")
+    llm.OpenAIConversation().interpret(session, "noise cancelling headphones")
+    assert captured["search_vocabulary"] == search_vocabulary(session)
+    assert "search_vocabulary" in captured["prompt"]
+
+
+def test_edit_maps_feature_spelling_to_listed_vocabulary(session):
+    session.scenario_id = "site-reputation"
+    service.edit(session, "features", Fact(value="Noise Cancelling, wireless, university", source="confirmed", hard=True))
+    assert session.brief["features"].value == "noise-cancelling, wireless, university"
+    assert session.brief["features"].hard  # Only spelling changes; strength is untouched.
+
+
+def test_edit_keeps_a_spelling_that_is_already_listed(session):
+    # The unscoped catalogue lists both spellings; an exact listing is never rewritten.
+    service.edit(session, "features", Fact(value="noise cancelling", source="confirmed"))
+    assert session.brief["features"].value == "noise cancelling"
+
+
+def test_edit_strips_eu_prefix_from_listed_sizes(session):
+    for typed, saved in [("EU 42", "42"), ("eu42", "42"), ("42", "42"), ("US 9", "US 9")]:
+        service.edit(session, "size", Fact(value=typed, source="confirmed", hard=True))
+        assert session.brief["size"].value == saved
+
+
+def test_edit_leaves_open_web_terms_unchanged(session):
+    session.search_provider = "browser_use"
+    service.edit(session, "features", Fact(value="Noise Cancelling", source="confirmed"))
+    assert session.brief["features"].value == "Noise Cancelling"

@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 from .gateway import LLMError, structured_call
-from .shopping_tools import supported_categories
+from .shopping_tools import supported_categories, search_vocabulary
 
 
 def checkout_controls(session):
@@ -25,6 +25,7 @@ class OpenAIConversation:
             (ROOT / "config/prompts/dialogue.txt").read_text(encoding="utf-8-sig"),
             {
                 "supported_categories": supported_categories(session),
+                "search_vocabulary": search_vocabulary(session),
                 "search_provider": session.search_provider,
                 "brief": {k: v.model_dump() for k, v in session.brief.items()},
                 "stage": session.stage,
