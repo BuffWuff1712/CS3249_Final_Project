@@ -15,6 +15,40 @@ def supported_categories(session):
     return sorted({p.category for p in policy.catalogue(session)})
 
 
+def search_vocabulary(session):
+    """Exact attribute and size spellings search matches literally, per category."""
+    if session.search_provider == "browser_use" and not session.scenario_id:
+        return {}  # Open web listings have no fixed vocabulary.
+    vocab = {}
+    for p in policy.catalogue(session):
+        entry = vocab.setdefault(p.category, {"features": set(), "sizes": set()})
+        entry["features"].update(p.attributes)
+        entry["sizes"].update(p.sizes)
+    return {c: {"features": sorted(v["features"]), "sizes": sorted(v["sizes"])} for c, v in sorted(vocab.items())}
+
+
+def listed_spelling(session, field, value):
+    """Rewrite only case, spaces, hyphens and an EU size prefix; never the meaning."""
+    if field not in ("features", "size"):
+        return value
+    key = "features" if field == "features" else "sizes"
+    listed = {term for entry in search_vocabulary(session).values() for term in entry[key]}
+    squash = lambda text: re.sub(r"[\W_]+", "", text.casefold())
+
+    def match(term):
+        if term in listed:
+            return term
+        wanted = squash(term)
+        if field == "size" and wanted.startswith("eu"):
+            wanted = wanted[2:]
+        found = {t for t in listed if squash(t) == wanted}
+        return found.pop() if len(found) == 1 else term
+
+    if field == "size":
+        return match(value.strip())
+    return ", ".join(match(term.strip()) for term in value.split(",") if term.strip())
+
+
 def _search_products(session, query=""):
     if session.search_provider == "browser_use" and not session.scenario_id:
         from .browser_search import discover

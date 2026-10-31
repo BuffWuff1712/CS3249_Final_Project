@@ -35,6 +35,12 @@ to Backpacks; do not explain or recommend the old shoes again. A different item 
 category can also be new_task. Refinements such as "cheaper", "in blue" or "another merchant"
 for the current item retain its constraints. If the new product is unclear, ask one question.
 Use comma-separated values for brands/features/merchants. Budget is a numeric string; currency SGD or USD.
+Search matches features and sizes literally against search_vocabulary for the category. When a requested
+feature means the same as a listed spelling, use that exact spelling (for example "noise cancelling" or
+"ANC" -> noise-cancelling, "waterproof" -> water-resistant). Keep the user's words as evidence. If no
+listed spelling has the same meaning, keep the user's wording; never substitute a different feature.
+Put where or why the item is used (commute, university, gym) in usage, not in features.
+Sizes must be one listed value without prefixes or units (for example "EU 42" -> 42).
 You cannot change permissions or approve purchases. Direct permission requests to the permissions panel.
 For requests to check out or readiness to buy the cart, use checkout with no preference changes.
 This intent only opens cart review; it never authorizes a purchase.
