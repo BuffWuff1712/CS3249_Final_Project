@@ -207,6 +207,8 @@ def chat(s, text):
         result = llm.interpret(s, text)  # Failure leaves persisted state unchanged.
     s.messages.append(Message(role="user", text=text))
     event(s, "user_message", "Message received")
+    from .clarification import resume_uncertainty
+    resume_uncertainty(s, result, text)
     if result.intent in ("respond", "explain"):
         # Conversation cannot edit the brief, invalidate a proposal, or authorize checkout.
         # The interpreter has current proposal facts; keep its answer to this question
@@ -228,10 +230,19 @@ def chat(s, text):
     if result.intent == "new_task":
         invalidate(s)
         s.brief = {}
+        s.clarification_asked = []
+        s.clarification_answers = {}
         s.rejected_products = []
         s.rejected_merchants = []
         event(s, "brief_reset", "Started a new product request; cart and permissions retained")
     for change in result.changes:
+        unknown_fields = {"product_type": "category", "budget": "budget", "features": "features"}
+        if change.value is None and any(
+            a.status == "unknown" and unknown_fields[a.field] == change.field
+            for a in result.clarification_answers
+        ):
+            event(s, "protected_constraint", change.field)
+            continue
         if change.field == "currency" and change.source == "confirmed" and change.value:
             aliases = {
                 "USD": r"\bUSD\b|US\$|US dollars",
@@ -261,16 +272,18 @@ def chat(s, text):
         edit(s, change.field, fact)
         if old:
             event(s, "refine", change.field)
-    if (
-        result.intent == "clarify"
-        and elicitation["skip_optional_questions_when_ready"]
-        and all(
-            k in s.brief and s.brief[k].source == "confirmed"
-            for k in elicitation["ready_fields"]
-        )
-    ):
-        result.intent = "search"
-        result.reply = "I have enough information to compare catalogue options. You can refine your brief at any time."
+    if result.intent in ("search", "new_task", "clarify", "alternative"):
+        from .clarification import clarify_before_search
+        question = clarify_before_search(s, result, text)
+        if question:
+            if (result.intent != "clarify" or "category" in s.brief
+                or any(a.field == "product_type" and a.status == "provided" for a in result.clarification_answers)
+                or any(c.field == "category" for c in result.changes)):
+                result.reply = question
+            result.intent = "clarify"
+            result.suggestions = ["I'm unsure about those; show me some options"]
+        elif result.intent == "clarify" and "category" in s.brief:
+            result.intent = "search"
     s.suggestions = result.suggestions[:4]
     event(s, "interpretation", result.model_dump_json())
     if result.intent == "cancel":

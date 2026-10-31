@@ -2,10 +2,18 @@
 
 import json
 import os
+import logging
+import math
+from time import perf_counter
+from uuid import uuid4
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 import httpx
 from pydantic import BaseModel
+
+
+TIMEOUT = 200
+logger = logging.getLogger("uvicorn.error")
 
 
 class LLMError(Exception):
@@ -20,6 +28,7 @@ class Settings:
     api: str
     structured: str
     reasoning: str
+    timeout: float = TIMEOUT
 
     @classmethod
     def load(cls, require_model=True):
@@ -57,8 +66,14 @@ class Settings:
             raise LLMError(
                 "Responses requires schema mode; use the explicit chat adapter for JSON/text compatibility."
             )
+        try:
+            timeout = float(os.getenv("OPENAI_TIMEOUT_SECONDS", str(TIMEOUT)))
+            if not math.isfinite(timeout) or not 10 <= timeout <= 600:
+                raise ValueError()
+        except ValueError:
+            raise LLMError("OPENAI_TIMEOUT_SECONDS must be a number between 10 and 600.") from None
         return cls(
-            *values, api, structured, os.getenv("OPENAI_REASONING_EFFORT", "").strip()
+            *values, api, structured, os.getenv("OPENAI_REASONING_EFFORT", "").strip(), timeout
         )
 
 
@@ -70,9 +85,9 @@ def make_client(settings=None):
     return OpenAI(
         api_key=config.api_key,
         base_url=config.base_url,
-        timeout=40,
+        timeout=config.timeout,
         max_retries=0,
-        http_client=httpx.Client(follow_redirects=False, timeout=40),
+        http_client=httpx.Client(follow_redirects=False, timeout=config.timeout),
     )
 
 
@@ -100,14 +115,28 @@ def safe_error(exc):
 
 
 def structured_call(schema: type[BaseModel], instructions: str, payload, settings=None):
+    from .progress import cancellable_call
+    return cancellable_call(lambda: _structured_call(schema, instructions, payload, settings))
+
+
+def _structured_call(schema, instructions, payload, settings=None):
     from openai import OpenAIError
 
     config = settings or Settings.load()
     client = make_client(config)
+    request_id = uuid4().hex[:12]
+    started = perf_counter()
+    status = "error"
+    error_type = "none"
+    payload_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     instructions += (
         "\nOUTPUT CONTRACT: Return exactly one valid JSON object, no markdown or prose outside it. All fields must match this schema: "
-        + json.dumps(schema.model_json_schema())
+        + json.dumps(schema.model_json_schema(), separators=(",", ":"))
     )
+    # Metadata only: never log prompts, responses, credentials, URLs or exception bodies.
+    logger.info("llm_call_start id=%s stage=%s api=%s mode=%s timeout_s=%s input_chars=%s",
+                request_id, schema.__name__, config.api, config.structured, config.timeout,
+                len(instructions) + len(payload_json))
     try:
         if config.api == "responses":
             options = (
@@ -116,7 +145,7 @@ def structured_call(schema: type[BaseModel], instructions: str, payload, setting
             result = client.responses.parse(
                 model=config.model,
                 instructions=instructions,
-                input=json.dumps(payload, ensure_ascii=False),
+                input=payload_json,
                 text_format=schema,
                 store=False,
                 **options,
@@ -126,7 +155,7 @@ def structured_call(schema: type[BaseModel], instructions: str, payload, setting
             options = {"reasoning_effort": config.reasoning} if config.reasoning else {}
             messages = [
                 {"role": "system", "content": instructions},
-                {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
+                {"role": "user", "content": payload_json},
             ]
             if config.structured == "schema":
                 result = client.chat.completions.parse(
@@ -139,10 +168,6 @@ def structured_call(schema: type[BaseModel], instructions: str, payload, setting
                     raise ValueError("Incomplete response")
                 output = result.choices[0].message.parsed
             else:
-                messages[0]["content"] += (
-                    "\nReturn only a JSON object matching this schema: "
-                    + json.dumps(schema.model_json_schema())
-                )
                 if config.structured == "json":
                     options["response_format"] = {"type": "json_object"}
                 result = client.chat.completions.create(
@@ -155,8 +180,13 @@ def structured_call(schema: type[BaseModel], instructions: str, payload, setting
                 )
         if output is None:
             raise ValueError("Missing parsed output or refusal")
-        return schema.model_validate(output)
+        validated = schema.model_validate(output)
+        status = "ok"
+        return validated
     except (OpenAIError, ValueError, TypeError, IndexError) as exc:
+        error_type = type(exc).__name__
         raise LLMError(safe_error(exc)) from exc
     finally:
+        logger.info("llm_call_end id=%s stage=%s status=%s elapsed_s=%.3f error_type=%s",
+                    request_id, schema.__name__, status, perf_counter() - started, error_type)
         client.close()

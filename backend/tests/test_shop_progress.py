@@ -22,7 +22,7 @@ def test_progress_arrives_while_model_is_still_working(monkeypatch):
         assert release.wait(5), "The client must receive progress before finishing the model call"
         return interpret(session, text)
     monkeypatch.setattr(service.llm, "interpret", delayed)
-    response = api.message_stream(s.id, api.Message(revision=0, text="Find headphones under SGD200"))
+    response = api.message_stream(s.id, api.Message(revision=0, text="Find wireless headphones under $200"))
     async def read():
         first = json.loads(await anext(response.body_iterator))
         assert first["type"] == "activity" and first["activity"]["state"] == "running"

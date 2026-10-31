@@ -24,6 +24,8 @@ def test_mock_switch_keeps_cart_not_shoe_preferences(session, text):
     service.chat(session, text)
     assert session.brief["category"].value == "Backpacks"
     assert "budget" not in session.brief and "size" not in session.brief and "features" not in session.brief
+    assert session.stage == "clarifying"
+    service.chat(session, "I'm unsure about those; show me some options")
     assert session.proposals[-1].product.category == "Backpacks"
     assert session.cart[0].model_dump() == old_cart
     assert session.permissions.model_dump() == permissions

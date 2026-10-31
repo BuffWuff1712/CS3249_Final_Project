@@ -45,7 +45,7 @@ def test_conversation_uses_reply_and_ignores_proposed_edits(session, monkeypatch
 
 
 def test_greeting_with_shopping_request_still_searches(session):
-    service.chat(session, "Hi, find backpacks under $100")
+    service.chat(session, "Hi, find waterproof backpacks under $100")
     assert session.brief["category"].value == "Backpacks"
     assert session.proposals[-1].product.category == "Backpacks"
 

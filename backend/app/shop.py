@@ -3,12 +3,20 @@ from fastapi import APIRouter
 from pydantic import Field
 from .runtime import shop_workspace as shop, storage
 from .runtime.schemas import Model, Fact, Permissions, CartSelection
+from threading import Event, RLock
+from uuid import uuid4
+from .runtime.progress import cancellation, check_cancelled, RequestStopped
+
+# Independent of the database lock: Stop must work while a model call is pending.
+_runs_lock = RLock()
+_runs = {}
 
 router = APIRouter(prefix="/shop/sessions")
 
 
 class Mutation(Model):
     revision: int = Field(ge=0)
+    request_id: str | None = Field(default=None, min_length=8, max_length=80, pattern=r"^[a-zA-Z0-9-]+$")
 
 
 class Message(Mutation):
@@ -42,7 +50,9 @@ def mutate(sid, body, work):
         work(s)
         shop.meta(s)["revision"] += 1
         response = shop.view(s)
-        storage.save(s)
+        with _runs_lock:
+            check_cancelled()
+            storage.save(s)
         return response
 
 
@@ -149,6 +159,15 @@ def checkout(sid: str, body: CheckoutMutation):
     return mutate(sid, body, lambda s: shop.checkout_cart(s, CartCheckout(items=body.items)))
 
 
+@router.post('/{sid}/stop/{request_id}')
+def stop_request(sid: str, request_id: str):
+    with _runs_lock:
+        signal = _runs.get((sid, request_id))
+        if signal is not None:
+            signal.set()
+    return {"stopped": signal is not None}
+
+
 def stream_mutation(sid, body, work):
     """Stream observations from the real operation; commit once using the usual lock."""
     import json
@@ -161,6 +180,12 @@ def stream_mutation(sid, body, work):
 
     updates = Queue()
     disconnected = Event()
+    cancelled = Event()
+    key = (sid, body.request_id or uuid4().hex)
+    with _runs_lock:
+        if key in _runs:
+            raise ValueError("Request is already running")
+        _runs[key] = cancelled
 
     def publish(event):
         if not disconnected.is_set():
@@ -168,15 +193,19 @@ def stream_mutation(sid, body, work):
 
     def run():
         try:
-            with observe(lambda activity: publish({"type": "activity", "activity": activity})):
+            with cancellation(cancelled), observe(lambda activity: publish({"type": "activity", "activity": activity})):
                 result = mutate(sid, body, work)
             publish({"type": "result", "view": result})
+        except RequestStopped as exc:
+            publish({"type": "error", "message": str(exc)})
         except (ValueError, LookupError, LLMError) as exc:
             publish({"type": "error", "message": str(exc)})
         except Exception:
             logging.getLogger(__name__).exception("Shopping stream failed")
             publish({"type": "error", "message": "The request could not finish. Reload the workspace before trying again."})
         finally:
+            with _runs_lock:
+                _runs.pop(key, None)
             updates.put(None)
 
     def events():
@@ -191,8 +220,8 @@ def stream_mutation(sid, body, work):
                     return
                 yield json.dumps(update) + "\n"
         finally:
-            # A disconnected client cannot safely undo an operation already in progress.
-            # Revision/fingerprint validation still prevents stale approval or retries.
+            # A committed result is never undone; the client reloads after stopping.
+            cancelled.set()
             disconnected.set()
 
     return StreamingResponse(events(), media_type="application/x-ndjson", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})

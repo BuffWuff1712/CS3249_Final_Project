@@ -28,6 +28,10 @@ export async function shopRequest(path = "", method = "GET", body?: unknown, sig
 export const shopFields = ["category", "usage", "budget", "currency", "features", "size", "preferred_brands", "excluded_brands", "merchants", "other"] as const;
 export type ShopField = typeof shopFields[number];
 export type ShopBrief = Record<string, Fact>;
+export async function stopShopRequest(sid: string, requestId: string) {
+  const response = await fetch(`${base}/shop/sessions/${encodeURIComponent(sid)}/stop/${encodeURIComponent(requestId)}`, { method: "POST" });
+  if (!response.ok) throw new Error("Could not confirm Stop. Reload the workspace before continuing.");
+}
 export function money(product: Product) {
   return new Intl.NumberFormat("en-SG", { style: "currency", currencyDisplay: "code", currency: product.currency }).format(product.price);
 }

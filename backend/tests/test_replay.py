@@ -129,7 +129,7 @@ def test_replayed_offer_reaches_risk_agent(replay):
 
 def test_full_replay_flow_to_simulated_receipt(replay):
     s = service.create()
-    service.chat(s, "I want headphones under $200")
+    service.chat(s, "I want headphones under $200; no feature preference")
     a = s.proposals[-1]
     assert a.product.source == "browser_use" and a.risk is not None and a.decision == "REVIEW"
     assert any(e.kind == "risk_agent" for e in s.events)

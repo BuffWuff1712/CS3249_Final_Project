@@ -22,7 +22,7 @@ def change(view, path, body=None, method="POST", status=200):
 
 
 def searched():
-    return change(create(), "messages", {"text": "Find headphones under $200"})
+    return change(create(), "messages", {"text": "Find headphones under $200; no feature preference"})
 
 
 def proposed(product_id="study-hp-target-trusted"):
@@ -109,7 +109,7 @@ def test_new_search_clears_selection_and_preserves_receipts():
     chosen = selection(view)
     view = change(change(view, "select", chosen), "finish", chosen)
     receipt = view["session"]["receipts"][0]
-    view = change(view, "messages", {"text": "Find running shoes under $200"})
+    view = change(view, "messages", {"text": "Find running shoes under $200; no feature preference"})
     assert view["selected"] is None
     assert view["session"]["receipts"] == [receipt]
     assert view["session"]["brief"]["category"]["value"] == "Running shoes"

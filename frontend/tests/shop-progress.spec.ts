@@ -39,7 +39,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 async function begin(page: import("@playwright/test").Page) {
-  await page.getByRole("textbox", { name: "Message Beany" }).fill("Find headphones under SGD200");
+  await page.getByRole("textbox", { name: "Message Beany" }).fill("Find wireless headphones under $200");
   await page.getByRole("button", { name: "Send", exact: true }).click();
   await expect(page.getByLabel("Backend request in progress", { exact: true })).toContainText("Reading your request");
   await expect(page.getByRole("article", { name: "Current recommendation", exact: true })).toHaveCount(0);
@@ -67,4 +67,14 @@ test("reset ignores the remainder of an old progress stream", async ({ page }) =
   await page.evaluate(() => (window as unknown as { releaseProgress: () => void }).releaseProgress());
   await expect(page.getByLabel("Comparison activity", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("article", { name: "Current recommendation", exact: true })).toHaveCount(0);
+});
+
+test("elapsed timer and Stop stay available while waiting", async ({ page }) => {
+  await begin(page);
+  await expect(page.getByRole("button", { name: "Stop", exact: true })).toBeEnabled();
+  await expect(page.getByLabel(/^Elapsed time: [1-9]/)).toBeVisible({ timeout: 5000 });
+  await page.getByRole("button", { name: "Stop", exact: true }).click();
+  await expect(page.getByText("Stopped waiting for this request.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Stop", exact: true })).toHaveCount(0);
 });

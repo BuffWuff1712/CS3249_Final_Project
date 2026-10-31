@@ -397,7 +397,8 @@ def test_ambiguous_dollar_does_not_confirm_usd(client, monkeypatch):
     assert (
         s.brief["currency"].value == "SGD" and s.brief["currency"].source == "suggested"
     )
-    assert s.proposals and s.clarification_count == 0
+    assert not s.proposals and s.clarification_count == 1
+    assert "features" in s.messages[-1].text
 
 
 def test_low_price_alone_cannot_become_high_with_weight_change(client):

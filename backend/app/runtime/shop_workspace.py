@@ -186,6 +186,8 @@ def merge_reply(s, start):
 
 
 def compare(s):
+    if s.stage == "clarifying":
+        raise ValueError("Please answer the shopping questions first; you can say you're unsure or have no preference.")
     if not policy.value(s, "category"):
         raise ValueError("Choose a product category before comparing.")
     clear_selection(s)

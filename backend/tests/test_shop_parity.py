@@ -21,7 +21,7 @@ def change(v, path, body=None, method='POST', status=200):
 
 
 def offer(v=None, product='study-hp-target-trusted'):
-    v = change(v or fresh(), 'messages', {'text': 'Find headphones under SGD200'})
+    v = change(v or fresh(), 'messages', {'text': 'Find headphones under SGD200; no feature preference'})
     return change(v, 'propose', {'product_id': product})
 
 
@@ -172,7 +172,7 @@ def test_saved_browser_replay_runs_real_facade_search_and_checkout_without_netwo
     monkeypatch.setenv('BEANY_SEARCH_PROVIDER', 'browser_use')
     monkeypatch.setenv('BROWSER_USE_REPLAY', 'data/replay/study_listings.json')
     monkeypatch.setattr(browser_search, 'run_task', lambda *_: pytest.fail('Replay must never invoke live provider'))
-    v = change(fresh(), 'messages', {'text': 'Find headphones under SGD200'})
+    v = change(fresh(), 'messages', {'text': 'Find headphones under SGD200; no feature preference'})
     assert v['current'] and v['offers']
     assert all(row['product']['source'] == 'browser_use' for row in v['offers'])
     assert all(row['product']['id'].startswith('web-') for row in v['offers'])
@@ -187,7 +187,7 @@ def test_saved_browser_replay_runs_real_facade_search_and_checkout_without_netwo
 
 def test_classic_cart_adoption_does_not_reclassify_saved_item_as_ephemeral_selection():
     s = service.create(search_provider='catalogue')
-    service.chat(s, 'Find headphones under SGD200')
+    service.chat(s, 'Find headphones under SGD200; no feature preference')
     from app.runtime.cart import add
     from app.runtime.schemas import CartSelection
     a = s.proposals[-1]

@@ -97,7 +97,7 @@ def test_no_match_does_not_relax_budget(session):
 
 
 def test_chat_one_reply_policy_and_exact_approval(session):
-    service.chat(session, "Find headphones under $150")
+    service.chat(session, "Find headphones under $150; no feature preference")
     assert len([m for m in session.messages if m.role == "assistant"]) == 1
     assert session.proposals and not session.receipts
     a = session.proposals[-1]
@@ -106,7 +106,7 @@ def test_chat_one_reply_policy_and_exact_approval(session):
 
 
 def test_failed_run_invalidates_previous_proposal(session, monkeypatch):
-    service.chat(session, "Find headphones under $150")
+    service.chat(session, "Find headphones under $150; no feature preference")
     old = session.proposals[-1]
     monkeypatch.setattr(service.llm, "interpret", lambda *_: Interpretation(
         reply="Searching", changes=[], intent="search", suggestions=[]))
@@ -137,7 +137,7 @@ def test_injection_offer_still_blocked_after_agent_selection(session, monkeypatc
         step("get_product_details", product_id="offer-injection"),
         step("propose", product_id="offer-injection"),
     ))
-    service.chat(session, "Find headphones under $150")
+    service.chat(session, "Find headphones under $150; no feature preference")
     a = session.proposals[-1]
     assert a.decision == "BLOCK" and session.stage == "blocked"
     with pytest.raises(ValueError):

@@ -283,6 +283,8 @@ class Session(Model):
     rejected_merchants: list[str] = Field(default_factory=list)
     rejected_products: list[str] = Field(default_factory=list)
     clarification_count: int = 0
+    clarification_asked: list[str] = Field(default_factory=list)
+    clarification_answers: dict[str, str] = Field(default_factory=dict)
     intervention_count: int = 0
     mode: str = "openai"
     cart: list[CartItem] = Field(default_factory=list)
@@ -309,6 +311,12 @@ class Change(Model):
     evidence: str
 
 
+class ClarificationAnswer(Model):
+    field: Literal["product_type", "budget", "features"]
+    status: Literal["provided", "unknown", "missing"]
+    evidence: str
+
+
 class Interpretation(Model):
     reply: str = Field(
         min_length=1,
@@ -317,6 +325,7 @@ class Interpretation(Model):
     changes: list[Change]
     intent: Literal["respond", "search", "clarify", "explain", "cancel", "new_task", "alternative", "checkout"]
     suggestions: list[str]
+    clarification_answers: list[ClarificationAnswer] = Field(default_factory=list)
 
 
 class Chat(Model):

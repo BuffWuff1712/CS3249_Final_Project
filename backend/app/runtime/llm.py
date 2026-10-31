@@ -1,7 +1,7 @@
 import json, os, re
 from pydantic import BaseModel
 from pathlib import Path
-from .schemas import Interpretation, Change
+from .schemas import Interpretation, Change, ClarificationAnswer
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -20,13 +20,12 @@ class OpenAIConversation:
     def interpret(self, session, text):
         if os.getenv("BEANY_LLM_MODE", "openai") == "mock":
             return mock_interpret(session, text)
-        return structured_call(
-            Interpretation,
-            (ROOT / "config/prompts/dialogue.txt").read_text(encoding="utf-8-sig"),
-            {
+        instructions = (ROOT / "config/prompts/dialogue.txt").read_text(encoding="utf-8-sig")
+        payload = {
                 "supported_categories": supported_categories(session),
                 "search_provider": session.search_provider,
                 "brief": {k: v.model_dump() for k, v in session.brief.items()},
+                "clarification": {"asked": session.clarification_asked, "answers": session.clarification_answers},
                 "stage": session.stage,
                 "checkout_ui": checkout_controls(session),
                 "permissions_read_only": session.permissions.model_dump(),
@@ -36,10 +35,21 @@ class OpenAIConversation:
                 else None,
                 "cart_items": [{"name": i.action.product.name, "category": i.action.product.category} for i in session.cart],
                 "selected_offer": next((i.action.model_dump() for i in session.cart if i.action.id == session.experiment.get("shop_workspace", {}).get("selected")), None),
-                "history": [m.model_dump() for m in session.messages[-20:]],
+                # Keep whole recent messages for references/banter; IDs and timestamps
+                # add no conversational meaning. Durable preferences live in brief.
+                "history": [{"role": m.role, "text": m.text} for m in session.messages[-20:]],
                 "latest_message": text,
-            },
-        )
+            }
+        result = structured_call(Interpretation, instructions, payload)
+        from .clarification import extraction_issues
+        issues = extraction_issues(session, result, text)
+        if issues:
+            # One corrective call only; Python still validates the second result.
+            result = structured_call(Interpretation, instructions, {
+                **payload, "validation_feedback": issues,
+                "repair_instruction": "Regenerate the complete interpretation. Quote literal contiguous text from latest_message, never ellipses or older messages. A provided answer needs a matching non-null preference change unless already in brief. If a fact cannot be grounded, ask for it; do not promise a search without a category.",
+            })
+        return result
 
 
 def mock_interpret(session, text):
@@ -130,11 +140,30 @@ def mock_interpret(session, text):
     elif lower.strip() in ("i need some shoes", "shoes"):
         intent = "clarify"
         question = "Will you use them for running or everyday wear?"
+    answers = []
+    broad_shoes = category == "Running shoes" and bool(re.search(r"\bshoes\b", lower)) and not re.search(r"running|hiking|trail|gym|walking", lower)
+    if broad_shoes:
+        answers.append(ClarificationAnswer(field="product_type", status="missing", evidence=""))
+        for change in changes:
+            if change.field == "category":
+                change.source = "suggested"
+    elif any(c.field == "category" for c in changes):
+        answers.append(ClarificationAnswer(field="product_type", status="provided", evidence=text))
+    for feature in ("cushioned", "waterproof", "wireless", "noise cancelling", "noise-cancelling", "lightweight"):
+        if feature in lower and not any(c.field == "features" for c in changes):
+            add("features", feature)
+            break
+    if re.search(r"unsure|don't know|dont know|no preference|not sure|no budget|no particular features|no feature preference", lower):
+        fields = (["features"] if "feature" in lower else ["budget"] if "budget" in lower else session.clarification_asked)
+        brief_fields = {"product_type": "category", "budget": "budget", "features": "features"}
+        answers.extend(ClarificationAnswer(field=f, status="unknown", evidence=text) for f in fields
+                       if not any(c.field == brief_fields[f] and c.source == "confirmed" for c in changes))
     return Interpretation(
         reply=question or "[Mock LLM] I have updated your shopping request.",
         changes=changes,
         intent=intent,
         suggestions=["Show me some options", "Find an alternative", "Cancel this task"],
+        clarification_answers=answers,
     )
 
 

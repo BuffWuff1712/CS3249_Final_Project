@@ -18,7 +18,7 @@ def client(tmp_path, monkeypatch):
     return TestClient(app)
 
 
-def start(client, text="Find headphones under $150"):
+def start(client, text="Find headphones under $150; no feature preference"):
     s = client.post("/sessions").json()
     response = client.post(f"/sessions/{s['id']}/messages", json={"text": text})
     assert response.status_code == 200, response.text
@@ -89,10 +89,8 @@ def test_clarification(client):
         and s["clarification_count"] == 1
         and not s["proposals"]
     )
-    assert [m["text"] for m in s["messages"][1:]] == [
-        "I need some shoes",
-        "Will you use them for running or everyday wear?",
-    ]
+    assert len(s["messages"][1:]) == 2
+    assert all(word in s["messages"][-1]["text"] for word in ("type", "budget", "features"))
 
 
 def test_unsupported_category_has_one_complete_clarification(client, monkeypatch):

@@ -1,15 +1,14 @@
 "use client";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { shopRequest, shopStream, ShopRequestError, money, rememberShop, type LiveShopActivity, type OfferPreview, type ShopField, type ShopView } from "@/lib/shopBackend";
+import { shopRequest, shopStream, stopShopRequest, ShopRequestError, money, rememberShop, type LiveShopActivity, type OfferPreview, type ShopField, type ShopView } from "@/lib/shopBackend";
 import type { Action, Fact } from "@/lib/beany";
 import { ShoppingReply } from "./ShoppingReply";
 import { ProductComparison, SellerComparison } from "./OfferComparisons";
 import { BackendNeedsSummary } from "./BackendNeedsSummary";
 import { BackendCurrentOffer, BackendProductEvidence, BackendRisk } from "./BackendOffer";
-import { ComparisonActivity, ActivitySteps } from "./ComparisonActivity";
+import { ComparisonActivity, LiveProgress } from "./ComparisonActivity";
 import { PurchaseComposer } from "./PurchaseComposer";
 import { UserCircleIcon } from "./ShoppingIcons";
-import { DotsThreeIcon } from "@phosphor-icons/react/dist/csr/DotsThree";
 import "./shopping.css";
 
 const STORAGE_KEY = "beany-shop-backend-session";
@@ -32,6 +31,8 @@ export function ShoppingWorkspace() {
   const [error, setError] = useState(""), [storageNotice, setStorageNotice] = useState(""), [uncertain, setUncertain] = useState(false);
   const [pendingText, setPendingText] = useState(""), [requested, setRequested] = useState<{ field: ShopField }>();
   const [liveSteps, setLiveSteps] = useState<LiveShopActivity[]>([]);
+  const [elapsed, setElapsed] = useState(0), [stopping, setStopping] = useState(false), [stopNotice, setStopNotice] = useState("");
+  const activeRequest = useRef<{ sid: string; id: string } | null>(null);
   const [allOffersOpen, setAllOffersOpen] = useState(false);
   const [historical, setHistorical] = useState<Action | null>(null), [evidenceId, setEvidenceId] = useState(0);
   const generation = useRef(0), controller = useRef<AbortController | null>(null), viewRef = useRef<ShopView | null>(null);
@@ -66,22 +67,44 @@ export function ShoppingWorkspace() {
     } finally { if (id === generation.current) setBusy(false); }
   }
   useEffect(() => { void load(); return () => { generation.current++; controller.current?.abort(); }; }, []);
+  useEffect(() => {
+    if (!busy) return;
+    const start = performance.now(); setElapsed(0);
+    const timer = window.setInterval(() => setElapsed(Math.floor((performance.now() - start) / 1000)), 1000);
+    return () => window.clearInterval(timer);
+  }, [busy]);
+  async function stop() {
+    const request = activeRequest.current;
+    if (!request || stopping) return;
+    setStopping(true);
+    try {
+      await stopShopRequest(request.sid, request.id);
+      generation.current++; controller.current?.abort(); activeRequest.current = null;
+      setStopNotice("Stopped waiting for this request. Your saved workspace has been reloaded; you can change your message and try again.");
+      await load();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Stop could not be confirmed."); setUncertain(true);
+    } finally { setStopping(false); }
+  }
   async function mutate(path: string, data: Record<string, unknown> = {}, method = "POST", submitted = "") {
     if (busy || uncertain || !viewRef.current) return false;
     const before = viewRef.current; const id = ++generation.current;
     const abort = new AbortController(); controller.current = abort;
+    const requestId = crypto.randomUUID();
+    activeRequest.current = { sid: before.session.id, id: requestId };
+    setStopNotice("");
     const compared = path === "propose" ? before.offers.find(offer => offer.product.id === data.product_id) : undefined;
     const actionText = compared ? `Compare ${compared.product.name} from ${compared.product.merchant}.` : "";
     let firstActivityAt: number | undefined;
     setBusy(true); setLiveSteps([]); setError(""); setHistorical(null); setPendingText(submitted || actionText); setRequested(undefined);
     if (submitted) setText("");
     try {
-      const body = { ...data, revision: before.revision };
+      const body = { ...data, revision: before.revision, request_id: requestId };
       const next = method === "POST" && ["messages", "compare", "propose", "seller", "alternative"].includes(path)
         ? await shopStream(`/${before.session.id}/${path}`, body, abort.signal, activity => {
           if (id !== generation.current || abort.signal.aborted) return;
           firstActivityAt ??= performance.now();
-          setLiveSteps(previous => previous.some(step => step.id === activity.id) ? previous.map(step => step.id === activity.id ? activity : step) : [...previous, activity]);
+          setLiveSteps(previous => [...previous.filter(step => step.id !== activity.id), activity]);
         })
         : await shopRequest(`/${before.session.id}/${path}`, method, body, abort.signal);
       // Keep genuine checks readable when a local Compare finishes almost instantly.
@@ -94,7 +117,7 @@ export function ShoppingWorkspace() {
         setUncertain(true); if (submitted) setText(current => current || submitted);
       }
       return false;
-    } finally { if (id === generation.current) { setBusy(false); setPendingText(""); } }
+    } finally { if (id === generation.current) { activeRequest.current = null; setBusy(false); setPendingText(""); } }
   }
   const session = view?.session;
   const current = view?.current;
@@ -105,7 +128,7 @@ export function ShoppingWorkspace() {
     const region = history.current;
     if (!region) return;
     if (busy) {
-      const latestStep = region.querySelector(".cui-progress .cui-live-steps > li:last-child");
+      const latestStep = region.querySelector(".cui-progress");
       if (latestStep) {
         const overflow = latestStep.getBoundingClientRect().bottom - region.getBoundingClientRect().bottom;
         if (overflow > 0) region.scrollTop += overflow + 12;
@@ -143,6 +166,7 @@ export function ShoppingWorkspace() {
         <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">{busy ? "Working on your request with the configured product source…" : error || latestReply || "Ready to compare products."}</p>
         <div ref={history} className="cui-chat-scroll" role="region" aria-label="Conversation history" tabIndex={0}>
           {storageNotice && <p className="cui-notice cui-notice--review">{storageNotice}</p>}
+          {stopNotice && <p role="status" className="cui-notice">{stopNotice}</p>}
           {error && <div role="alert" className="cui-input-error"><p>{error}</p><p>Your last confirmed server state is shown. Selection and checkout are paused until it is reloaded.</p><button disabled={busy} onClick={() => void load()}>Reload workspace</button></div>}
           <div className="cui-conversation-history">
             {session?.messages.slice(-60).map((message, offset) => {
@@ -157,11 +181,11 @@ export function ShoppingWorkspace() {
           </div>
           {!busy && session?.messages.length === 1 && <div className="cui-examples"><span>Editable examples</span>{examples.map(([label, example]) => <button key={label} disabled={disabled} onClick={() => { setText(example); document.getElementById("cui-message")?.focus(); }}>{label}</button>)}</div>}
           {pendingText && <div className="cui-turn cui-turn--user"><span className="cui-avatar" aria-hidden="true"><UserCircleIcon /></span><div className="cui-turn-body"><span className="sr-only">You</span><p>{pendingText}</p></div></div>}
-          {(busy || !!error && !!liveSteps.length) && <div className="cui-turn cui-progress" aria-label="Backend request in progress"><span className="cui-avatar" aria-hidden="true">b.</span><div className="cui-turn-body"><div className="cui-live-activity" aria-live="polite" aria-relevant="additions text">{liveSteps.length ? <ActivitySteps activity={liveSteps} stopped={!busy} /> : <p className="cui-progress-label"><DotsThreeIcon className="cui-typing" aria-hidden="true" />Starting your request…</p>}</div></div></div>}
+          {(busy || !!error && !!liveSteps.length) && <div className="cui-turn cui-progress" aria-label="Backend request in progress"><span className="cui-avatar" aria-hidden="true">b.</span><div className="cui-turn-body"><LiveProgress activity={liveSteps} elapsed={elapsed} stopped={!busy} /></div></div>}
           {!busy && !!session?.suggestions.length && <div className="cui-actions cui-suggestions" aria-label="Suggested replies">{session.suggestions.map(suggestion => <button key={suggestion} disabled={disabled} onClick={() => void mutate("messages", { text: suggestion }, "POST", suggestion)}>{suggestion}</button>)}</div>}
-          {!busy && session && !current && !receipt && !!session.brief.category && <div className="cui-actions"><button disabled={disabled} onClick={() => void mutate("compare")}>Compare current needs</button></div>}
+          {!busy && session && session.stage !== "clarifying" && !current && !receipt && !!session.brief.category && <div className="cui-actions"><button disabled={disabled} onClick={() => void mutate("compare")}>Compare current needs</button></div>}
         </div>
-        {session && <div className="cui-actions"><button disabled={disabled || session.stage === "cancelled"} onClick={() => void mutate("cancel")}>Cancel shopping task</button></div>}
+        {session && <div className="cui-actions">{busy && activeRequest.current && !!liveSteps.length ? <button disabled={stopping} onClick={() => void stop()}>{stopping ? "Stopping…" : "Stop"}</button> : <button disabled={disabled || session.stage === "cancelled"} onClick={() => void mutate("cancel")}>Cancel shopping task</button>}</div>}
         <PurchaseComposer text={text} setText={setText} send={value => void mutate("messages", { text: value }, "POST", value)} loaded={!!session} busy={disabled} started={!!session && session.messages.length > 1} />
       </section>
       <section ref={panel} className="cui-decision-column" id="shopping-decision" aria-label="Current decision">

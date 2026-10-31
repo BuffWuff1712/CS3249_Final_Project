@@ -106,6 +106,13 @@ def usable_output(raw, hosts):
 
 
 def run_task(brief, query, *, client=None, sleep=time.sleep, clock=time.monotonic):
+    from .progress import cancellable_call
+    return cancellable_call(lambda: _run_task(brief, query, client=client, sleep=sleep, clock=clock))
+
+
+def _run_task(brief, query, *, client=None, sleep=time.sleep, clock=time.monotonic):
+    from .progress import check_cancelled
+    check_cancelled()
     key = os.getenv("BROWSER_USE_API_KEY", "").strip()
     if not key:
         raise LLMError("Set BROWSER_USE_API_KEY in backend/.env to enable live product search")
@@ -166,6 +173,7 @@ def run_task(brief, query, *, client=None, sleep=time.sleep, clock=time.monotoni
         response.raise_for_status()
         run_id = str(UUID(response.json()["id"]))
         while clock() - started < timeout:
+            check_cancelled()
             response = client.get(BASE + "/runs/" + run_id, headers=headers)
             response.raise_for_status()
             data = response.json()
