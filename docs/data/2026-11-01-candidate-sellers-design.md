@@ -1,7 +1,7 @@
 # Candidate Sellers and Demo Scenario
 
 Date: 2026-11-01
-Status: Draft for review
+Status: Implemented
 Related: [study dataset design](2026-10-21-study-dataset-design.md), [website reputation design](2026-10-29-website-reputation-design.md)
 
 ## 1. Goal

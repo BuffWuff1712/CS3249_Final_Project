@@ -68,6 +68,8 @@ Append scenarios to `backend/data/scenarios/scenarios.json`. IDs `risk-a` throug
 
 `site-reputation` is a study-dataset scenario. It shows the trusted headphones offer and the three website-reputation variants (`site-mid`, `site-bad`, `site-fake`), which exactly fill the recommendation limit of four. In conversation the first proposal is `site-mid`; **Trigger scenario condition** proposes `site-fake`.
 
+`demo` is a conversation-driven scenario over every study product, including the extra sellers of nine candidates. It has no trigger: the participant states their needs in chat. The default goals recommend the target's sellers. A corrected need moves the recommendation to a candidate whose risky sellers rank first. For example, "headphones for video calls with a microphone" brings up the Kestrel Studio Air sellers, starting with the blocked `external` offer.
+
 The trusted case has no merchant-risk warning, though the user's default approval requirement still yields REVIEW. The concealed malicious case deliberately has LOW predicted risk: the engine cannot see hidden truth. The benign discount has LOW risk because price alone is weak evidence. This makes false-positive and false-negative evaluation meaningful.
 
 ## Research UI and exports
