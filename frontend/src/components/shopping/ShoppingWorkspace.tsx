@@ -8,7 +8,7 @@ import { BackendNeedsSummary } from "./BackendNeedsSummary";
 import { BackendCurrentOffer, BackendProductEvidence, BackendRisk } from "./BackendOffer";
 import { ComparisonActivity, LiveProgress } from "./ComparisonActivity";
 import { PurchaseComposer } from "./PurchaseComposer";
-import { UserCircleIcon } from "./ShoppingIcons";
+import { UserCircleIcon, CoinsIcon, ArrowCounterClockwiseIcon } from "./ShoppingIcons";
 import "./shopping.css";
 
 const STORAGE_KEY = "beany-shop-backend-session";
@@ -127,6 +127,7 @@ export function ShoppingWorkspace() {
   useEffect(() => {
     const region = history.current;
     if (!region) return;
+    if (busy && pendingText && window.matchMedia("(max-width: 760px)").matches) region.scrollIntoView({ block: "start" });
     if (busy) {
       const latestStep = region.querySelector(".cui-progress");
       if (latestStep) {
@@ -138,7 +139,7 @@ export function ShoppingWorkspace() {
     let target = busy ? region.querySelector(".cui-progress") : region.querySelector(".cui-conversation-history > .cui-turn:last-child");
     if (!busy && target?.previousElementSibling?.classList.contains("cui-activity")) target = target.previousElementSibling;
     if (target) region.scrollTop += target.getBoundingClientRect().top - region.getBoundingClientRect().top;
-  }, [session?.messages.length, busy, liveSteps]);
+  }, [session?.messages.length, busy, liveSteps, pendingText]);
   useEffect(() => {
     if (view?.current?.id && currentRef.current?.current?.id !== view.current.id && panel.current) panel.current.scrollTop = 0;
     currentRef.current = view;
@@ -185,7 +186,7 @@ export function ShoppingWorkspace() {
           {!busy && !!session?.suggestions.length && <div className="cui-actions cui-suggestions" aria-label="Suggested replies">{session.suggestions.map(suggestion => <button key={suggestion} disabled={disabled} onClick={() => void mutate("messages", { text: suggestion }, "POST", suggestion)}>{suggestion}</button>)}</div>}
           {!busy && session && session.stage !== "clarifying" && !current && !receipt && !!session.brief.category && <div className="cui-actions"><button disabled={disabled} onClick={() => void mutate("compare")}>Compare current needs</button></div>}
         </div>
-        {session && <div className="cui-actions">{busy && activeRequest.current && !!liveSteps.length ? <button disabled={stopping} onClick={() => void stop()}>{stopping ? "Stopping…" : "Stop"}</button> : <button disabled={disabled || session.stage === "cancelled"} onClick={() => void mutate("cancel")}>Cancel shopping task</button>}</div>}
+        {session && busy && activeRequest.current && !!liveSteps.length && <div className="cui-actions"><button disabled={stopping} onClick={() => void stop()}>{stopping ? "Stopping…" : "Stop"}</button></div>}
         <PurchaseComposer text={text} setText={setText} send={value => void mutate("messages", { text: value }, "POST", value)} loaded={!!session} busy={disabled} started={!!session && session.messages.length > 1} />
       </section>
       <section ref={panel} className="cui-decision-column" id="shopping-decision" aria-label="Current decision">
@@ -193,10 +194,9 @@ export function ShoppingWorkspace() {
           {historical ? <section aria-label="Historical comparison evidence"><h2>Evidence from this comparison</h2><p className="cui-source">Historical proposal snapshot. This is not a current selectable offer.</p><button onClick={() => setHistorical(null)}>Back to current decision</button><BackendRisk merchant={historical.merchant_details} risk={historical.risk} decision={historical.decision} rules={historical.rules} /><BackendProductEvidence replay={!!session?.search_replay} product={historical.product} merchant={historical.merchant_details} /></section> : <>
           {!current && <div className="cui-decision-empty"><h2>Your current match</h2><p>{busy ? "Waiting for the backend's comparison." : session?.stage === "no_match" ? "No eligible offer was proposed. Your constraints were kept." : receipt ? "Your simulated decision is complete." : "Your comparison will appear here."}</p><p className="cui-source">Compare products, inspect seller terms and website reputation, then choose explicitly.</p></div>}
           {view?.current_error && <div className="cui-stale" role="alert"><p>{view.current_error}</p><button disabled={disabled} onClick={() => void mutate("compare")}>Compare current needs</button></div>}
-          {current && <BackendCurrentOffer replay={!!session?.search_replay} action={current} selected={selected} disabled={disabled} selectionInvalid={!!view?.current_error} evidenceId={evidenceId} select={() => void mutate("select", { proposal_id: current.id, fingerprint: current.fingerprint })} seller={() => void mutate("seller")} addCart={() => void mutate("cart", { proposal_id: current.id, fingerprint: current.fingerprint })} reject={() => void mutate("reject", { proposal_id: current.id, fingerprint: current.fingerprint })} alternative={() => void mutate("alternative")} edit={() => setRequested({ field: "features" })} />}
+          {current && <BackendCurrentOffer sellerPreferences={<section className="cui-seller-reason" aria-label="Seller preference"><p>Same model &amp; variant:</p><div className="cui-actions">{(["longer returns", "lowest price"] as const).map(preference => <button key={preference} disabled={disabled} aria-pressed={view?.seller_preference === preference} onClick={() => void mutate("seller", { preference })}>{preference === "longer returns" ? <ArrowCounterClockwiseIcon aria-hidden="true" /> : <CoinsIcon aria-hidden="true" />}{preference === "longer returns" ? "Prefer longer returns" : "Prefer lowest price"}</button>)}</div></section>} brief={session?.brief || {}} replay={!!session?.search_replay} action={current} selected={selected} disabled={disabled} selectionInvalid={!!view?.current_error} evidenceId={evidenceId} select={() => void mutate("select", { proposal_id: current.id, fingerprint: current.fingerprint })} seller={() => void mutate("seller")} addCart={() => void mutate("cart", { proposal_id: current.id, fingerprint: current.fingerprint })} alternative={() => void mutate("alternative")} />}
           {selected && <section ref={selection} className="cui-selection" aria-label="Selected offer"><h2>Your selected offer</h2><p>{view?.selected?.product.name} · {view?.selected && money(view.selected.product)}</p><p>No receipt, order or payment has been created. Review the backend's terms and risk findings before finishing.</p>{view?.selection_error && <p role="alert">{view.selection_error}</p>}<button className="primary" disabled={disabled || !!view?.selection_error} onClick={finish}>Finish decision</button></section>}
           {receipt && <section className="cui-selection" aria-label="Simulated receipt"><h2>Decision complete</h2><p>{receipt.product.name} · {money(receipt.product)}</p><p>Receipt: {receipt.id}</p><p>No real order or payment was created.</p></section>}
-          {current && <section className="cui-seller-reason" aria-label="Seller preference"><p>Compare sellers of this exact model and variant.</p><div className="cui-actions">{(["longer returns", "lowest price"] as const).map(preference => <button key={preference} disabled={disabled} aria-pressed={view?.seller_preference === preference} onClick={() => void mutate("seller", { preference })}>{preference === "longer returns" ? "Prefer longer returns" : "Prefer lowest price"}</button>)}</div></section>}
           {current && !!alternativeModels.length && <ProductComparison replay={!!session?.search_replay} current={current} alternatives={alternativeModels} disabled={disabled} choose={id => void mutate("propose", { product_id: id })} />}
           {!!sellers.length && <section className="cui-alternative" aria-label="Sellers of the same model"><SellerComparison offers={currentOffer ? [currentOffer, ...sellers] : sellers} currentId={current?.product.id} disabled={disabled} replay={!!session?.search_replay} choose={id => void mutate("propose", { product_id: id })} /></section>}
           {!!view?.offers.length && <details onToggle={event => setAllOffersOpen(event.currentTarget.open)}><summary>Compare all {view.offers.length} eligible offers</summary>{allOffersOpen && <SellerComparison offers={view.offers} all currentId={current?.product.id} disabled={disabled} replay={!!session?.search_replay} choose={id => void mutate("propose", { product_id: id })} />}</details>}

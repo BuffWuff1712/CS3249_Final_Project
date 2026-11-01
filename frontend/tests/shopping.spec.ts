@@ -63,7 +63,7 @@ test("vague request, repair and cancellation", async ({ page }) => {
   await expect(page.getByRole("article", { name: "Current recommendation", exact: true })).toBeVisible();
   await send(page, "cancel");
   await expect(page.getByRole("article", { name: "Current recommendation", exact: true })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Cancel shopping task", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Cancel shopping task", exact: true })).toHaveCount(0);
 });
 
 test("study hard block supports reject and refine while preventing checkout and preserving CSV export", async ({ page, request }) => {
@@ -96,7 +96,7 @@ test("keyboard submission and recoverable network errors", async ({ page }, test
   await input.press("Enter");
   await expect(page.getByRole("button", { name: "Select this offer", exact: true })).toBeEnabled();
   await page.screenshot({ path: testInfo.outputPath("beany-review.png"), fullPage: true });
-  await page.getByRole("button", { name: "Cancel shopping task", exact: true }).click();
+  await page.getByRole("button", { name: "Cancel this task", exact: true }).click();
   await expect(page.getByRole("button", { name: "Select this offer", exact: true })).toHaveCount(0);
 });
 
@@ -119,7 +119,7 @@ test("merchant evidence is public but hidden truth is research-only", async ({ p
 test("risky offer can be replaced with another merchant without losing brief", async ({ page, request }) => {
   const s = await study(request, "risk-i"); await ready(page, s.id);
   const current = page.getByRole("article", { name: "Current recommendation", exact: true });
-  await expect(current).toContainText("Merchant risk: high predicted risk");
+  await expect(current).toContainText("Merchant risk: high estimate");
   await current.getByRole("button", { name: "Find another merchant", exact: true }).click();
   await expect(current).toContainText("Demo Store");
   const result = await (await request.get(`${API}/sessions/${s.id}`)).json();

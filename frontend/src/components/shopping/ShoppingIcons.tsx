@@ -11,3 +11,8 @@ export { ProhibitIcon } from "@phosphor-icons/react/dist/csr/Prohibit";
 export { InfoIcon } from "@phosphor-icons/react/dist/csr/Info";
 export { UserCircleIcon } from "@phosphor-icons/react/dist/csr/UserCircle";
 export { ArrowDownIcon } from "@phosphor-icons/react/dist/csr/ArrowDown";
+
+export { ShoppingCartIcon } from "@phosphor-icons/react/dist/csr/ShoppingCart";
+export { StorefrontIcon } from "@phosphor-icons/react/dist/csr/Storefront";
+export { ArrowsLeftRightIcon } from "@phosphor-icons/react/dist/csr/ArrowsLeftRight";
+export { ArrowCounterClockwiseIcon } from "@phosphor-icons/react/dist/csr/ArrowCounterClockwise";

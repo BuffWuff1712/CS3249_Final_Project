@@ -5,7 +5,7 @@ test("compact facts, comparison tables and bullet answers preserve shopping cont
   const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
   await page.goto("/");
   await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
-  await page.getByRole("textbox", { name: "Message Beany" }).fill("Find headphones under SGD200");
+  await page.getByRole("textbox", { name: "Message Beany" }).fill("Find headphones under SGD200; no feature preference");
   await page.getByRole("button", { name: "Send", exact: true }).click();
   const current = page.getByRole("article", { name: "Current recommendation", exact: true });
   await expect(current).toBeVisible();
@@ -47,7 +47,7 @@ test("assistant bullet markup is rendered as text and semantic lists, never HTML
 
 test("Lumen summary surfaces reviews, return terms and the current seller in comparison", async ({ page, request }, testInfo) => {
   const created = await (await request.post("http://localhost:8100/shop/sessions")).json();
-  const searched = await (await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200" } })).json();
+  const searched = await (await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200; no feature preference" } })).json();
   const proposed = await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/propose`, { data: { revision: searched.revision, product_id: "study-hp-target-lowprice" } });
   expect(proposed.ok()).toBeTruthy();
   await page.addInitScript(id => localStorage.setItem("beany-shop-backend-session", id), created.session.id);
@@ -74,7 +74,7 @@ test("Lumen summary surfaces reviews, return terms and the current seller in com
 
 test("comparison picker and seller table switch recommendations and clear selection", async ({ page, request }, testInfo) => {
   const created = await (await request.post("http://localhost:8100/shop/sessions")).json();
-  const searched = await (await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200" } })).json();
+  const searched = await (await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200; no feature preference" } })).json();
   await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/propose`, { data: { revision: searched.revision, product_id: "study-hp-target-lowprice" } });
   await page.addInitScript(id => localStorage.setItem("beany-shop-backend-session", id), created.session.id);
   await page.setViewportSize({ width: testInfo.project.name === "mobile" ? 320 : 1470, height: 735 });
@@ -84,7 +84,7 @@ test("comparison picker and seller table switch recommendations and clear select
   await page.getByRole("button", { name: "Select this offer", exact: true }).click();
   await expect(page.getByLabel("Selected offer", { exact: true })).toBeVisible();
   const sellers = page.getByRole("table", { name: "Compare sellers of this model", exact: true });
-  const available = await sellers.getByRole("button", { name: /^Compare offer from/ }).evaluateAll(buttons => buttons.filter(button => !(button as HTMLButtonElement).disabled).map(button => button.textContent!));
+  const available = await sellers.getByRole("button", { name: /^Compare offer from/ }).evaluateAll(buttons => buttons.filter(button => !(button as HTMLButtonElement).disabled).map(button => button.getAttribute("aria-label") || button.textContent!));
   expect(available.length).toBeGreaterThan(0);
   await sellers.getByRole("button", { name: available[0], exact: true }).click();
   await expect(current).toContainText(available[0].replace("Compare offer from ", ""));
@@ -103,7 +103,7 @@ test("comparison picker and seller table switch recommendations and clear select
 
 test("Compare records a user message and displays real checks before its answer", async ({ page, request }, testInfo) => {
   const created = await (await request.post("http://localhost:8100/shop/sessions")).json();
-  const searched = await (await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200" } })).json();
+  const searched = await (await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200; no feature preference" } })).json();
   const initial = await (await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/propose`, { data: { revision: searched.revision, product_id: "study-hp-target-lowprice" } })).json();
   const offer = initial.offers.find((item: { model_key: string; product: { id: string }; decision: string }) => item.model_key === initial.current_model_key && item.product.id !== initial.current.product.id && item.decision !== "BLOCK");
   expect(offer).toBeTruthy();

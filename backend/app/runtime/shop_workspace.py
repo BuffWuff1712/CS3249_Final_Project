@@ -147,6 +147,76 @@ def record(s, events_before, proposals_before):
     meta(s)["history"] = [*meta(s)["history"], {"message_index": len(s.messages) - 1, "proposal_id": a.id, "activity": activity}][-30:]
 
 
+def suggested_reply(s, text):
+    """Explicit UI shortcuts use checked facts rather than model-generated commands."""
+    command = text.casefold()
+    if command == "cancel this task":
+        s.messages.append(Message(role="user", text=text))
+        cancel(s)
+        return True
+    if command not in ("show me some options", "find an alternative") or not s.recommendations:
+        return False
+    from .progress import step
+    with step("Comparing matching models and seller checks…", "Compared matching models and seller checks"):
+        offers = preview(s)
+        models = {}
+        for offer in offers:
+            if offer["decision"] != "BLOCK":
+                previous = models.get(offer["model_key"])
+                if previous is None or offer["product"]["price"] < previous["product"]["price"]:
+                    models[offer["model_key"]] = offer
+    s.messages.append(Message(role="user", text=text))
+    service.event(s, "user_message", "Suggested reply selected")
+    current = s.proposals[-1] if s.proposals and s.proposals[-1].status == "pending" else None
+    if command == "show me some options":
+        def cell(value):
+            return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\n", " ").replace("\r", " ")
+        rows = []
+        for offer in list(models.values())[:3]:
+            p = offer["product"]
+            features = ", ".join(p["attributes"][:4]) or "Not supplied"
+            returns = (offer["merchant"] or {}).get("return_policy") or "Not supplied"
+            rows.append("| " + " | ".join(cell(value) for value in (
+                f"{p['name']} · {p['merchant']}", f"{p['currency']} {p['price']:.2f}", features, returns)) + " |")
+        service.message(s, ("Here are matching models, showing the lowest-priced selectable offer for each:\n\n"
+                           + "| Model / seller | Price | Listed features | Returns |\n| --- | --- | --- | --- |\n"
+                           + "\n".join(rows)
+                           + "\n\nAll options require your approval before simulated checkout. Use the comparison panel to inspect the full offer and concerns.\n\nYour current selection and needs are unchanged. Nothing has been purchased.") if rows else "No selectable offers match your saved needs. Your limits and selection are unchanged. You can edit your needs to explore other options.")
+        return True
+    alternative = next((offer for offer in models.values() if not current or offer["model_key"] != model_key(current.product)), None)
+    if alternative is None:
+        service.message(s, "I couldn't find another selectable model matching your saved needs. I kept your current offer and limits. Use Find another seller for the same model, or Change needs to broaden the comparison.")
+        return True
+    product_id = alternative["product"]["id"]
+    candidate = next(p for p in policy.search(s, limit=None) if p.id == product_id)
+    clear_selection(s)
+    events, proposals = len(s.events), len(s.proposals)
+    start = len(s.messages)
+    service.propose(s, candidate, recommendations=policy.search(s, limit=None))
+    del s.messages[start:]
+    action = s.proposals[-1]
+    lines = ["A different model to review:",
+             f"- **New offer:** {candidate.name} · {candidate.currency} {candidate.price:.2f} · {candidate.merchant}"]
+    if current:
+        lines.append(f"- **Previously:** {current.product.name} · {current.product.currency} {current.product.price:.2f} · {current.product.merchant}")
+        if current.product.currency == candidate.currency:
+            difference = candidate.price - current.product.price
+            price_change = f"{candidate.currency} {abs(difference):.2f} {'more' if difference > 0 else 'less'}" if difference else "Same price"
+            lines.append(f"- **Price change:** {price_change}.")
+    lines.append("- **Listed features:** " + (", ".join(candidate.attributes) or "Not supplied"))
+    if action.risk:
+        evidence = list(dict.fromkeys(item.evidence.strip() for item in action.risk.evidence if item.evidence.strip()))
+        lines.append(f"- **Seller risk:** {action.risk.level.lower()} estimate; not proof of fraud or a safety guarantee.")
+        lines.extend(f"- **Concern:** {item}" for item in evidence)
+    lines.extend(f"- **Restriction:** {rule.explanation}" for rule in action.rules
+                 if rule.decision != "ALLOW" and rule.rule_id not in ("approval", "merchant_risk"))
+    lines.append("\nReview the concerns, then use **Select this offer** if you want to proceed. Approval is required before simulated checkout.")
+    lines.append("\nYour needs are unchanged. Any previous selection was cleared. Nothing has been purchased.")
+    service.message(s, "\n".join(lines))
+    record(s, events, proposals)
+    return True
+
+
 def message(s, text):
     text = text.strip()
     if not text:
@@ -160,6 +230,8 @@ def message(s, text):
         service.message(s, "I kept your current needs and selection. Please state the budget or seller preference you want to apply, or use the explicit needs and seller controls. A denied change does not authorize changing your limit.")
         s.suggestions = []
         service.event(s, "clarification", "Preserved constraints while clarifying a denied budget or seller change")
+        return
+    if suggested_reply(s, text):
         return
     before = s.model_copy(deep=True)
     events, proposals = len(s.events), len(s.proposals)
@@ -289,7 +361,7 @@ def cancel(s):
     service.invalidate(s)
     s.stage = "cancelled"
     service.event(s, "cancel", "Cancelled through explicit control")
-    service.message(s, "Cancelled. No pending proposal can be approved. Saved cart items remain available for separate review.")
+    service.message(s, "Shopping task cancelled. Nothing was purchased. Saved cart items remain available for separate review. Use Start fresh to begin a new search.")
     s.suggestions = []
 
 
