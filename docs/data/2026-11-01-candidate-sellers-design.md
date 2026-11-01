@@ -15,7 +15,7 @@ This change gives nine existing candidates additional sellers drawn from the exi
 - Statements of priority such as "battery life matters most" when the brief otherwise stays the same. Search weights every feature equally, and the assistant chooses among the top results. Changing that belongs to the policy owner.
 - Free sessions without a scenario. They keep the original fixtures mixed in.
 - New product models, new merchants, merchant records, ground-truth labels and the site registry. All stay unchanged.
-- Existing scenarios. None of them gains the new offers, so the user study is unaffected.
+- Existing scenarios that list `product_ids` or `merchant_ids` (`risk-a` to `risk-i`, `site-reputation`). None of them gains the new offers, so the user study is unaffected. The ten original scenarios without such a list (`normal` to `rejection`) already see the whole catalogue, study data included, and now also see the new offers. A test pins which scenarios those are.
 - The `/shop` frontend, which is teammate-owned.
 
 ### Decisions taken in review

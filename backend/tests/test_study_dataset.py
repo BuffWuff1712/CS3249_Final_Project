@@ -611,6 +611,16 @@ def test_no_other_scenario_lists_seller_offers():
     assert all(not new & set(s.get("product_ids") or []) for s in specs if s["id"] != "demo")
 
 
+def test_only_legacy_scenarios_see_the_whole_catalogue():
+    # Scenarios without product_ids or merchant_ids see every offer, seller offers included.
+    specs = json.loads((ROOT / "data/scenarios/scenarios.json").read_text(encoding="utf-8-sig"))
+    unlisted = {s["id"] for s in specs if not s.get("product_ids") and not s.get("merchant_ids")}
+    assert unlisted == {
+        "normal", "ambiguous", "uncertain", "budget", "substitution",
+        "merchant", "privacy", "correction", "injection", "rejection",
+    }
+
+
 @pytest.mark.parametrize("cat", STUDY_CATEGORIES)
 def test_demo_default_goal_shows_only_the_target(cat):
     s = demo_session(PINNED[cat]["category"], PINNED[cat]["features"], PINNED[cat]["budget"])

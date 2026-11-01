@@ -72,7 +72,7 @@ Signals are a property of the data. Risk levels, weights, thresholds and the fin
 
 Search recommends at most four offers (`recommendation_limit` in `config/policy.json`), cheapest first among equal matches. Offers beyond the four cheapest only appear after the participant rejects earlier ones. `site-reputation` is a worked example: it lists `trusted` and the three website-reputation variants, and leaves out `neutral` so all four are recommended.
 
-`demo` lists every study product, has no trigger and no initial brief, and is opened from `/research` for demonstrations. A test keeps its `product_ids` equal to all `study-*` products. Its sessions mix many variants, so they are not for analysis.
+`demo` lists every study product, has no trigger and no initial brief, and is opened from `/research` for demonstrations. A test keeps its `product_ids` equal to all `study-*` products. It lists `lowprice` and `benign` together, an exception to rule 3 that `test_study_scenarios_match_manifest[demo]` checks. Its sessions mix many variants, so they are not for analysis. The original scenarios without `product_ids` (`normal` to `rejection`) see the whole catalogue, candidate sellers included.
 
 ## Editing study records
 
