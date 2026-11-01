@@ -276,6 +276,14 @@ def message(s, text):
 
 def edit(s, field, fact):
     clear_selection(s)
+    old = s.brief.get("category")
+    if field == "category" and fact and old and fact.value.casefold() != old.value.casefold() and len(s.brief) > 1:
+        # Needs stated for the old category (size, features, budget) do not carry over.
+        cleared = ", ".join(f.replace("_", " ") for f in s.brief if f != "category")
+        service.reset_request(s)
+        service.edit(s, field, fact)
+        service.message(s, f"Category changed to {fact.value}. Your previous needs were for {old.value}, so I cleared them ({cleared}). Add any needs for {fact.value}, then compare.")
+        return
     service.edit(s, field, fact)
     service.message(s, f"{field.replace('_', ' ').capitalize()} {'updated' if fact else 'removed'}. Compare your current needs before selecting again.")
 

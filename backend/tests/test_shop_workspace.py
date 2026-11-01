@@ -409,3 +409,11 @@ def test_restricting_the_current_seller_keeps_the_chosen_model():
     assert view["current_model_key"] == key
     assert view["current"]["product"]["merchant"] != merchant
     assert "no longer allowed" in view["session"]["messages"][-1]["text"]
+
+
+def test_changing_category_in_needs_clears_needs_for_the_old_category():
+    view = change(create(), "messages", {"text": "Find running shoes for running under $150, size 10, cushioned"})
+    assert {"budget", "size", "features"} <= set(view["session"]["brief"])
+    view = change(view, "brief", {"field": "category", "fact": {"value": "Backpacks", "source": "confirmed", "hard": True}}, method="PUT")
+    assert set(view["session"]["brief"]) == {"category"}
+    assert "cleared" in view["session"]["messages"][-1]["text"]

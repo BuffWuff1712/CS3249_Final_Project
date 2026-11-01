@@ -70,6 +70,25 @@ def edit(s, field, fact):
     return s
 
 
+def switches_category(s, changes, text):
+    old = s.brief.get("category")
+    return bool(old) and any(
+        c.field == "category" and c.value and c.value.casefold() != old.value.casefold()
+        and (c.source != "confirmed" or (c.evidence.strip() and c.evidence.casefold() in text.casefold()))
+        for c in changes
+    )
+
+
+def reset_request(s):
+    invalidate(s)
+    s.brief = {}
+    s.clarification_asked = []
+    s.clarification_answers = {}
+    s.rejected_products = []
+    s.rejected_merchants = []
+    event(s, "brief_reset", "Started a new product request; cart and permissions retained")
+
+
 def create(*, search_provider=None):
     from .browser_search import configured_provider, configured_replay
     s = Session(mode=os.getenv("BEANY_LLM_MODE", "openai"), search_provider=search_provider or configured_provider(),
@@ -229,14 +248,11 @@ def chat(s, text):
         event(s, "cart_review_requested", "User requested checkout review; no purchase authorized")
         return s
     # The interpreter decides whether this is a new task, including within one category.
+    # A different category always is one: sizes, features and budget belong to the old product.
+    if result.intent in ("search", "clarify", "alternative") and switches_category(s, result.changes, text):
+        result.intent = "new_task"
     if result.intent == "new_task":
-        invalidate(s)
-        s.brief = {}
-        s.clarification_asked = []
-        s.clarification_answers = {}
-        s.rejected_products = []
-        s.rejected_merchants = []
-        event(s, "brief_reset", "Started a new product request; cart and permissions retained")
+        reset_request(s)
     for change in result.changes:
         unknown_fields = {"product_type": "category", "budget": "budget", "features": "features"}
         if change.value is None and any(
