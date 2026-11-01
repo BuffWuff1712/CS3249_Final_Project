@@ -72,6 +72,29 @@ test("Lumen summary surfaces reviews, return terms and the current seller in com
   await page.screenshot({ path: testInfo.outputPath("lumen-model-comparison.png"), fullPage: false });
 });
 
+test("seller table sorts by price by default and by lowest risk on request", async ({ page, request }, testInfo) => {
+  const created = await (await request.post("http://localhost:8100/shop/sessions")).json();
+  const searched = await (await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200; no feature preference" } })).json();
+  expect((await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/propose`, { data: { revision: searched.revision, product_id: "study-hp-target-lowprice" } })).ok()).toBeTruthy();
+  await page.addInitScript(id => localStorage.setItem("beany-shop-backend-session", id), created.session.id);
+  await page.setViewportSize({ width: testInfo.project.name === "mobile" ? 320 : 1280, height: 900 });
+  await page.goto("/");
+  const sellers = page.getByRole("table", { name: "Compare sellers of this model", exact: true });
+  const rows = sellers.locator("tbody tr[aria-label^='Seller offer']");
+  const order = { low: 0, medium: 1, high: 2, critical: 3, unknown: 4 } as Record<string, number>;
+  const levels = () => rows.evaluateAll(trs => trs.map(tr => tr.querySelector(".cui-risk-badge")?.className.match(/cui-tone-(\w+)/)?.[1] || "unknown"));
+  const sort = page.getByLabel("Sort sellers by", { exact: true });
+  await expect(sort).toHaveValue("price");
+  await expect(rows.first()).toHaveAttribute("aria-label", "Seller offer Bargain Depot SG");
+  await sort.selectOption("risk");
+  const ranked = (await levels()).map(level => order[level]);
+  expect(ranked).toEqual([...ranked].sort((a, b) => a - b));
+  await expect(rows.last()).toHaveAttribute("aria-label", "Seller offer Quickpay Deals");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await sort.selectOption("price");
+  await expect(rows.first()).toHaveAttribute("aria-label", "Seller offer Bargain Depot SG");
+});
+
 test("comparison picker and seller table switch recommendations and clear selection", async ({ page, request }, testInfo) => {
   const created = await (await request.post("http://localhost:8100/shop/sessions")).json();
   const searched = await (await request.post(`http://localhost:8100/shop/sessions/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200; no feature preference" } })).json();
