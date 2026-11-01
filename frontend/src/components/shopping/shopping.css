@@ -427,3 +427,59 @@
 .cui-progress-history>summary::-webkit-details-marker{display:none}
 .cui-progress-history[open]>summary>span:first-child{transform:rotate(90deg)}
 .cui-progress-history .cui-live-steps{margin-top:12px}
+
+/* Evidence-based highlights and consistent, labelled visual indicators. */
+.cui-matched-priorities { margin: 14px 0 10px; }
+.cui-matched-priorities h4 { font-size: 11px; color: var(--muted); margin: 0 0 7px; font-weight: 600; }
+.cui-matched-priorities ul { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; list-style: none; }
+.cui-matched-priorities li { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border: 1px solid #c3d3fb; border-radius: 6px; background: #edf3ff; color: #214caa; font-size: 12px; font-weight: 600; }
+.cui-matched-priorities svg { width: 15px; height: 15px; }
+.cui-product-points .cui-battery-fact { display: flex; align-items: flex-start; gap: 6px; margin-left: -17px; }
+.cui-battery-fact > svg { width: 17px; height: 17px; margin-top: 2px; color: #315480; }
+.cui-key-spec { background: #edf3ff; color: #214caa; padding: 1px 4px; border-radius: 3px; }
+.cui-rating, .cui-rating-value { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.cui-rating { align-items: flex-start; flex-direction: column; gap: 3px; }
+.cui-rating-value strong { font-size: 12px; font-variant-numeric: tabular-nums; }
+.cui-stars { display: inline-flex; flex: 0 0 auto; gap: 2px; line-height: 0; }
+.cui-star-slot { display: block; position: relative; width: 14px; height: 14px; color: #dce2ed; }
+.cui-stars .cui-star-slot svg { width: 14px; height: 14px; max-width: none; }
+.cui-star-fill { position: absolute; inset: 0 auto 0 0; overflow: hidden; color: #9a6508; }
+.cui-rating-count { font-size: 11px; color: var(--muted); }
+.cui-badge { display: inline-flex; align-items: flex-start; gap: 5px; padding: 5px 7px; border: 1px solid transparent; border-radius: 6px; font-size: 11px; line-height: 1.45; font-weight: 600; max-width: 100%; text-align: left; }
+.cui-badge > svg { width: 15px; height: 15px; flex: 0 0 15px; margin-top: 0; }
+.cui-tone-low { background: #eef5f2; border-color: #cbded4; color: #345747; }
+.cui-tone-medium, .cui-site-mid { background: #fff5df; border-color: #ecd4a0; color: #7b4b05; }
+.cui-tone-high, .cui-tone-critical, .cui-site-poor { background: #fff0ed; border-color: #efc4bf; color: #a02620; }
+.cui-tone-unknown, .cui-site-unknown { background: #f0f3f7; border-color: #dbe1e9; color: #4e6078; }
+.cui-site-good { background: #eef5f0; border-color: #cbded0; color: #365a40; }
+.cui-risk-summary { margin: 10px 0; }
+.cui-policy-status { display: flex; align-items: flex-start; flex-direction: column; gap: 4px; }
+.cui-policy-status small { font-size: 11px; color: var(--muted); }
+.cui-concern-list { list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 8px; }
+.cui-concern-list > li { padding: 10px 12px; background: #fff8eb; border-left: 3px solid #c48b25; border-radius: 4px; }
+.cui-concern-list strong { display: block; font-size: 12px; color: #714a0c; }
+.cui-concern-list p { margin: 4px 0 0; font-size: 12px; }
+.cui-shopping-checks h4 { font-size: 12px; margin: 12px 0 4px; }
+.cui-shopping-checks ul, .cui-visible-concerns { padding-left: 18px; list-style: disc; }
+.cui-shopping-checks li, .cui-visible-concerns li { margin-top: 5px; }
+.cui-compare-table .cui-price-cell, .cui-offer-table .cui-price-cell { white-space: nowrap; overflow-wrap: normal; font-variant-numeric: tabular-nums; }
+.cui-offer-table th:first-child { width: 24%; }
+.cui-offer-table th:nth-child(2) { width: 23%; }
+.cui-offer-table th:nth-child(3) { width: 35%; }
+.cui-offer-table th:nth-child(4) { width: 18%; }
+.cui-table-badges { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; margin-top: 8px; }
+.cui-table-badges .cui-badge { font-size: 10px; padding: 4px 5px; }
+.cui-table-badges .cui-badge svg { width: 13px; height: 13px; flex-basis: 13px; }
+.cui-offer-table .cui-table-reasons { list-style: disc; margin: 7px 0 0; padding-left: 13px; font-size: 11px; color: var(--cui-danger-text); }
+.cui-table-reasons li + li { margin-top: 4px; }
+@media (min-width: 761px) {
+  .cui-offer-table .cui-price-cell { white-space: normal; }
+  .cui-offer-table .cui-price-cell .cui-money-amount { white-space: nowrap; }
+}
+
+.cui-money { display: inline-flex; flex-wrap: wrap; column-gap: 4px; row-gap: 0; max-width: 100%; font-variant-numeric: tabular-nums; }
+.cui-money .cui-money-amount { white-space: nowrap; overflow-wrap: normal; }
+
+@media (max-width: 600px) {
+  .cui-compare-table caption, .cui-offer-table caption { display: block; width: 100%; }
+}
