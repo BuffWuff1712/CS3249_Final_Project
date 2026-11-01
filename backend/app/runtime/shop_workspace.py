@@ -147,6 +147,60 @@ def record(s, events_before, proposals_before):
     meta(s)["history"] = [*meta(s)["history"], {"message_index": len(s.messages) - 1, "proposal_id": a.id, "activity": activity}][-30:]
 
 
+def suggested_reply(s, text):
+    """Explicit UI shortcuts use checked facts rather than model-generated commands."""
+    command = text.casefold()
+    if command == "cancel this task":
+        s.messages.append(Message(role="user", text=text))
+        cancel(s)
+        return True
+    if command not in ("show me some options", "find an alternative") or not s.recommendations:
+        return False
+    from .progress import step
+    with step("Comparing matching models and seller checks…", "Compared matching models and seller checks"):
+        offers = preview(s)
+        models = {}
+        for offer in offers:
+            if offer["decision"] != "BLOCK":
+                previous = models.get(offer["model_key"])
+                if previous is None or offer["product"]["price"] < previous["product"]["price"]:
+                    models[offer["model_key"]] = offer
+    s.messages.append(Message(role="user", text=text))
+    service.event(s, "user_message", "Suggested reply selected")
+    current = s.proposals[-1] if s.proposals and s.proposals[-1].status == "pending" else None
+    if command == "show me some options":
+        lines = []
+        for offer in list(models.values())[:3]:
+            p = offer["product"]
+            features = ", ".join(p["attributes"][:4]) or "No listed features supplied"
+            returns = (offer["merchant"] or {}).get("return_policy") or "Return terms not supplied"
+            status = "Needs your approval" if offer["decision"] == "REVIEW" else "Within checked policy limits"
+            lines.append(f"- {p['name']} — {p['currency']} {p['price']:.2f} from {p['merchant']}. Listed features: {features}. Returns: {returns} {status}.")
+        service.message(s, ("Here are matching models, showing the lowest-priced selectable offer for each:\n" + "\n".join(lines) + "\nUse the comparison on the right to inspect an offer. Your current selection and needs are unchanged; nothing has been purchased.") if lines else "No selectable offers match your saved needs. Your limits and selection are unchanged. You can edit your needs to explore other options.")
+        return True
+    alternative = next((offer for offer in models.values() if not current or offer["model_key"] != model_key(current.product)), None)
+    if alternative is None:
+        service.message(s, "I couldn't find another selectable model matching your saved needs. I kept your current offer and limits. Use Find another seller for the same model, or Change needs to broaden the comparison.")
+        return True
+    product_id = alternative["product"]["id"]
+    candidate = next(p for p in policy.search(s, limit=None) if p.id == product_id)
+    clear_selection(s)
+    events, proposals = len(s.events), len(s.proposals)
+    start = len(s.messages)
+    service.propose(s, candidate, recommendations=policy.search(s, limit=None))
+    fallback = " ".join(item.text for item in s.messages[start:])
+    del s.messages[start:]
+    change = f"A different model: {candidate.name} from {candidate.merchant}, {candidate.currency} {candidate.price:.2f}."
+    if current:
+        change += f" Previously: {current.product.name} from {current.product.merchant}, {current.product.currency} {current.product.price:.2f}."
+        if current.product.currency == candidate.currency:
+            difference = candidate.price - current.product.price
+            change += f" This is {candidate.currency} {abs(difference):.2f} {'more' if difference > 0 else 'less'}." if difference else " The price is unchanged."
+    service.message(s, change + "\n- Listed features: " + (", ".join(candidate.attributes) or "Not supplied") + "\n- " + fallback + "\nYour needs were kept. Any previous selection was cleared so you can review this alternative.")
+    record(s, events, proposals)
+    return True
+
+
 def message(s, text):
     text = text.strip()
     if not text:
@@ -160,6 +214,8 @@ def message(s, text):
         service.message(s, "I kept your current needs and selection. Please state the budget or seller preference you want to apply, or use the explicit needs and seller controls. A denied change does not authorize changing your limit.")
         s.suggestions = []
         service.event(s, "clarification", "Preserved constraints while clarifying a denied budget or seller change")
+        return
+    if suggested_reply(s, text):
         return
     before = s.model_copy(deep=True)
     events, proposals = len(s.events), len(s.proposals)
@@ -289,7 +345,7 @@ def cancel(s):
     service.invalidate(s)
     s.stage = "cancelled"
     service.event(s, "cancel", "Cancelled through explicit control")
-    service.message(s, "Cancelled. No pending proposal can be approved. Saved cart items remain available for separate review.")
+    service.message(s, "Shopping task cancelled. Nothing was purchased. Saved cart items remain available for separate review. Use Start fresh to begin a new search.")
     s.suggestions = []
 
 

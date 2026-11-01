@@ -314,8 +314,9 @@ def test_explicit_comparisons_attach_activity_before_the_whole_assistant_answer(
         previous_count = len(view["session"]["messages"])
         view = change(view, path, body)
         replies = view["session"]["messages"][previous_count:]
-        assert len(replies) == 1 and replies[0]["role"] == "assistant"
-        assert view["history"][-1]["message_index"] == previous_count
+        expected_roles = ["assistant"] if path == "compare" else ["user", "assistant"]
+        assert [reply["role"] for reply in replies] == expected_roles
+        assert view["history"][-1]["message_index"] == previous_count + len(replies) - 1
         assert view["history"][-1]["proposal_id"] == view["current"]["id"]
 
 
