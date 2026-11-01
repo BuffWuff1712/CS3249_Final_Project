@@ -393,11 +393,30 @@ def finish(s, proposal_id, fingerprint):
 
 def permissions(s, value):
     clear_selection(s)
+    # The offer the user was viewing, possibly one they switched to, is rechecked rather than re-searched.
+    current = s.proposals[-1] if s.recommendations and s.proposals and s.proposals[-1].status == "pending" else None
     service.invalidate(s)
     s.permissions = value
     s.stage = "ready"
     service.event(s, "permissions", "Permissions explicitly updated through controls")
-    service.message(s, "Permissions saved. Pending proposals were cleared; compare again. Cart items retain their original needs and use current permissions at checkout.")
+    candidates = policy.search(s, limit=None) if current else []
+    product = next((p for p in candidates if p.id == current.product.id), None)
+    if product is not None:
+        note = f"Permissions saved. I rechecked the offer you were viewing, {product.name} from {product.merchant}, under the new permissions."
+    else:
+        # A newly restricted merchant drops out of search; keep the model the user chose if another seller has it.
+        product = next((p for p in candidates if model_key(p) == model_key(current.product)), None) if current else None
+        if product is None:
+            service.message(s, "Permissions saved. Pending proposals were cleared; compare again. Cart items retain their original needs and use current permissions at checkout.")
+            return
+        note = f"Permissions saved. {current.product.merchant} is no longer allowed, so I kept the model you were viewing, {product.name}, from {product.merchant}."
+    events, proposals = len(s.events), len(s.proposals)
+    start = len(s.messages)
+    service.message(s, note)
+    service.propose(s, product, recommendations=candidates)
+    merge_reply(s, start)
+    s.messages[-1].text += " Cart items retain their original needs and use current permissions at checkout."
+    record(s, events, proposals)
 
 
 def cancel(s):

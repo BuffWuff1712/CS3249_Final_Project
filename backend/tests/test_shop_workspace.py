@@ -380,3 +380,32 @@ def test_another_product_keeps_other_sellers_available():
     view = change(view, "alternative")
     assert any(o["product"]["merchant_id"] == merchant for o in view["offers"])
     assert view["session"]["rejected_merchants"] == []
+
+
+def test_permissions_recheck_the_offer_the_user_switched_to():
+    view = searched()
+    first = view["current"]["product"]["id"]
+    view = change(view, "alternative")
+    switched = view["current"]["product"]["id"]
+    assert switched != first
+    permissions = copy.deepcopy(view["session"]["permissions"])
+    allowed = permissions["payment_methods"]
+    permissions["payment_methods"] = []
+    view = change(view, "permissions", {"permissions": permissions}, method="PUT")
+    assert view["current"]["product"]["id"] == switched
+    assert view["current"]["decision"] == "BLOCK"
+    assert "rechecked the offer you were viewing" in view["session"]["messages"][-1]["text"]
+    permissions["payment_methods"] = allowed
+    view = change(view, "permissions", {"permissions": permissions}, method="PUT")
+    assert view["current"]["product"]["id"] == switched and view["current"]["decision"] != "BLOCK"
+
+
+def test_restricting_the_current_seller_keeps_the_chosen_model():
+    view = proposed()
+    key, merchant = view["current_model_key"], view["current"]["product"]["merchant"]
+    permissions = copy.deepcopy(view["session"]["permissions"])
+    permissions["restricted_merchants"] = [merchant]
+    view = change(view, "permissions", {"permissions": permissions}, method="PUT")
+    assert view["current_model_key"] == key
+    assert view["current"]["product"]["merchant"] != merchant
+    assert "no longer allowed" in view["session"]["messages"][-1]["text"]
