@@ -25,9 +25,10 @@ test("priorities, fractional ratings, unique evidence and compact seller control
   const fractional = await current.locator(".cui-stars").first().locator(".cui-star-fill").last().evaluate(element => element.getBoundingClientRect().width);
   expect(fractional).toBeCloseTo(8.4, 1);
   await expect(current.locator(".cui-key-spec")).toHaveText("Up to 40 hours");
-  await current.getByText("View risk evidence", { exact: true }).press("Enter");
   await expect(current.getByText("Merchant and product information is inconsistent in the fixture.", { exact: true })).toHaveCount(1);
+  await expect(current.getByRole("region", { name: "Seller and listing concerns", exact: true })).toContainText("Conflicting information");
   await expect(current.getByText("Conflicting information", { exact: true })).toBeVisible();
+  await expect(current.getByRole("region", { name: "Seller and listing concerns", exact: true }).locator("details")).toHaveCount(0);
   await expect(current).toContainText("not proof of fraud or a safety guarantee");
   const sellers = page.getByRole("table", { name: "Compare sellers of this model", exact: true });
   const selected = sellers.getByRole("row", { name: "Seller offer Lion City Sports Hub", exact: true });

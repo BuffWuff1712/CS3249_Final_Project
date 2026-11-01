@@ -20,17 +20,16 @@ export function BackendRisk({ merchant, risk, decision, rules }: { merchant: Mer
   const detailChecks = decision === "BLOCK" ? checks.filter(rule => rule.decision !== "BLOCK") : checks;
   return <section aria-label="Merchant and website assessment" className="cui-backend-risk">
     <div className="cui-assessment-badges"><SiteBadge site={site} /><RiskBadge risk={risk} merchant /><PolicyBadge decision={decision} /></div>
+    <section className="cui-seller-concerns" aria-label="Seller and listing concerns"><h4>Seller / listing concerns</h4>
+      {concerns.length > 0 ? <ul className="cui-concern-list">{concerns.map(item => <li key={item.rule_id + item.evidence}><strong>{concernTitle(item.rule_id)}</strong><p>{readableRule(item.evidence)}</p></li>)}</ul> : <p className="cui-source">{risk?.explanation || "No assessment supplied; risk remains unknown."}</p>}
+    </section>
+    {decision === "BLOCK" && restrictions.length > 0 && <ul className="cui-visible-concerns">{restrictions.map(text => <li key={text}>{readableRule(text)}</li>)}</ul>}
     <aside className="cui-assessment-info" aria-label="About these checks"><InfoIcon aria-hidden="true" /><div><strong>About these checks</strong>
       <p>{site ? `${site.domain} · ${site.label}` : "No registered website assessment supplied."}</p>
       <p>{risk ? <>{risk.basis === "ai" ? "AI evidence review" : risk.basis === "rules_fallback" ? "Rules fallback; AI review unavailable" : "Rules-based assessment"}. An estimate, not proof of fraud or a safety guarantee.</> : "Merchant assessment unavailable; risk remains unknown."}</p>
       <p>{decision === "BLOCK" ? "This offer cannot be selected." : "Your explicit selection is required before simulated checkout."}</p>
     </div></aside>
-    {decision === "BLOCK" && restrictions.length > 0 && <ul className="cui-visible-concerns">{restrictions.map(text => <li key={text}>{readableRule(text)}</li>)}</ul>}
-    {risk && ["HIGH", "CRITICAL"].includes(risk.level) && concerns.length > 0 && <p className="cui-visible-concerns"><strong>Key concern: {concernTitle(concerns[0].rule_id)}</strong></p>}
-    <details><summary>View risk evidence</summary>
-      {concerns.length > 0 ? <ul className="cui-concern-list">{concerns.map(item => <li key={item.rule_id + item.evidence}><strong>{concernTitle(item.rule_id)}</strong><p>{readableRule(item.evidence)}</p></li>)}</ul> : <p>{risk?.explanation || "No assessment supplied; risk remains unknown."}</p>}
-      {detailChecks.length > 0 && <section className="cui-shopping-checks"><h4>Shopping restrictions and checks</h4><ul>{detailChecks.map(rule => <li key={rule.rule_id}>{readableRule(rule.explanation)}</li>)}</ul></section>}
-    </details>
+    {detailChecks.length > 0 && <details><summary>More assessment details</summary><section className="cui-shopping-checks"><h4>Shopping restrictions and checks</h4><ul>{detailChecks.map(rule => <li key={rule.rule_id}>{readableRule(rule.explanation)}</li>)}</ul></section></details>}
   </section>;
 }
 

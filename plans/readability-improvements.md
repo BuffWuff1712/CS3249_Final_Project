@@ -52,3 +52,7 @@ Regression: 6 desktop/mobile readability cases passed, including nine budget pre
 ## Follow-up: compact assessment presentation
 
 Added consistent list/battery/scales icons, grouped assessment badges above one About these checks info box, and removed the payment/data-sharing summary line at the user’s request. Policy decisions, source details and restrictions remain unchanged. TypeScript and whitespace checks passed before commit.
+
+## Follow-up: concerns visible by default
+
+Product review concerns remain separate from seller/listing concerns. Unique seller/listing evidence now appears directly below the assessment badges, without opening a dropdown. Additional shopping checks appear under More assessment details only when present; full product/seller sources remain available in the existing source disclosure. Six desktop/mobile readability cases and TypeScript passed, including a check that the inconsistency concern is visible once without opening details. This follow-up is included in the subsequent visible-concerns commit.

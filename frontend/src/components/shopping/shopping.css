@@ -491,3 +491,7 @@
 .cui-assessment-info > div { min-width: 0; }
 .cui-assessment-info strong { font-size: 11px; color: var(--ink); }
 .cui-assessment-info p { margin: 4px 0 0; font-size: 11px; line-height: 1.55; }
+
+.cui-seller-concerns { margin: 12px 0; }
+.cui-seller-concerns > h4 { margin: 0 0 6px; font-size: 12px; font-weight: 600; }
+.cui-seller-concerns .cui-concern-list { margin: 0; }
