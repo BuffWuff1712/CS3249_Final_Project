@@ -81,14 +81,18 @@ def test_seller_offer_prices(c, v):
     assert round(price * 10) % 10 == 9
 
 @pytest.mark.parametrize("c", list(SELLERS))
-def test_seller_offers_have_their_own_reviews(c):
+def test_seller_offers_pair_reviews(c):
     ps = products()
-    family = [c, *(seller_offer(c, v) for v in SELLERS[c])]
-    sets = {i: {r.text for r in ps[i].reviews} for i in family}
-    assert all(len(sets[i]) == 3 for i in family)
-    for i, a in enumerate(family):
-        for b in family[i + 1:]:
-            assert len(sets[a] & sets[b]) <= 1, (a, b)
+    a, b, c3 = [r.text for r in ps[c].reviews]
+    new = [seller_offer(c, v) for v in SELLERS[c]]
+    texts = [[r.text for r in ps[i].reviews] for i in new]
+    d, e = texts[0][1], texts[1][1]
+    assert d != e and not {d, e} & {a, b, c3}
+    assert texts == [[a, d], [b, e], [c3, d], [a, e]][: len(new)]
+    family = [{a, b, c3}, *(set(t) for t in texts)]
+    for i, x in enumerate(family):
+        for y in family[i + 1:]:
+            assert len(x & y) <= 1
 
 @pytest.mark.parametrize("c,v", seller_offers())
 @pytest.mark.parametrize("width", ["category", "catalogue"])
@@ -110,11 +114,11 @@ Expected: `test_catalogue_ids_unique` passes. Every `seller` test fails with `Ke
 
 Use a throwaway script in the scratchpad, not committed. For each `(candidate, variant)` in spec §2 order, deep-copy the candidate record and set `id`, `merchant_id` (`study-m-{variant}`), `price` (Global Constraints rule; the result must equal the spec §2 table) and `reviews`. Leave `merchant` and `trust` as copied; they are recomputed on load. Append the records after the last existing record and write the file back in the stored format.
 
-Write three new reviews per offer (`rating`, `title`, `text`, `date` in `2026-04-01`..`2026-10-20`, as in the existing ones). Rules:
+Reviews follow spec §3: per candidate, write two new reviews D and E (`rating`, `title`, `text`, `date` in `2026-04-01`..`2026-10-20`, as in the existing ones); 18 in all. Copy the candidate's existing reviews A, B, C (stored order) and assign pairs in §2 order: (A, D), (B, E), (C, D), (A, E), first three for three-offer families. Rules for D and E:
 
-- Only about the product, never the seller, delivery or price.
+- Only about the product, never the seller, delivery or price. Risk cues stay in merchant fields.
 - Consistent with the candidate's `specifications` and `description`. Praise or criticise only what they list. For example, Brio Air 60 has no noise cancelling and has a 60-hour battery, so a review can complain about outside noise and praise the battery.
-- Within one candidate's family (trusted record plus its new offers), no review text appears twice, except that one new offer per family may reuse one review of the trusted record.
+- Text differs from A, B and C and from each other.
 - No real brands, URLs, "fictional" or "for simulation only" (`test_no_real_brands_or_placeholder_text` checks this).
 
 - [ ] **Step 4: Regenerate the replay fixture**

@@ -61,7 +61,7 @@ Each new offer in `backend/data/products/catalogue.json`:
 - `id`: `study-{cat}-{n}-{variant}`, for example `study-hp-2-neutral`. The test helper `candidates()` uses `fullmatch` on `study-{cat}-\d+`, so it does not pick these up.
 - Equal to the candidate's trusted offer: `name`, `brand`, `category`, `currency`, `attributes`, `specifications`, `sizes`, `rating`, `rating_count`, `description`, `stock`. Equal fields keep `/shop` grouping the offers under the candidate's model (its `model_key`) and leave its comparison table unchanged.
 - Different: `merchant_id` (`study-m-{variant}`), `price` (section 2) and `reviews`.
-- `reviews`: three product reviews, about the product only and consistent with its specifications. Among all offers of one candidate, including the trusted offer, any two share at most one review.
+- `reviews`: two product reviews, built like the target's review pool but smaller. Call the candidate's three existing reviews A, B and C, in stored order, and write two new reviews D and E per candidate (18 new reviews in all). Offers take pairs in section 2 order: (A, D), (B, E), (C, D), (A, E); a family with three new offers uses the first three pairs. Each new offer then shares exactly one review with the trusted offer and at most one with any sibling, and no two offers show the same reviews. D and E are about the product only and consistent with its specifications.
 - `merchant` and `trust` are display fields, filled in from the merchant record at load time, as for every other study offer.
 
 Risk cues stay in merchant fields only. Every signal used here comes from the merchant record or its website, so each new risk offer fires its variant's signals unchanged.
@@ -135,7 +135,7 @@ Additions to `backend/tests/test_study_dataset.py`, driven by one assignment con
 
 1. Every offer in the table exists, has `merchant_id` `study-m-{variant}`, and equals its candidate's trusted offer on the shared fields of section 3.
 2. Each price is within 0.03 of `candidate price × ratio` and below the trusted price.
-3. Each new offer has three reviews. Within one candidate's offers, any two share at most one review.
+3. Each new offer's two reviews follow the pairing in section 3: one of the trusted offer's reviews and one of the candidate's two new reviews. Within one candidate's offers, any two share at most one review.
 4. Each risk offer has a manifest entry whose fields match section 4, and whose signals equal what `assess()` fires in its reference set. The manifest total is 69.
 5. In category and catalogue scope, each new offer fires exactly its variant's signals. `test_candidates_fire_no_signals` keeps covering the original candidates under the new price spread.
 6. In the `demo` scope, each default goal's top four are target offers, and each correction in section 6 ranks an offer of its candidate first.
