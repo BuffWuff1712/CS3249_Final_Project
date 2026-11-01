@@ -5,7 +5,7 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from app.runtime import service, storage, merchant_risk, merchants, research, gateway
+from app.runtime import service, storage, merchant_risk, merchants, research, gateway, policy
 from app.runtime.schemas import Session, Fact, Permissions, Action, Decision
 from app.runtime.policy import catalogue, evaluate, fingerprint
 
@@ -100,6 +100,40 @@ def test_risk_scenarios(client, id, decision):
     )
     assert response.status_code == (409 if decision == "BLOCK" else 200)
     assert not s["permissions"]["share_personal_data"]
+
+
+FORCED = "The seller shows a signal that always blocks checkout, so this offer is blocked."
+
+
+@pytest.mark.parametrize(
+    "id, text",
+    [
+        ("risk-b", "Seller risk is estimated high, so this offer needs your review before simulated checkout."),
+        ("risk-d", "Seller risk is estimated critical, so this offer is blocked."),
+        ("risk-c", FORCED),
+        ("risk-f", FORCED),
+    ],
+)
+def test_merchant_risk_rule_states_the_consequence(client, id, text):
+    a = scenario(client, id)["proposals"][-1]
+    rule = next(r for r in a["rules"] if r["rule_id"] == "merchant_risk")
+    assert rule["explanation"] == text != a["risk"]["explanation"]
+
+
+def test_user_facing_reasons_keep_the_assessment_once(client):
+    s = scenario(client, "risk-b")
+    a = s["proposals"][-1]
+    chat = next(m["text"] for m in reversed(s["messages"]) if " costs " in m["text"])
+    assert "so this offer needs your review" in chat
+    assert chat.count(a["risk"]["explanation"]) == 1
+    blocked = Action.model_validate(scenario(client, "risk-d")["proposals"][-1])
+    assert blocked.risk.explanation in policy.reasons(blocked, "BLOCK")
+
+
+def test_detailed_explanation_separates_signals_from_disclaimer(client):
+    risk = scenario(client, "risk-f")["proposals"][-1]["risk"]
+    signals = " ".join(e["evidence"] for e in risk["evidence"])
+    assert signals + " This is an uncertain assessment" in risk["explanation"]
 
 
 def test_low_price_alone_is_not_high_risk(client):

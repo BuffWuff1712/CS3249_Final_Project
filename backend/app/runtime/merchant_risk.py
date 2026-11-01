@@ -177,7 +177,7 @@ def score(merchant, evidence, config, force_block, basis):
     explanation = (
         f"{merchant.name}: {level.lower()} predicted risk from {basis}. "
         + (
-            " ".join(e.evidence for e in evidence)
+            " ".join(e.evidence for e in evidence) + " "
             if config.explanation_detail == "detailed"
             else f"{len(evidence)} signal(s) observed. "
         )

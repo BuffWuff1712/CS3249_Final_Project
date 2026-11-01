@@ -17,7 +17,7 @@ export function BackendRisk({ merchant, risk, decision, rules }: { merchant: Mer
     <p className={decision === "BLOCK" ? "cui-policy-block" : "cui-source"}>{decision === "BLOCK" ? <ProhibitIcon aria-hidden="true" /> : <InfoIcon aria-hidden="true" />} {decision === "BLOCK" ? "Unavailable under your shopping rules" : decision === "REVIEW" ? "Review and explicit approval required" : "Within checked policy limits; your explicit selection is still required"}</p>
     {decision !== "BLOCK" && risk && ["HIGH", "CRITICAL"].includes(risk.level) && <ul className="cui-visible-concerns">{risk.evidence.map(item => <li key={item.rule_id}>{item.evidence}</li>)}</ul>}
     {decision === "BLOCK" && <ul>{rules.filter(rule => rule.decision === "BLOCK").map(rule => <li key={rule.rule_id}>{readableRule(rule.explanation)}</li>)}</ul>}
-    <details><summary>View risk evidence</summary>{risk && <p>{risk.explanation}</p>}{risk?.evidence.length ? <ul>{risk.evidence.map(item => <li key={item.rule_id}>{item.evidence}</li>)}</ul> : <p>No configured risk signals were reported. This does not guarantee safety.</p>}{rules.length > 0 && <ul>{rules.map(rule => <li key={rule.rule_id}>{readableRule(rule.explanation)}</li>)}</ul>}</details>
+    <details><summary>View risk evidence</summary>{risk?.evidence.length ? <ul>{risk.evidence.map(item => <li key={item.rule_id}>{item.evidence}</li>)}</ul> : <p>No configured risk signals were reported. This does not guarantee safety.</p>}{rules.length > 0 && <ul>{rules.map(rule => <li key={rule.rule_id}>{readableRule(rule.explanation)}</li>)}</ul>}</details>
   </section>;
 }
 
