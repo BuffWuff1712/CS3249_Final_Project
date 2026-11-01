@@ -8,7 +8,7 @@ Related: [study dataset design](2026-10-21-study-dataset-design.md), [website re
 
 When a user corrects their needs during a demonstration, the recommendation moves from the study target to another product. Today every candidate product (`study-{cat}-1` onward) has one seller, the trusted store, so after a correction the user sees no risk at all.
 
-This change gives nine existing candidates additional sellers drawn from the existing study merchants: a clean small store plus low-to-medium risk stores, and one high-risk store per category. A new conversation-driven `demo` scenario shows only study data, so a demonstration can run one flow: state a need, see the target's risky sellers, correct the need, and see the new product's sellers, including risky ones.
+This change gives every existing candidate additional sellers drawn from the existing study merchants: a clean small store plus low-to-medium risk stores, and one high-risk store per category. It landed in two batches: nine candidates first, then the remaining eight (section 2.2). A new conversation-driven `demo` scenario shows only study data, so a demonstration can run one flow: state a need, see the target's risky sellers, correct the need, and see the new product's sellers, including risky ones.
 
 ### Out of scope
 
@@ -24,7 +24,7 @@ This change gives nine existing candidates additional sellers drawn from the exi
 |---|---|
 | Kind of correction | Only corrections that change the needs themselves (features, usage or budget). |
 | Product variety | Existing candidates are enough. No new models. |
-| Sellers | Existing study merchants only. Each chosen candidate gets `neutral`, two low-to-medium risk stores, and in one candidate per category a high-risk store. |
+| Sellers | Existing study merchants only. Each candidate gets `neutral`, two low-to-medium risk stores, and in one candidate per category a high-risk store. The second batch adds no high-risk store and favours variants the first batch used least. |
 | Excluded variants | `lowprice` and `benign` (their `low_price` signal needs a stable same-brand median), `lookalike` (its merchant flag claims a knockoff, which a genuine candidate is not), `concealed` (not requested). |
 | Prices | Candidate price times the variant's existing ratio, so a risky seller is cheaper than the trusted one, as for the target. |
 | Entry point | A `demo` scenario that lists every study product, opened from `/research`. |
@@ -48,6 +48,23 @@ The trusted offer of each candidate (`study-{cat}-{n}`) stays as it is. Prices r
 
 That is 30 new offers: 9 `neutral` and 21 risk offers. Bold marks the high-risk store in each category.
 
+### 2.2 Second batch
+
+The remaining eight candidates, approved after the first batch. Each gets `neutral` and two low-to-medium risk stores; the reviews follow section 3 with three offers per family.
+
+| Candidate | New offers (variant: price SGD) |
+|---|---|
+| `study-hp-4` Kestrel Flat S2, 37.9 | neutral 35.9, inconsistent 29.9, data-mid 29.9 |
+| `study-hp-5` Kestrel Stage IEM, 94.9 | neutral 89.9, site-bad 75.9, payment 75.9 |
+| `study-hp-6` Brio Desk Headset, 34.9 | neutral 32.9, site-fake 27.9, pressure 28.9 |
+| `study-rs-3` Summit Trek 2, 121.9 | neutral 114.9, data-mid 96.9, site-bad 96.9 |
+| `study-rs-5` Tread Flex Gym, 41.9 | neutral 38.9, payment 32.9, site-fake 32.9 |
+| `study-bp-3` Carta Carryall XL, 80.9 | neutral 75.9, inconsistent 63.9, site-bad 63.9 |
+| `study-bp-5` Fennec Clear Mesh, 26.9 | neutral 24.9, site-fake 20.9, returns 20.9 |
+| `study-bp-6` Fennec Student 18, 26.9 | neutral 24.9, data-mid 20.9, payment 20.9 |
+
+That is 24 more offers: 8 `neutral` and 16 risk offers, bringing the totals to 54 offers, 37 of them risk offers, and 16 more new reviews (34 in all). With both batches, `low_price` still fires only on the target `lowprice` and `benign` offers, and every ranking in section 6 is unchanged.
+
 `site-fake` sits on Arro Lift Neutral because its original trusted offer is also sold by Northline Outfitters, whose name `site-fake` copies on an imitation domain.
 
 ### 2.1 Low-price safety
@@ -68,7 +85,7 @@ Risk cues stay in merchant fields only. Every signal used here comes from the me
 
 ## 4. Manifest and Replay
 
-`backend/data/research/risk_offer_manifest.json` gains one entry per risk offer (21 entries; total 69). `neutral` offers get no entry, as now. The fields follow the existing entries:
+`backend/data/research/risk_offer_manifest.json` gains one entry per risk offer (21 entries in the first batch, 16 in the second; total 85). `neutral` offers get no entry, as now. The fields follow the existing entries:
 
 | Field | Value |
 |---|---|
@@ -136,7 +153,7 @@ Additions to `backend/tests/test_study_dataset.py`, driven by one assignment con
 1. Every offer in the table exists, has `merchant_id` `study-m-{variant}`, and equals its candidate's trusted offer on the shared fields of section 3.
 2. Each price is within 0.03 of `candidate price × ratio` and below the trusted price.
 3. Each new offer's two reviews follow the pairing in section 3: one of the trusted offer's reviews and one of the candidate's two new reviews. Within one candidate's offers, any two share at most one review.
-4. Each risk offer has a manifest entry whose fields match section 4, and whose signals equal what `assess()` fires in its reference set. The manifest total is 69.
+4. Each risk offer has a manifest entry whose fields match section 4, and whose signals equal what `assess()` fires in its reference set. The manifest total is 85.
 5. In category and catalogue scope, each new offer fires exactly its variant's signals. `test_candidates_fire_no_signals` keeps covering the original candidates under the new price spread.
 6. In the `demo` scope, each default goal's top four are target offers, and each correction in section 6 ranks an offer of its candidate first.
 7. The `demo` scenario lists exactly every `study-*` product. No other scenario lists a new offer.

@@ -323,3 +323,21 @@ Expected: the same failures as the Task 1 baseline and no new ones.
 git add backend/data/README.md docs/configuration-guide.md docs/data/2026-11-01-candidate-sellers-design.md
 git commit -m "docs: describe candidate sellers and the demo scenario"
 ```
+
+### Task 5: Second batch of candidate sellers (spec §2.2)
+
+**Files:**
+- Modify: `backend/data/products/catalogue.json` (append 24 records), `backend/data/replay/study_listings.json` (regenerated), `backend/data/research/risk_offer_manifest.json` (append 16 entries), `backend/data/README.md`
+- Test: `backend/tests/test_study_dataset.py`, `backend/tests/test_replay.py`
+
+**Interfaces:**
+- Consumes: `SELLERS`, `SELLER_RATIOS`, `seller_offer`, `seller_offers` (Task 1); every seller test is parametrized over `SELLERS`, so extending the constant extends the tests.
+
+- [ ] **Step 1: Extend the tests.** Append the eight §2.2 candidates to `SELLERS` in table order. In `test_seller_offers_complete` change 30 to 54; in `test_manifest_complete` change 69 to 85; in `test_replay.py` change the headphone replay count from 34 to 43.
+- [ ] **Step 2: Run them to verify they fail.** Run: `.venv/bin/python -m pytest tests/test_study_dataset.py tests/test_replay.py -q -p no:cacheprovider`. Expected: `KeyError` on `study-hp-4-neutral` and siblings, and the three count assertions fail.
+- [ ] **Step 3: Append the 24 records** with the Task 1 Step 3 script rules, including two new reviews D and E per candidate (16 in all) paired (A, D), (B, E), (C, D). Then regenerate the replay fixture.
+- [ ] **Step 4: Append the 16 manifest entries** with the Task 2 Step 3 rules.
+- [ ] **Step 4b: Extend `demo` `product_ids`** to every `study-*` ID in catalogue order; `test_demo_scenario_lists_every_study_product` fails until it does.
+- [ ] **Step 5: Run the tests to verify they pass**, including `test_demo_correction_ranks_candidate_sellers` unchanged. Then run the full suite and compare it with the baseline.
+- [ ] **Step 6: Update the README** "Candidate sellers" bullet to say every candidate has extra sellers.
+- [ ] **Step 7: Commit** the data, tests, README and both docs.

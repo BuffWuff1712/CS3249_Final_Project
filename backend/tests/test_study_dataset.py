@@ -154,6 +154,15 @@ SELLERS = {
     "study-bp-4": ["neutral", "pressure", "data-mid", "data-high"],
     "study-bp-2": ["neutral", "site-mid", "nobiz"],
     "study-bp-1": ["neutral", "returns", "payment"],
+    # Second batch (spec §2.2).
+    "study-hp-4": ["neutral", "inconsistent", "data-mid"],
+    "study-hp-5": ["neutral", "site-bad", "payment"],
+    "study-hp-6": ["neutral", "site-fake", "pressure"],
+    "study-rs-3": ["neutral", "data-mid", "site-bad"],
+    "study-rs-5": ["neutral", "payment", "site-fake"],
+    "study-bp-3": ["neutral", "inconsistent", "site-bad"],
+    "study-bp-5": ["neutral", "site-fake", "returns"],
+    "study-bp-6": ["neutral", "data-mid", "payment"],
 }
 SELLER_RATIOS = {
     "neutral": 0.95,
@@ -410,7 +419,7 @@ def test_no_real_brands_or_placeholder_text():
 
 def test_manifest_complete():
     entries = manifest()
-    assert len(entries) == 69
+    assert len(entries) == 85
     assert {e["category"] for e in entries.values()} == {"Headphones", "Running shoes", "Backpacks"}
 
 
@@ -499,7 +508,7 @@ def test_catalogue_ids_unique():
 
 def test_seller_offers_complete():
     ps = products()
-    assert len(seller_offers()) == 30
+    assert len(seller_offers()) == 54
     for c, v in seller_offers():
         o, base = ps[seller_offer(c, v)], ps[c]
         assert o.merchant_id == f"study-m-{v}" and base.merchant_id == "study-m-trusted"

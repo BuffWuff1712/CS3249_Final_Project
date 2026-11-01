@@ -866,7 +866,31 @@
       "study-bp-2-nobiz",
       "study-bp-1-neutral",
       "study-bp-1-returns",
-      "study-bp-1-payment"
+      "study-bp-1-payment",
+      "study-hp-4-neutral",
+      "study-hp-4-inconsistent",
+      "study-hp-4-data-mid",
+      "study-hp-5-neutral",
+      "study-hp-5-site-bad",
+      "study-hp-5-payment",
+      "study-hp-6-neutral",
+      "study-hp-6-site-fake",
+      "study-hp-6-pressure",
+      "study-rs-3-neutral",
+      "study-rs-3-data-mid",
+      "study-rs-3-site-bad",
+      "study-rs-5-neutral",
+      "study-rs-5-payment",
+      "study-rs-5-site-fake",
+      "study-bp-3-neutral",
+      "study-bp-3-inconsistent",
+      "study-bp-3-site-bad",
+      "study-bp-5-neutral",
+      "study-bp-5-site-fake",
+      "study-bp-5-returns",
+      "study-bp-6-neutral",
+      "study-bp-6-data-mid",
+      "study-bp-6-payment"
     ]
   }
 ]

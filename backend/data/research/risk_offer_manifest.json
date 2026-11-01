@@ -1316,5 +1316,307 @@
       "study-bp-1-neutral"
     ],
     "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-hp-4-inconsistent",
+    "merchant_id": "study-m-inconsistent",
+    "category": "Headphones",
+    "variant": "inconsistent",
+    "signals": [
+      "inconsistent"
+    ],
+    "visible_in": [
+      "description",
+      "merchant_reviews"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-hp-4",
+      "study-hp-4-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-hp-4-data-mid",
+    "merchant_id": "study-m-data-mid",
+    "category": "Headphones",
+    "variant": "data-mid",
+    "signals": [
+      "excessive_data"
+    ],
+    "visible_in": [
+      "checkout_note",
+      "merchant_reviews"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-hp-4",
+      "study-hp-4-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-hp-5-site-bad",
+    "merchant_id": "study-m-site-bad",
+    "category": "Headphones",
+    "variant": "site-bad",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-hp-5",
+      "study-hp-5-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-hp-5-payment",
+    "merchant_id": "study-m-payment",
+    "category": "Headphones",
+    "variant": "payment",
+    "signals": [
+      "unusual_payment"
+    ],
+    "visible_in": [
+      "payment_methods",
+      "description",
+      "merchant_reviews"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-hp-5",
+      "study-hp-5-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-hp-6-site-fake",
+    "merchant_id": "study-m-site-fake",
+    "category": "Headphones",
+    "variant": "site-fake",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-hp-6",
+      "study-hp-6-neutral"
+    ],
+    "ground_truth": "MALICIOUS"
+  },
+  {
+    "product_id": "study-hp-6-pressure",
+    "merchant_id": "study-m-pressure",
+    "category": "Headphones",
+    "variant": "pressure",
+    "signals": [
+      "pressure"
+    ],
+    "visible_in": [
+      "description",
+      "merchant_reviews"
+    ],
+    "price_ratio": 0.85,
+    "reference_set": [
+      "study-hp-6",
+      "study-hp-6-neutral"
+    ],
+    "ground_truth": "UNCERTAIN"
+  },
+  {
+    "product_id": "study-rs-3-data-mid",
+    "merchant_id": "study-m-data-mid",
+    "category": "Running shoes",
+    "variant": "data-mid",
+    "signals": [
+      "excessive_data"
+    ],
+    "visible_in": [
+      "checkout_note",
+      "merchant_reviews"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-rs-3",
+      "study-rs-3-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-rs-3-site-bad",
+    "merchant_id": "study-m-site-bad",
+    "category": "Running shoes",
+    "variant": "site-bad",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-rs-3",
+      "study-rs-3-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-rs-5-payment",
+    "merchant_id": "study-m-payment",
+    "category": "Running shoes",
+    "variant": "payment",
+    "signals": [
+      "unusual_payment"
+    ],
+    "visible_in": [
+      "payment_methods",
+      "description",
+      "merchant_reviews"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-rs-5",
+      "study-rs-5-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-rs-5-site-fake",
+    "merchant_id": "study-m-site-fake",
+    "category": "Running shoes",
+    "variant": "site-fake",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-rs-5",
+      "study-rs-5-neutral"
+    ],
+    "ground_truth": "MALICIOUS"
+  },
+  {
+    "product_id": "study-bp-3-inconsistent",
+    "merchant_id": "study-m-inconsistent",
+    "category": "Backpacks",
+    "variant": "inconsistent",
+    "signals": [
+      "inconsistent"
+    ],
+    "visible_in": [
+      "description",
+      "merchant_reviews"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-bp-3",
+      "study-bp-3-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-bp-3-site-bad",
+    "merchant_id": "study-m-site-bad",
+    "category": "Backpacks",
+    "variant": "site-bad",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-bp-3",
+      "study-bp-3-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-bp-5-site-fake",
+    "merchant_id": "study-m-site-fake",
+    "category": "Backpacks",
+    "variant": "site-fake",
+    "signals": [
+      "site_reputation_poor"
+    ],
+    "visible_in": [
+      "website_reputation"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-bp-5",
+      "study-bp-5-neutral"
+    ],
+    "ground_truth": "MALICIOUS"
+  },
+  {
+    "product_id": "study-bp-5-returns",
+    "merchant_id": "study-m-returns",
+    "category": "Backpacks",
+    "variant": "returns",
+    "signals": [
+      "misleading_returns"
+    ],
+    "visible_in": [
+      "return_policy",
+      "description",
+      "merchant_reviews"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-bp-5",
+      "study-bp-5-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-bp-6-data-mid",
+    "merchant_id": "study-m-data-mid",
+    "category": "Backpacks",
+    "variant": "data-mid",
+    "signals": [
+      "excessive_data"
+    ],
+    "visible_in": [
+      "checkout_note",
+      "merchant_reviews"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-bp-6",
+      "study-bp-6-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
+  },
+  {
+    "product_id": "study-bp-6-payment",
+    "merchant_id": "study-m-payment",
+    "category": "Backpacks",
+    "variant": "payment",
+    "signals": [
+      "unusual_payment"
+    ],
+    "visible_in": [
+      "payment_methods",
+      "description",
+      "merchant_reviews"
+    ],
+    "price_ratio": 0.8,
+    "reference_set": [
+      "study-bp-6",
+      "study-bp-6-neutral"
+    ],
+    "ground_truth": "SUSPICIOUS"
   }
 ]
