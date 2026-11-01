@@ -21,12 +21,16 @@ for (const suggestion of ["Show me some options", "Find an alternative", "Cancel
     expect(saved.session.receipts).toHaveLength(0);
     if (suggestion === "Show me some options") {
       await expect(response).toContainText("Here are matching models");
-      expect(await response.locator("li").count()).toBeGreaterThan(1);
+      const table = response.getByRole("table", { name: "Matching model options" });
+      await expect(table).toBeVisible();
+      expect(await table.locator("tbody tr").count()).toBeGreaterThan(1);
+      await expect(table.getByRole("columnheader")).toHaveText(["Model / seller", "Price", "Listed features", "Returns"]);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       expect(saved.current.id).toBe(baseline.current.id);
       expect(saved.selected).toBeTruthy();
       await expect(page.getByRole("button", { name: "Finish decision", exact: true })).toBeEnabled();
     } else if (suggestion === "Find an alternative") {
-      await expect(response).toContainText("A different model:");
+      await expect(response).toContainText("A different model to review:");
       await expect(response).toContainText(`Previously: ${baseline.current.product.name}`);
       expect(saved.current.product.name).not.toBe(baseline.current.product.name);
       expect(saved.current.decision).not.toBe("BLOCK");

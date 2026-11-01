@@ -39,7 +39,6 @@ function normalized(text: string) {
 export function MatchedPriorities({ product, brief }: { product: Product; brief: Record<string, Fact> }) {
   const requested = brief.features?.source === "confirmed" ? brief.features.value.split(",").map(value => value.trim()).filter(Boolean) : [];
   const attributes = new Set(product.attributes.map(normalized));
-  const matches = [...new Set(requested.filter(value => attributes.has(normalized(value))))];
   const unknown = requested.filter(value => !attributes.has(normalized(value)));
   const budget = brief.budget;
   const amount = Number(budget?.value);
@@ -55,8 +54,45 @@ export function MatchedPriorities({ product, brief }: { product: Product; brief:
   const budgetNote = validBudget && !sameCurrency
     ? `Budget match unconfirmed: offer is priced in ${product.currency}; your ${budgetKind} is ${budgetLabel}. No currency conversion is performed.`
     : validBudget && product.price > amount ? `Above your ${budgetLabel} ${budgetKind}${currencyAssumed ? " (currency assumed)" : ""}.` : "";
-  if (!requested.length && !validBudget) return null;
-  return <section className="cui-matched-priorities" aria-label="Priority matches"><h4>Matches your saved priorities</h4>{(budgetMatch || matches.length > 0) && <ul>{budgetMatch && <li><CheckCircleIcon weight="fill" aria-hidden="true" />{budgetMatch}</li>}{matches.map(match => <li key={match}><CheckCircleIcon weight="fill" aria-hidden="true" />{match}</li>)}</ul>}{budgetNote && <p className="cui-source">{budgetNote}</p>}{unknown.length > 0 && <p className="cui-source">Not established from listed features: {unknown.join(", ")}. Missing evidence does not mean a feature is absent.</p>}</section>;
+  type Match = { label: string; state: "match" | "unknown" | "mismatch"; required: boolean };
+  const chips: Match[] = [];
+  const add = (label: string, state: Match["state"], required: boolean) => chips.push({ label, state, required });
+  if (budgetMatch) add(budgetMatch, "match", budget.hard);
+  else if (budgetNote) add(sameCurrency ? "Above your budget" : "Budget match unconfirmed", sameCurrency ? "mismatch" : "unknown", budget.hard);
+  const size = brief.size;
+  if (size?.source === "confirmed" && size.value.trim()) {
+    const supplied = product.sizes.length > 0;
+    const available = product.sizes.includes(size.value.trim());
+    add(`Size ${size.value}: ${available ? "available" : supplied ? "unavailable" : "availability unknown"}`, available ? "match" : supplied ? "mismatch" : "unknown", true);
+  }
+  for (const [field, fact] of Object.entries(brief)) {
+    if (fact.source !== "confirmed" || !fact.value.trim() || ["budget", "size", "features"].includes(field)) continue;
+    if (!fact.hard && field !== "usage" && field !== "preferred_brands") continue;
+    const values = fact.value.split(",").map(normalized).filter(Boolean);
+    if (field === "category") add(`Category: ${fact.value}`, normalized(fact.value) === normalized(product.category) ? "match" : "mismatch", fact.hard);
+    else if (field === "currency") {
+      if (!validBudget) add(`Currency: ${fact.value}`, normalized(fact.value) === normalized(product.currency) ? "match" : "mismatch", fact.hard);
+    } else if (field === "preferred_brands" || field === "excluded_brands") {
+      const supplied = !!product.brand?.trim();
+      const included = supplied && values.includes(normalized(product.brand));
+      const match = field === "excluded_brands" ? !included : included;
+      add(field === "excluded_brands" ? `Excluded brands: ${!supplied ? "brand unknown" : included ? `${product.brand} is excluded` : "avoided"}` : `Brand: ${supplied ? product.brand : "unknown"}`, !supplied ? "unknown" : match ? "match" : "mismatch", fact.hard);
+    } else if (field === "merchants") {
+      const supplied = !!product.merchant?.trim();
+      add(`Seller: ${supplied ? product.merchant : "unknown"}`, !supplied ? "unknown" : values.includes(normalized(product.merchant)) ? "match" : "mismatch", fact.hard);
+    } else if (field === "usage") {
+      const listed = attributes.has(normalized(fact.value));
+      add(`For ${fact.value}: ${listed ? "listed" : "suitability unknown"}`, listed ? "match" : "unknown", fact.hard);
+    } else add(`${field.replaceAll("_", " ")}: ${fact.value} — not verified`, "unknown", fact.hard);
+  }
+  for (const value of [...new Set(requested)]) add(attributes.has(normalized(value)) ? value : `${value}: not established`, attributes.has(normalized(value)) ? "match" : "unknown", brief.features.hard);
+  chips.sort((a, b) => Number(b.required) - Number(a.required));
+  if (!chips.length && !budgetNote) return null;
+  return <section className="cui-matched-priorities" aria-label="Priority matches"><h4>How this matches your needs</h4><ul>{chips.map((chip, index) => {
+    const Icon = chip.state === "match" ? CheckCircleIcon : chip.state === "mismatch" ? ProhibitIcon : InfoIcon;
+    return <li key={index} className={`cui-constraint-${chip.state}`} title={chip.required ? "Required constraint" : "Preference"} aria-label={`${chip.required ? "Required" : "Preferred"}: ${chip.label}`}><Icon weight={chip.state === "match" ? "fill" : "regular"} aria-hidden="true" />{chip.label}</li>;
+  })}</ul>{budgetNote && <p className="cui-source">{budgetNote}</p>}{unknown.length > 0 && <p className="cui-source">Not established from listed features: {unknown.join(", ")}. Missing evidence does not mean a feature is absent.</p>}</section>;
+
 }
 
 export function concernTitle(id: string) {

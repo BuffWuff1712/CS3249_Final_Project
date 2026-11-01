@@ -1,8 +1,9 @@
 "use client";
+import type { ReactNode } from "react";
 import type { Action, Fact, Merchant, MerchantRisk, Product } from "@/lib/beany";
 import { MerchantDetails } from "@/components/MerchantDetails";
 import { money } from "@/lib/shopBackend";
-import { CheckCircleIcon, InfoIcon, ScalesIcon } from "./ShoppingIcons";
+import { CheckCircleIcon, InfoIcon, ScalesIcon, ShoppingCartIcon, StorefrontIcon, ArrowsLeftRightIcon } from "./ShoppingIcons";
 import { ListBulletsIcon } from "@phosphor-icons/react/dist/csr/ListBullets";
 import { BatteryHighIcon } from "@phosphor-icons/react/dist/csr/BatteryHigh";
 import { RatingStars, RiskBadge, SiteBadge, PolicyBadge, MatchedPriorities, uniqueConcerns, concernTitle, blockingReasons } from "./ShoppingReadability";
@@ -49,7 +50,7 @@ export function BackendProductEvidence({ product, merchant, replay = false }: { 
   </section>;
 }
 
-export function BackendCurrentOffer({ action, brief = {}, selected, disabled, selectionInvalid = false, select, seller, edit, addCart, reject, alternative, replay = false, evidenceId }: { action: Action; brief?: Record<string, Fact>; selected: boolean; disabled: boolean; selectionInvalid?: boolean; select: () => void; addCart: () => void; reject: () => void; alternative: () => void; seller: () => void; edit: () => void; replay?: boolean; evidenceId?: number }) {
+export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, selected, disabled, selectionInvalid = false, select, seller, addCart, alternative, replay = false, evidenceId }: { sellerPreferences?: ReactNode; action: Action; brief?: Record<string, Fact>; selected: boolean; disabled: boolean; selectionInvalid?: boolean; select: () => void; addCart: () => void; alternative: () => void; seller: () => void; replay?: boolean; evidenceId?: number }) {
   return <article className="cui-recommendation" aria-label="Current recommendation">
     <h2 className="cui-panel-title">Your current match</h2><div className="cui-product-heading"><h3>{action.product.name}</h3><div><strong>{money(action.product)}</strong><span>{action.product.merchant}</span></div></div>
     <MatchedPriorities product={action.product} brief={brief} />
@@ -65,8 +66,14 @@ export function BackendCurrentOffer({ action, brief = {}, selected, disabled, se
     </dl>
     {action.product.reviews?.find(review => review.rating <= 2) && <p className="cui-review-concern"><strong>Review concern:</strong> One supplied product excerpt says “{action.product.reviews.find(review => review.rating <= 2)!.text}” This does not establish a failure rate.</p>}
     <BackendRisk merchant={action.merchant_details} risk={action.risk} decision={action.decision} rules={action.rules} />
-    {selected ? <p className="cui-selected-label"><CheckCircleIcon weight="fill" aria-hidden="true" />Offer selected; no receipt created yet</p> : <button className="primary cui-select" disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={select}>Select this offer</button>}
-    <div className="cui-secondary-actions"><button disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={addCart}>Add to cart</button><button disabled={disabled} onClick={reject}>Reject offer</button><button disabled={disabled} onClick={alternative}>Find another merchant</button><button disabled={disabled} onClick={edit}>Change needs</button><button disabled={disabled} onClick={seller}>Find another seller</button></div>
+    <section className="cui-offer-actions" aria-label="Offer actions">
+      <div className="cui-offer-primary">
+        {selected ? <p className="cui-selected-label"><CheckCircleIcon weight="fill" aria-hidden="true" />Offer selected; no receipt created yet</p> : <button className="primary cui-select" disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={select}><CheckCircleIcon aria-hidden="true" />Select this offer</button>}
+        <button disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={addCart}><ShoppingCartIcon aria-hidden="true" />Add to cart</button>
+      </div>
+      <div className="cui-offer-explore"><h4>Explore alternatives</h4><div className="cui-actions"><button disabled={disabled} onClick={alternative}><StorefrontIcon aria-hidden="true" />Find another merchant</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div></div>
+      {sellerPreferences}
+    </section>
     <details key={evidenceId || 0} open={!!evidenceId}><summary>View comparison and sources</summary><BackendProductEvidence product={action.product} merchant={action.merchant_details} replay={replay} /></details>
   </article>;
 }

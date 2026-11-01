@@ -6,17 +6,18 @@ async function send(page: Page, text: string) {
   await page.getByRole("button", { name: "Send", exact: true }).click();
   await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
 }
-test("explicit reject, general alternative and cancellation preserve user control", async ({ page }) => {
+test("grouped offer actions, general alternative and cancellation preserve user control", async ({ page }) => {
   await ready(page); await send(page, "Find headphones under SGD200; no feature preference");
   const current = page.getByRole("article", { name: "Current recommendation" });
   const first = await current.getByRole("heading", { level: 3 }).innerText();
   await current.getByRole("button", { name: "Find another merchant", exact: true }).click();
   await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
   await expect(current).toBeVisible();
-  await current.getByRole("button", { name: "Reject offer", exact: true }).click();
-  await expect(current).toHaveCount(0);
-  await page.getByRole("button", { name: "Compare current needs" }).click();
-  await expect(current).toBeVisible();
+  await expect(current.getByRole("button", { name: "Reject offer", exact: true })).toHaveCount(0);
+  await expect(current.getByRole("button", { name: "Change needs", exact: true })).toHaveCount(0);
+  const actions = current.getByRole("region", { name: "Offer actions", exact: true });
+  await expect(actions.getByRole("button")).toHaveCount(6);
+  await expect(actions.locator("button svg")).toHaveCount(6);
   await page.getByRole("button", { name: "Select this offer", exact: true }).click();
   await expect(page.getByLabel("Selected offer", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Cancel this task", exact: true }).click();

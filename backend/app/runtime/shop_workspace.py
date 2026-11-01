@@ -169,14 +169,19 @@ def suggested_reply(s, text):
     service.event(s, "user_message", "Suggested reply selected")
     current = s.proposals[-1] if s.proposals and s.proposals[-1].status == "pending" else None
     if command == "show me some options":
-        lines = []
+        def cell(value):
+            return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\n", " ").replace("\r", " ")
+        rows = []
         for offer in list(models.values())[:3]:
             p = offer["product"]
-            features = ", ".join(p["attributes"][:4]) or "No listed features supplied"
-            returns = (offer["merchant"] or {}).get("return_policy") or "Return terms not supplied"
-            status = "Needs your approval" if offer["decision"] == "REVIEW" else "Within checked policy limits"
-            lines.append(f"- {p['name']} — {p['currency']} {p['price']:.2f} from {p['merchant']}. Listed features: {features}. Returns: {returns} {status}.")
-        service.message(s, ("Here are matching models, showing the lowest-priced selectable offer for each:\n" + "\n".join(lines) + "\nUse the comparison on the right to inspect an offer. Your current selection and needs are unchanged; nothing has been purchased.") if lines else "No selectable offers match your saved needs. Your limits and selection are unchanged. You can edit your needs to explore other options.")
+            features = ", ".join(p["attributes"][:4]) or "Not supplied"
+            returns = (offer["merchant"] or {}).get("return_policy") or "Not supplied"
+            rows.append("| " + " | ".join(cell(value) for value in (
+                f"{p['name']} · {p['merchant']}", f"{p['currency']} {p['price']:.2f}", features, returns)) + " |")
+        service.message(s, ("Here are matching models, showing the lowest-priced selectable offer for each:\n\n"
+                           + "| Model / seller | Price | Listed features | Returns |\n| --- | --- | --- | --- |\n"
+                           + "\n".join(rows)
+                           + "\n\nAll options require your approval before simulated checkout. Use the comparison panel to inspect the full offer and concerns.\n\nYour current selection and needs are unchanged. Nothing has been purchased.") if rows else "No selectable offers match your saved needs. Your limits and selection are unchanged. You can edit your needs to explore other options.")
         return True
     alternative = next((offer for offer in models.values() if not current or offer["model_key"] != model_key(current.product)), None)
     if alternative is None:
@@ -188,15 +193,26 @@ def suggested_reply(s, text):
     events, proposals = len(s.events), len(s.proposals)
     start = len(s.messages)
     service.propose(s, candidate, recommendations=policy.search(s, limit=None))
-    fallback = " ".join(item.text for item in s.messages[start:])
     del s.messages[start:]
-    change = f"A different model: {candidate.name} from {candidate.merchant}, {candidate.currency} {candidate.price:.2f}."
+    action = s.proposals[-1]
+    lines = ["A different model to review:",
+             f"- **New offer:** {candidate.name} · {candidate.currency} {candidate.price:.2f} · {candidate.merchant}"]
     if current:
-        change += f" Previously: {current.product.name} from {current.product.merchant}, {current.product.currency} {current.product.price:.2f}."
+        lines.append(f"- **Previously:** {current.product.name} · {current.product.currency} {current.product.price:.2f} · {current.product.merchant}")
         if current.product.currency == candidate.currency:
             difference = candidate.price - current.product.price
-            change += f" This is {candidate.currency} {abs(difference):.2f} {'more' if difference > 0 else 'less'}." if difference else " The price is unchanged."
-    service.message(s, change + "\n- Listed features: " + (", ".join(candidate.attributes) or "Not supplied") + "\n- " + fallback + "\nYour needs were kept. Any previous selection was cleared so you can review this alternative.")
+            price_change = f"{candidate.currency} {abs(difference):.2f} {'more' if difference > 0 else 'less'}" if difference else "Same price"
+            lines.append(f"- **Price change:** {price_change}.")
+    lines.append("- **Listed features:** " + (", ".join(candidate.attributes) or "Not supplied"))
+    if action.risk:
+        evidence = list(dict.fromkeys(item.evidence.strip() for item in action.risk.evidence if item.evidence.strip()))
+        lines.append(f"- **Seller risk:** {action.risk.level.lower()} estimate; not proof of fraud or a safety guarantee.")
+        lines.extend(f"- **Concern:** {item}" for item in evidence)
+    lines.extend(f"- **Restriction:** {rule.explanation}" for rule in action.rules
+                 if rule.decision != "ALLOW" and rule.rule_id not in ("approval", "merchant_risk"))
+    lines.append("\nReview the concerns, then use **Select this offer** if you want to proceed. Approval is required before simulated checkout.")
+    lines.append("\nYour needs are unchanged. Any previous selection was cleared. Nothing has been purchased.")
+    service.message(s, "\n".join(lines))
     record(s, events, proposals)
     return True
 
