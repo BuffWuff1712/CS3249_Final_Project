@@ -337,3 +337,83 @@ def test_negated_budget_edit_cannot_be_applied_by_a_wrong_model_interpretation(m
     assert view["session"]["brief"] == before["session"]["brief"]
     assert view["selected"] == before["selected"]
     assert view["session"]["cart"] == before["session"]["cart"]
+
+
+def selectable(view, key=None):
+    return {o["product"]["id"]: o["model_key"] for o in view["offers"]
+            if o["decision"] != "BLOCK" and (key is None or o["model_key"] == key)}
+
+
+def test_another_product_walks_every_model_before_repeating():
+    view = searched()
+    models = set(selectable(view).values())
+    shown = [view["current_model_key"]]
+    for _ in range(len(models) - 1):
+        view = change(view, "alternative")
+        assert view["current"]["decision"] != "BLOCK"
+        shown.append(view["current_model_key"])
+    assert len(set(shown)) == len(shown) == len(models)
+    view = change(view, "alternative")
+    assert view["current_model_key"] != shown[-1]
+    assert "seen all" in view["session"]["messages"][-1]["text"]
+
+
+def test_another_seller_walks_every_seller_before_repeating():
+    view = proposed()
+    key = view["current_model_key"]
+    sellers = selectable(view, key)
+    assert len(sellers) >= 3
+    shown = [view["current"]["product"]["id"]]
+    for _ in range(len(sellers) - 1):
+        view = change(view, "seller")
+        assert view["current_model_key"] == key
+        shown.append(view["current"]["product"]["id"])
+    assert len(set(shown)) == len(shown) == len(sellers)
+    view = change(view, "seller")
+    assert view["current"]["product"]["id"] != shown[-1]
+    assert "seen all" in view["session"]["messages"][-1]["text"]
+
+
+def test_another_product_keeps_other_sellers_available():
+    view = proposed()
+    merchant = view["current"]["product"]["merchant_id"]
+    view = change(view, "alternative")
+    assert any(o["product"]["merchant_id"] == merchant for o in view["offers"])
+    assert view["session"]["rejected_merchants"] == []
+
+
+def test_permissions_recheck_the_offer_the_user_switched_to():
+    view = searched()
+    first = view["current"]["product"]["id"]
+    view = change(view, "alternative")
+    switched = view["current"]["product"]["id"]
+    assert switched != first
+    permissions = copy.deepcopy(view["session"]["permissions"])
+    allowed = permissions["payment_methods"]
+    permissions["payment_methods"] = []
+    view = change(view, "permissions", {"permissions": permissions}, method="PUT")
+    assert view["current"]["product"]["id"] == switched
+    assert view["current"]["decision"] == "BLOCK"
+    assert "rechecked the offer you were viewing" in view["session"]["messages"][-1]["text"]
+    permissions["payment_methods"] = allowed
+    view = change(view, "permissions", {"permissions": permissions}, method="PUT")
+    assert view["current"]["product"]["id"] == switched and view["current"]["decision"] != "BLOCK"
+
+
+def test_restricting_the_current_seller_keeps_the_chosen_model():
+    view = proposed()
+    key, merchant = view["current_model_key"], view["current"]["product"]["merchant"]
+    permissions = copy.deepcopy(view["session"]["permissions"])
+    permissions["restricted_merchants"] = [merchant]
+    view = change(view, "permissions", {"permissions": permissions}, method="PUT")
+    assert view["current_model_key"] == key
+    assert view["current"]["product"]["merchant"] != merchant
+    assert "no longer allowed" in view["session"]["messages"][-1]["text"]
+
+
+def test_changing_category_in_needs_clears_needs_for_the_old_category():
+    view = change(create(), "messages", {"text": "Find running shoes for running under $150, size 10, cushioned"})
+    assert {"budget", "size", "features"} <= set(view["session"]["brief"])
+    view = change(view, "brief", {"field": "category", "fact": {"value": "Backpacks", "source": "confirmed", "hard": True}}, method="PUT")
+    assert set(view["session"]["brief"]) == {"category"}
+    assert "cleared" in view["session"]["messages"][-1]["text"]

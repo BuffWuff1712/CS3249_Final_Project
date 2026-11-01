@@ -10,7 +10,7 @@ test("grouped offer actions, general alternative and cancellation preserve user 
   await ready(page); await send(page, "Find headphones under SGD200; no feature preference");
   const current = page.getByRole("article", { name: "Current recommendation" });
   const first = await current.getByRole("heading", { level: 3 }).innerText();
-  await current.getByRole("button", { name: "Find another merchant", exact: true }).click();
+  await current.getByRole("button", { name: "Find another product", exact: true }).click();
   await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
   await expect(current).toBeVisible();
   await expect(current.getByRole("button", { name: "Reject offer", exact: true })).toHaveCount(0);

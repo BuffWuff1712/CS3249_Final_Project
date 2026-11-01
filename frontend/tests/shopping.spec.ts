@@ -73,7 +73,7 @@ test("study hard block supports reject and refine while preventing checkout and 
   await expect(current.getByRole("button", { name: "Add to cart", exact: true })).toBeDisabled();
   await expect(current.getByText("Blocked by backend policy", { exact: true })).toBeVisible();
   await expect(current.getByRole("button", { name: "Change needs", exact: true })).toBeEnabled();
-  await expect(current.getByRole("button", { name: "Find another merchant", exact: true })).toBeEnabled();
+  await expect(current.getByRole("button", { name: "Find another product", exact: true })).toBeEnabled();
   await current.getByRole("button", { name: "Reject offer", exact: true }).click();
   await expect(current).toHaveCount(0);
   const csv = await request.get(`${API}/research/sessions/${s.id}/export`, { headers: researchHeaders });
@@ -116,11 +116,11 @@ test("merchant evidence is public but hidden truth is research-only", async ({ p
   expect((await report.json()).metrics.fn).toBe(1);
 });
 
-test("risky offer can be replaced with another merchant without losing brief", async ({ page, request }) => {
+test("risky offer can be replaced with another product without losing brief", async ({ page, request }) => {
   const s = await study(request, "risk-i"); await ready(page, s.id);
   const current = page.getByRole("article", { name: "Current recommendation", exact: true });
   await expect(current).toContainText("Merchant risk: high estimate");
-  await current.getByRole("button", { name: "Find another merchant", exact: true }).click();
+  await current.getByRole("button", { name: "Find another product", exact: true }).click();
   await expect(current).toContainText("Demo Store");
   const result = await (await request.get(`${API}/sessions/${s.id}`)).json();
   expect(result.brief.budget.value).toBe("150");

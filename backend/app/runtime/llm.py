@@ -13,7 +13,7 @@ from .policy import reasons
 
 def checkout_controls(session):
     if session.experiment.get("shop_workspace"):
-        return "The shopping UI uses Select this offer (temporary selection), then Finish decision (explicit simulated checkout). Add to cart saves an item with its original needs across searches. Cart leads to Review checkout and Confirm simulated checkout for multiple items. Settings edits explicit permissions. Change needs edits the brief; Find another seller preserves only a provably identical model; Find another merchant may change products. Reject offer and Cancel shopping task never purchase. Chat cannot grant permissions, approve or finish."
+        return "The shopping UI uses Select this offer (temporary selection), then Finish decision (explicit simulated checkout). Add to cart saves an item with its original needs across searches. Cart leads to Review checkout and Confirm simulated checkout for multiple items. Settings edits explicit permissions. Change needs edits the brief; Find another seller preserves only a provably identical model; Find another product shows a different matching model. Reject offer and Cancel shopping task never purchase. Chat cannot grant permissions, approve or finish."
     return "For a suitable pending product ask whether to Add to cart or Proceed to checkout. Both lead to review, never claim an order occurred. Final approval happens on the checkout page using Confirm simulated checkout."
 
 
@@ -156,7 +156,7 @@ def mock_interpret(session, text):
             add("features", feature)
             break
     if re.search(r"unsure|don't know|dont know|no preference|not sure|no budget|no particular features|no feature preference", lower):
-        fields = (["features"] if "feature" in lower else ["budget"] if "budget" in lower else session.clarification_asked)
+        fields = [f for f, word in (("budget", "budget"), ("features", "feature")) if word in lower] or session.clarification_asked
         brief_fields = {"product_type": "category", "budget": "budget", "features": "features"}
         answers.extend(ClarificationAnswer(field=f, status="unknown", evidence=text) for f in fields
                        if not any(c.field == brief_fields[f] and c.source == "confirmed" for c in changes))
@@ -236,7 +236,7 @@ def explain_outcome(session):
             Make clear that checkout has not happened yet.
             - For blocked: explain the actual blocking reason in everyday language.
             Do not offer approval as a way around the block. Suggest an available next
-            step, such as refining the request or finding another merchant.
+            step, such as refining the request, finding another seller or finding another product.
             - For completed: explicitly say checkout was simulated. Do not imply a real
             payment, order, shipment, or delivery was created.
             - If information is missing, state the specific uncertainty without inventing

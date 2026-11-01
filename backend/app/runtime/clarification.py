@@ -56,6 +56,10 @@ def clarify_before_search(session, result, text):
     # An answer flag is not a usable search category, especially in older saved sessions.
     if not session.brief.get("category"):
         session.clarification_answers.pop("product_type", None)
+    # The type is asked once. A reply that still names none ("any shoes") searches the stated
+    # family; the narrower catalogue category stays suggested, never confirmed.
+    elif session.clarification_answers.get("product_type") == "missing" and "product_type" in session.clarification_asked:
+        session.clarification_answers["product_type"] = "unknown"
     missing = [field for field in FIELDS if session.clarification_answers.get(field) not in ("provided", "unknown")]
     if not missing:
         return None
