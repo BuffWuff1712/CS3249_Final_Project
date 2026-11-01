@@ -71,7 +71,7 @@ export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, sel
         {selected ? <p className="cui-selected-label"><CheckCircleIcon weight="fill" aria-hidden="true" />Offer selected; no receipt created yet</p> : <button className="primary cui-select" disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={select}><CheckCircleIcon aria-hidden="true" />Select this offer</button>}
         <button disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={addCart}><ShoppingCartIcon aria-hidden="true" />Add to cart</button>
       </div>
-      <div className="cui-offer-explore"><h4>Explore alternatives</h4><div className="cui-actions"><button disabled={disabled} onClick={alternative}><StorefrontIcon aria-hidden="true" />Find another merchant</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div></div>
+      <div className="cui-offer-explore"><div className="cui-actions"><button disabled={disabled} onClick={alternative}><StorefrontIcon aria-hidden="true" />Find another merchant</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div></div>
       {sellerPreferences}
     </section>
     <details key={evidenceId || 0} open={!!evidenceId}><summary>View comparison and sources</summary><BackendProductEvidence product={action.product} merchant={action.merchant_details} replay={replay} /></details>

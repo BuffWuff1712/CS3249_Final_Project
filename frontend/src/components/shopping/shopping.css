@@ -518,14 +518,14 @@
 }
 
 /* Consistent two-column action rows, with room for labels and touch targets. */
-.cui-offer-actions { display: grid; gap: 12px; margin: 16px 0; padding: 14px; border: 1px solid #d9e2f2; border-radius: 10px; background: #f7f9fe; }
+.cui-offer-actions { display: grid; gap: 12px; margin: 16px 0; padding: 14px; border: 0; border-radius: 10px; background: transparent; }
 .cui-offer-primary, .cui-offer-actions .cui-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; }
 .cui-offer-primary .cui-select { margin: 0; }
 .cui-offer-actions button { display: flex; justify-content: center; align-items: center; gap: 7px; width: 100%; min-height: 42px; padding: 9px 10px; font-size: 12px; line-height: 1.4; }
 .cui-offer-actions button svg { width: 17px; height: 17px; flex-shrink: 0; }
 .cui-offer-explore { display: grid; gap: 8px; }
 .cui-offer-explore h4 { margin: 0; font-size: 11px; color: var(--muted); }
-.cui-offer-actions .cui-seller-reason { display: grid; gap: 8px; margin: 0; padding: 12px 0 0; border-radius: 0; border-top: 1px solid #d9e2f2; background: transparent; }
+.cui-offer-actions .cui-seller-reason { display: grid; gap: 8px; margin: 0; padding: 12px 0 0; border-radius: 0; border-top: 0; background: transparent; }
 .cui-offer-actions .cui-seller-reason p { margin: 0; font-size: 11px; color: var(--muted); }
 .cui-offer-actions [aria-pressed="true"] { background: #e7eeff; border-color: #5476d6; color: #214caa; }
 .cui-offer-primary .cui-selected-label { margin: 0; font-size: 12px; }
