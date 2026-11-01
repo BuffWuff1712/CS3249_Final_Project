@@ -565,3 +565,72 @@ def test_seller_manifest_matches_engine(c, v):
 
 def test_neutral_sellers_have_no_manifest_entry():
     assert not any(seller_offer(c, "neutral") in manifest() for c in SELLERS)
+
+
+DEMO_CORRECTIONS = [  # (cat, features, budget, candidate, expected top four variants); spec §6
+    ("hp", "wireless, foldable, long-battery", 200, "study-hp-2", ["returns", "pressure", "neutral", None]),
+    ("hp", "wireless, microphone", 200, "study-hp-3", ["external", "site-mid", "payment", "neutral"]),
+    ("hp", "wireless, noise-cancelling, foldable", 300, "study-hp-1", ["nobiz", "site-bad", "neutral", None]),
+    ("rs", "trail", 180, "study-rs-2", ["inconsistent", "injection", "pressure", "neutral"]),
+    ("rs", "road, lightweight", 180, "study-rs-4", ["site-mid", "returns", "neutral", None]),
+    ("rs", "cushioned, road, responsive", 250, "study-rs-1", ["nobiz", "site-fake", "neutral", None]),
+    ("bp", "travel", 120, "study-bp-4", ["data-high", "data-mid", "pressure", "neutral"]),
+    ("bp", "laptop, lightweight", 120, "study-bp-2", ["site-mid", "nobiz", "neutral", None]),
+    ("bp", "laptop, water-resistant, rolling", 150, "study-bp-1", ["payment", "returns", "neutral", None]),
+]
+# None stands for the candidate's own trusted record.
+
+
+def demo_session(category, features, budget, hard_features=False):
+    return Session(
+        scenario_id="demo",
+        brief={
+            "category": Fact(value=category),
+            "budget": Fact(value=str(budget), hard=True),
+            "features": Fact(value=features, hard=hard_features),
+        },
+    )
+
+
+def demo_spec():
+    specs = json.loads((ROOT / "data/scenarios/scenarios.json").read_text(encoding="utf-8-sig"))
+    return next(s for s in specs if s["id"] == "demo")
+
+
+def test_demo_scenario_lists_every_study_product():
+    spec = demo_spec()
+    ids = spec["product_ids"]
+    assert len(ids) == len(set(ids))
+    assert set(ids) == {i for i in products() if i.startswith("study-")}
+    assert spec["trigger_product"] is None and spec["initial_brief"] == {} and spec["permissions"] == {}
+
+
+def test_no_other_scenario_lists_seller_offers():
+    specs = json.loads((ROOT / "data/scenarios/scenarios.json").read_text(encoding="utf-8-sig"))
+    new = {seller_offer(c, v) for c, v in seller_offers()}
+    assert all(not new & set(s.get("product_ids") or []) for s in specs if s["id"] != "demo")
+
+
+@pytest.mark.parametrize("cat", STUDY_CATEGORIES)
+def test_demo_default_goal_shows_only_the_target(cat):
+    s = demo_session(PINNED[cat]["category"], PINNED[cat]["features"], PINNED[cat]["budget"])
+    top = [p.id for p in search(s)]
+    assert len(top) == 4 and all(i.startswith(f"study-{cat}-target-") for i in top)
+
+
+@pytest.mark.parametrize("cat,features,budget,c,expected", DEMO_CORRECTIONS)
+def test_demo_correction_ranks_candidate_sellers(cat, features, budget, c, expected):
+    s = demo_session(PINNED[cat]["category"], features, budget)
+    assert [p.id for p in search(s)] == [seller_offer(c, v) if v else c for v in expected]
+
+
+def test_demo_hard_feature_correction_matches_soft():
+    soft = demo_session("Headphones", "wireless, microphone", 200)
+    hard = demo_session("Headphones", "wireless, microphone", 200, hard_features=True)
+    assert [p.id for p in search(hard)][0] == [p.id for p in search(soft)][0] == "study-hp-3-external"
+
+
+def test_demo_rejecting_first_seller_keeps_the_product():
+    s = demo_session("Headphones", "wireless, microphone", 200)
+    s.rejected_merchants = ["study-m-external"]
+    assert search(s)[0].id == "study-hp-3-site-mid"
