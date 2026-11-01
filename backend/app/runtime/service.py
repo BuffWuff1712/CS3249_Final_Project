@@ -1,7 +1,7 @@
 import json, os, re
 from pathlib import Path
 from .schemas import Session, Message, Event, Fact, Action, Receipt, Approval
-from .policy import FIELDS, search, catalogue, evaluate, fingerprint
+from .policy import FIELDS, search, catalogue, evaluate, fingerprint, reasons
 from .llm import OpenAIConversation, explain_outcome
 from .merchants import merchant_for
 from .merchant_risk import load_config, digest
@@ -181,7 +181,7 @@ def propose(s, product=None, *, recommendations=None, **kwargs):
                     "merchant_id": a.product.merchant_id,
                     "risk": a.risk.model_dump() if a.risk else None,
                     "decision": a.decision,
-                    "warning": " ".join(r.explanation for r in a.rules),
+                    "warning": reasons(a),
                 }
             ),
         )
@@ -191,7 +191,7 @@ def propose(s, product=None, *, recommendations=None, **kwargs):
     message(
         s,
         f"{product.name} costs {product.currency} {product.price:.2f}. "
-        + " ".join(r.explanation for r in a.rules),
+        + reasons(a),
     )
     if a.decision != "BLOCK":
         message(s, "Use Select this offer to save this proposal, then Finish decision to explicitly confirm simulated checkout. Or use Add to cart to save items across searches and review them together in Cart. Nothing has been purchased." if s.experiment.get("shop_workspace") else "Would you like to add this to your cart or proceed to checkout? You can review your items before confirming simulated checkout.")

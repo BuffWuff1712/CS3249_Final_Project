@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 from .gateway import LLMError, structured_call
 from .shopping_tools import supported_categories, search_vocabulary
+from .policy import reasons
 
 
 def checkout_controls(session):
@@ -131,7 +132,7 @@ def mock_interpret(session, text):
         if current and current.status == "pending" and not any(
             item.action.id == current.id for item in session.cart
         ):
-            question = " ".join(r.explanation for r in current.rules) or "No policy concerns were reported for this item."
+            question = reasons(current) or "No policy concerns were reported for this item."
         else:
             question = "What would you like me to explain?"
     elif not category:

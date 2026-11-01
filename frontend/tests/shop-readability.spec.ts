@@ -6,7 +6,7 @@ test("priorities, fractional ratings, unique evidence and compact seller control
   const searched = await (await request.post(`${API}/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200; no feature preference" } })).json();
   const edited = await (await request.put(`${API}/${created.session.id}/brief`, { data: { revision: searched.revision, field: "features", fact: { value: "wireless, noise cancellation, long battery", source: "confirmed", hard: false } } })).json();
   const compared = await (await request.post(`${API}/${created.session.id}/compare`, { data: { revision: edited.revision } })).json();
-  const lion = compared.offers.find((offer: { product: { merchant: string } }) => offer.product.merchant === "Lion City Sports Hub");
+  const lion = compared.offers.find((offer: { product: { id: string } }) => offer.product.id === "study-hp-target-inconsistent");
   expect(lion).toBeTruthy();
   const proposed = await request.post(`${API}/${created.session.id}/propose`, { data: { revision: compared.revision, product_id: lion.product.id } });
   expect(proposed.ok()).toBeTruthy();

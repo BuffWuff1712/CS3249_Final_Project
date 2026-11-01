@@ -65,6 +65,13 @@ Explicit upper limits (under, at most, never exceed) are hard; ideally/around ar
 Excluded brands remain exclusions. Budget is a numeric string; currency is SGD or USD.
 A bare $ or missing currency does not confirm either currency: suggest SGD for this
 Singapore study. Brands/features/merchants use comma-separated values.
+Search matches features and sizes literally against search_vocabulary for the category.
+When a requested feature means the same as a listed spelling, use that exact spelling
+(e.g. "noise cancelling" or "ANC" -> noise-cancelling, "waterproof" -> water-resistant).
+Keep the user's words as evidence. If no listed spelling has the same meaning, keep the
+user's wording; never substitute a different feature. Put where or why the item is used
+(commute, university, gym) in usage, not in features. Sizes must be one listed value
+without prefixes or units (e.g. "EU 42" -> 42).
 In catalogue mode, map to supported_categories (bags/backpacks to Backpacks). Explain if
 none fits; never force an unrelated category. With browser_use, categories are open-ended
 even if supported_categories is empty. Catalogue records are fictional; live web listings
