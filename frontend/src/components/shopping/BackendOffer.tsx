@@ -3,9 +3,10 @@ import type { ReactNode } from "react";
 import type { Action, Fact, Merchant, MerchantRisk, Product } from "@/lib/beany";
 import { MerchantDetails } from "@/components/MerchantDetails";
 import { money } from "@/lib/shopBackend";
-import { CheckCircleIcon, InfoIcon, ScalesIcon, ShoppingCartIcon, StorefrontIcon, ArrowsLeftRightIcon } from "./ShoppingIcons";
+import { CheckCircleIcon, InfoIcon, ScalesIcon, ShoppingCartIcon, ArrowsLeftRightIcon } from "./ShoppingIcons";
 import { ListBulletsIcon } from "@phosphor-icons/react/dist/csr/ListBullets";
 import { BatteryHighIcon } from "@phosphor-icons/react/dist/csr/BatteryHigh";
+import { PackageIcon } from "@phosphor-icons/react/dist/csr/Package";
 import { RatingStars, RiskBadge, SiteBadge, PolicyBadge, MatchedPriorities, uniqueConcerns, concernTitle, blockingReasons } from "./ShoppingReadability";
 
 export function readableRule(explanation: string) {
@@ -71,7 +72,7 @@ export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, sel
         {selected ? <p className="cui-selected-label"><CheckCircleIcon weight="fill" aria-hidden="true" />Offer selected; no receipt created yet</p> : <button className="primary cui-select" disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={select}><CheckCircleIcon aria-hidden="true" />Select this offer</button>}
         <button disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={addCart}><ShoppingCartIcon aria-hidden="true" />Add to cart</button>
       </div>
-      <div className="cui-offer-explore"><div className="cui-actions"><button disabled={disabled} onClick={alternative}><StorefrontIcon aria-hidden="true" />Find another merchant</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div></div>
+      <div className="cui-offer-explore"><div className="cui-actions"><button disabled={disabled} onClick={alternative}><PackageIcon aria-hidden="true" />Find another product</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div></div>
       {sellerPreferences}
     </section>
     <details key={evidenceId || 0} open={!!evidenceId}><summary>View comparison and sources</summary><BackendProductEvidence product={action.product} merchant={action.merchant_details} replay={replay} /></details>

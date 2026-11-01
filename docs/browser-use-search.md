@@ -54,7 +54,7 @@ which replayed study listings leave empty, so every offer comes out LOW.
 
 A replay search returns every fixture listing in the brief's category whose name, brand, category,
 description or attributes contain all search words. Only the top four appear as recommendations;
-**Find another merchant** moves through the remaining offers. The supported categories come from the
+**Find another product** and **Find another seller** move through the remaining models and sellers. The supported categories come from the
 fixture (Headphones, Running shoes and Backpacks for the study data). Fixture hosts use reserved
 `.test` domains, which are accepted only in replay sessions.
 
@@ -139,7 +139,7 @@ Browser Use reads only the product page plus the seller and return-policy pages 
 same retailer. Images, review lists, other websites and price research are out of scope. Every field is
 optional: a blank field means "not visible", and is neither a risk signal nor evidence of safety. Null
 or overlong values are blanked or clipped instead of failing the run; links outside the retailer list are
-dropped. A named seller becomes its own merchant ID, so "Find another merchant" excludes that seller
+dropped. A named seller becomes its own merchant ID, so asking in chat for another merchant excludes that seller
 rather than the whole retailer. This extra browsing raises the cost and duration of each run.
 
 When a live product is proposed, `runtime/risk_agent.py` makes one call to the configured model. It

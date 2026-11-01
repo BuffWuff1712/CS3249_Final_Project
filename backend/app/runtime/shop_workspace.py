@@ -156,15 +156,7 @@ def suggested_reply(s, text):
         return True
     if command not in ("show me some options", "find an alternative") or not s.recommendations:
         return False
-    from .progress import step
-    with step("Comparing matching models and seller checks…", "Compared matching models and seller checks"):
-        offers = preview(s)
-        models = {}
-        for offer in offers:
-            if offer["decision"] != "BLOCK":
-                previous = models.get(offer["model_key"])
-                if previous is None or offer["product"]["price"] < previous["product"]["price"]:
-                    models[offer["model_key"]] = offer
+    models = selectable_models(s)
     s.messages.append(Message(role="user", text=text))
     service.event(s, "user_message", "Suggested reply selected")
     current = s.proposals[-1] if s.proposals and s.proposals[-1].status == "pending" else None
@@ -183,19 +175,58 @@ def suggested_reply(s, text):
                            + "\n".join(rows)
                            + "\n\nAll options require your approval before simulated checkout. Use the comparison panel to inspect the full offer and concerns.\n\nYour current selection and needs are unchanged. Nothing has been purchased.") if rows else "No selectable offers match your saved needs. Your limits and selection are unchanged. You can edit your needs to explore other options.")
         return True
-    alternative = next((offer for offer in models.values() if not current or offer["model_key"] != model_key(current.product)), None)
-    if alternative is None:
-        service.message(s, "I couldn't find another selectable model matching your saved needs. I kept your current offer and limits. Use Find another seller for the same model, or Change needs to broaden the comparison.")
-        return True
+    if not different_model(s, models, current):
+        service.message(s, NO_OTHER_MODEL)
+    return True
+
+
+NO_OTHER_MODEL = "I couldn't find another selectable model matching your saved needs. I kept your current offer and limits. Use Find another seller for the same model, or Change needs to broaden the comparison."
+
+
+def selectable_models(s):
+    """The lowest-priced selectable offer of each matching model, in search order."""
+    from .progress import step
+    with step("Comparing matching models and seller checks…", "Compared matching models and seller checks"):
+        models = {}
+        for offer in preview(s):
+            if offer["decision"] != "BLOCK":
+                previous = models.get(offer["model_key"])
+                if previous is None or offer["product"]["price"] < previous["product"]["price"]:
+                    models[offer["model_key"]] = offer
+    return models
+
+
+def browsed(s):
+    """Models and sellers already shown by repeated browsing under the current needs."""
+    state = meta(s)
+    needs = json.dumps({field: fact.model_dump() for field, fact in s.brief.items()}, sort_keys=True)
+    if state.get("browsed", {}).get("needs") != needs:
+        state["browsed"] = {"needs": needs, "models": [], "sellers": {}}
+    return state["browsed"]
+
+
+def different_model(s, models, current):
+    """Propose the next model not yet shown, so repeated requests never bounce between two."""
+    seen = browsed(s)
+    current_key = model_key(current.product) if current else None
+    others = [offer for offer in models.values() if offer["model_key"] != current_key]
+    if not others:
+        return False
+    fresh = [offer for offer in others if offer["model_key"] not in seen["models"] + [current_key]]
+    seen["models"] = ([current_key] if current_key else []) + (seen["models"] if fresh else [])
+    alternative = (fresh or others)[0]
+    seen["models"].append(alternative["model_key"])
     product_id = alternative["product"]["id"]
     candidate = next(p for p in policy.search(s, limit=None) if p.id == product_id)
     clear_selection(s)
     events, proposals = len(s.events), len(s.proposals)
+    if current:
+        service.event(s, "alternative", current.id)
     start = len(s.messages)
     service.propose(s, candidate, recommendations=policy.search(s, limit=None))
     del s.messages[start:]
     action = s.proposals[-1]
-    lines = ["A different model to review:",
+    lines = ["A different model to review:" if fresh else f"You have now seen all {len(others) + bool(current)} matching models, so this starts again from the first:",
              f"- **New offer:** {candidate.name} · {candidate.currency} {candidate.price:.2f} · {candidate.merchant}"]
     if current:
         lines.append(f"- **Previously:** {current.product.name} · {current.product.currency} {current.product.price:.2f} · {current.product.merchant}")
@@ -264,6 +295,7 @@ def compare(s):
         raise ValueError("Choose a product category before comparing.")
     clear_selection(s)
     service.invalidate(s)
+    meta(s).pop("browsed", None)
     events, proposals = len(s.events), len(s.proposals)
     outcome = run_shopping(s)
     if outcome.status != "proposed":
@@ -315,8 +347,20 @@ def another_seller(s, preference=None):
         period = int(days.group(1)) if days else -1
         price = offer["product"]["price"]
         return (price,) if meta(s)["seller_preference"] == "lowest price" else (-period, price)
-    chosen = sorted(candidates, key=rank)[0]
+    candidates = sorted(candidates, key=rank)
+    # Walk sellers in rank order; ranking from scratch each time would bounce between the top two.
+    seen = browsed(s)["sellers"]
+    if preference is not None:
+        fresh = candidates
+        seen[key] = []
+    else:
+        fresh = [o for o in candidates if o["product"]["id"] not in seen.get(key, []) + [current.product.id]]
+        seen[key] = [current.product.id] + (seen.get(key, []) if fresh else [])
+    chosen = (fresh or candidates)[0]
+    seen[key].append(chosen["product"]["id"])
     propose(s, chosen["product"]["id"])
+    if not fresh:
+        s.messages[-1].text += f" You have now seen all {len(candidates) + 1} eligible sellers of this model, so this starts again from the top-ranked one."
     s.messages[-1].text += " Kept the exact product model and variant while comparing eligible sellers. Return terms are supplied catalogue claims; eligibility and exclusions still need review."
 
 
@@ -374,12 +418,12 @@ def reject(s, proposal_id, fingerprint):
 
 
 def alternative(s):
-    events, proposals = len(s.events), len(s.proposals)
-    clear_selection(s)
-    start = len(s.messages)
-    service.alternative(s)
-    merge_reply(s, start)
-    record(s, events, proposals)
+    """Find another product: a different model, never another seller of the same one."""
+    if not s.recommendations:
+        raise ValueError("Compare a product before finding another one.")
+    current = s.proposals[-1] if s.proposals and s.proposals[-1].status == "pending" else None
+    if not different_model(s, selectable_models(s), current):
+        raise ValueError(NO_OTHER_MODEL)
 
 
 def add_cart(s, proposal_id, fingerprint):
