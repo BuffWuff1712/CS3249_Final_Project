@@ -37,4 +37,18 @@ After: `plans/verification/readability-improvements/`:
 
 Source limits remain explicit: a listed battery duration is not automatically a confirmed fit for commuting; unknown ratings/assessments stay unknown; the generic inconsistency signal does not identify particular conflicting fields. The UI does not invent them.
 
-Code changes are local and uncommitted. The local preview is running with mock conversation, local catalogue and an isolated audit database.
+Readability changes were committed locally as `7e2380a`. The local preview is running with mock conversation, local catalogue and an isolated audit database.
+
+## Follow-up: duplicate cancellation control
+
+Removed the bottom idle Cancel shopping task control, retaining the suggested Cancel this task action and Stop during active requests. Updated affected cancellation selectors. The existing reject/alternative/cancellation journey passed on desktop and mobile (2 cases). This follow-up is included in the subsequent UI-polish commit.
+
+## Follow-up: budget match highlights
+
+Added price/budget to the same match area, including offers with no feature preferences. Confirmed hard limits and preferred targets use distinct wording. Equal-to-limit offers count as within budget; above-budget and different-currency offers receive explanatory text rather than a positive match chip. Missing, invalid or unconfirmed budgets do not produce a match. The needs strip's existing SGD currency default is explicitly labelled “currency assumed” unless currency is confirmed.
+
+Regression: 6 desktop/mobile readability cases passed, including nine budget presentation states (within, equal, preferred, above, currency mismatch, assumed currency, suggested budget, invalid and missing), alongside existing rating/evidence/selection checks. These UI edge states use controlled saved-brief fixtures; backend policy was not changed.
+
+## Follow-up: compact assessment presentation
+
+Added consistent list/battery/scales icons, grouped assessment badges above one About these checks info box, and removed the payment/data-sharing summary line at the user’s request. Policy decisions, source details and restrictions remain unchanged. TypeScript and whitespace checks passed before commit.

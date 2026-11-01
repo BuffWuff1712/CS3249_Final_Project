@@ -2,7 +2,8 @@
 import type { Action, Fact, Merchant, MerchantRisk, Product } from "@/lib/beany";
 import { MerchantDetails } from "@/components/MerchantDetails";
 import { money } from "@/lib/shopBackend";
-import { CheckCircleIcon } from "./ShoppingIcons";
+import { CheckCircleIcon, InfoIcon, ScalesIcon } from "./ShoppingIcons";
+import { ListBulletsIcon } from "@phosphor-icons/react/dist/csr/ListBullets";
 import { BatteryHighIcon } from "@phosphor-icons/react/dist/csr/BatteryHigh";
 import { RatingStars, RiskBadge, SiteBadge, PolicyBadge, MatchedPriorities, uniqueConcerns, concernTitle, blockingReasons } from "./ShoppingReadability";
 
@@ -18,9 +19,12 @@ export function BackendRisk({ merchant, risk, decision, rules }: { merchant: Mer
   const restrictions = blockingReasons(checks, risk);
   const detailChecks = decision === "BLOCK" ? checks.filter(rule => rule.decision !== "BLOCK") : checks;
   return <section aria-label="Merchant and website assessment" className="cui-backend-risk">
-    <div className="cui-site"><SiteBadge site={site} /><p>{site ? `${site.domain} · ${site.label}` : "No registered website assessment supplied."}</p></div>
-    <div className="cui-risk-summary"><RiskBadge risk={risk} merchant /><small>{risk?.basis === "ai" ? "AI evidence review" : risk?.basis === "rules_fallback" ? "Rules fallback; AI review unavailable" : risk ? "Rules-based assessment" : "Assessment unavailable"}. An estimate, not proof of fraud or a safety guarantee.</small></div>
-    <p className="cui-policy-status"><PolicyBadge decision={decision} /><small>{decision === "BLOCK" ? "This offer cannot be selected." : "Your explicit selection is required before simulated checkout."}</small></p>
+    <div className="cui-assessment-badges"><SiteBadge site={site} /><RiskBadge risk={risk} merchant /><PolicyBadge decision={decision} /></div>
+    <aside className="cui-assessment-info" aria-label="About these checks"><InfoIcon aria-hidden="true" /><div><strong>About these checks</strong>
+      <p>{site ? `${site.domain} · ${site.label}` : "No registered website assessment supplied."}</p>
+      <p>{risk ? <>{risk.basis === "ai" ? "AI evidence review" : risk.basis === "rules_fallback" ? "Rules fallback; AI review unavailable" : "Rules-based assessment"}. An estimate, not proof of fraud or a safety guarantee.</> : "Merchant assessment unavailable; risk remains unknown."}</p>
+      <p>{decision === "BLOCK" ? "This offer cannot be selected." : "Your explicit selection is required before simulated checkout."}</p>
+    </div></aside>
     {decision === "BLOCK" && restrictions.length > 0 && <ul className="cui-visible-concerns">{restrictions.map(text => <li key={text}>{readableRule(text)}</li>)}</ul>}
     {risk && ["HIGH", "CRITICAL"].includes(risk.level) && concerns.length > 0 && <p className="cui-visible-concerns"><strong>Key concern: {concernTitle(concerns[0].rule_id)}</strong></p>}
     <details><summary>View risk evidence</summary>
@@ -51,8 +55,8 @@ export function BackendCurrentOffer({ action, brief = {}, selected, disabled, se
     <h2 className="cui-panel-title">Your current match</h2><div className="cui-product-heading"><h3>{action.product.name}</h3><div><strong>{money(action.product)}</strong><span>{action.product.merchant}</span></div></div>
     <MatchedPriorities product={action.product} brief={brief} />
     <ul className="cui-product-points">
-      <li><strong>Listed features:</strong> {action.product.attributes.join(", ") || "Not supplied"}</li>
-      {Object.entries(action.product.specifications).filter(([key]) => /battery|weight|capacity|cushion|drop|laptop/i.test(key)).slice(0, 2).map(([key, value]) => <li key={key} className={/battery/i.test(key) ? "cui-battery-fact" : undefined}>{/battery/i.test(key) && <BatteryHighIcon aria-hidden="true" />}<span><strong>{key}:</strong> {/battery/i.test(key) && /^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i.test(value) ? <><strong className="cui-key-spec">{value.match(/^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i)![0]}</strong>{value.replace(/^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i, "")}</> : value}</span></li>)}
+      <li className="cui-icon-fact"><ListBulletsIcon aria-hidden="true" /><span><strong>Listed features:</strong> {action.product.attributes.join(", ") || "Not supplied"}</span></li>
+      {Object.entries(action.product.specifications).filter(([key]) => /battery|weight|capacity|cushion|drop|laptop/i.test(key)).slice(0, 2).map(([key, value]) => <li key={key} className={/battery|weight/i.test(key) ? "cui-icon-fact" : undefined}>{/battery/i.test(key) ? <BatteryHighIcon aria-hidden="true" /> : /weight/i.test(key) ? <ScalesIcon aria-hidden="true" /> : null}<span><strong>{key}:</strong> {/battery/i.test(key) && /^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i.test(value) ? <><strong className="cui-key-spec">{value.match(/^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i)![0]}</strong>{value.replace(/^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i, "")}</> : value}</span></li>)}
       {!!action.product.sizes.length && <li><strong>Available sizes:</strong> {action.product.sizes.join(", ")}</li>}
     </ul>
     <dl className="cui-match-facts">
@@ -61,7 +65,6 @@ export function BackendCurrentOffer({ action, brief = {}, selected, disabled, se
       <div><dt>Seller reviews</dt><dd><RatingStars rating={action.merchant_details?.review_rating} count={action.merchant_details?.review_count} /></dd></div>
     </dl>
     {action.product.reviews?.find(review => review.rating <= 2) && <p className="cui-review-concern"><strong>Review concern:</strong> One supplied product excerpt says “{action.product.reviews.find(review => review.rating <= 2)!.text}” This does not establish a failure rate.</p>}
-    <p className="cui-source">Payment: {action.payment_method} · Data sharing: {action.shares_personal_data ? "requested" : "none"}</p>
     <BackendRisk merchant={action.merchant_details} risk={action.risk} decision={action.decision} rules={action.rules} />
     {selected ? <p className="cui-selected-label"><CheckCircleIcon weight="fill" aria-hidden="true" />Offer selected; no receipt created yet</p> : <button className="primary cui-select" disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={select}>Select this offer</button>}
     <div className="cui-secondary-actions"><button disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={addCart}>Add to cart</button><button disabled={disabled} onClick={reject}>Reject offer</button><button disabled={disabled} onClick={alternative}>Find another merchant</button><button disabled={disabled} onClick={edit}>Change needs</button><button disabled={disabled} onClick={seller}>Find another seller</button></div>

@@ -41,8 +41,22 @@ export function MatchedPriorities({ product, brief }: { product: Product; brief:
   const attributes = new Set(product.attributes.map(normalized));
   const matches = [...new Set(requested.filter(value => attributes.has(normalized(value))))];
   const unknown = requested.filter(value => !attributes.has(normalized(value)));
-  if (!requested.length) return null;
-  return <section className="cui-matched-priorities" aria-label="Priority matches"><h4>Matches your saved priorities</h4>{matches.length > 0 && <ul>{matches.map(match => <li key={match}><CheckCircleIcon weight="fill" aria-hidden="true" />{match}</li>)}</ul>}{unknown.length > 0 && <p className="cui-source">Not established from listed features: {unknown.join(", ")}. Missing evidence does not mean a feature is absent.</p>}</section>;
+  const budget = brief.budget;
+  const amount = Number(budget?.value);
+  // Match the needs strip's SGD default, while making the assumption explicit.
+  const currency = brief.currency?.value?.trim().toUpperCase() || "SGD";
+  const currencyAssumed = brief.currency?.source !== "confirmed";
+  const validBudget = budget?.source === "confirmed" && Number.isFinite(amount) && amount > 0;
+  const sameCurrency = currency === product.currency.toUpperCase();
+  const budgetLabel = `${currency}${new Intl.NumberFormat("en-SG", { maximumFractionDigits: 2 }).format(amount)}`;
+  const budgetKind = budget?.hard ? "budget" : "target budget";
+  const budgetMatch = validBudget && sameCurrency && product.price <= amount
+    ? `Within your ${budgetLabel} ${budgetKind}${currencyAssumed ? " (currency assumed)" : ""}` : "";
+  const budgetNote = validBudget && !sameCurrency
+    ? `Budget match unconfirmed: offer is priced in ${product.currency}; your ${budgetKind} is ${budgetLabel}. No currency conversion is performed.`
+    : validBudget && product.price > amount ? `Above your ${budgetLabel} ${budgetKind}${currencyAssumed ? " (currency assumed)" : ""}.` : "";
+  if (!requested.length && !validBudget) return null;
+  return <section className="cui-matched-priorities" aria-label="Priority matches"><h4>Matches your saved priorities</h4>{(budgetMatch || matches.length > 0) && <ul>{budgetMatch && <li><CheckCircleIcon weight="fill" aria-hidden="true" />{budgetMatch}</li>}{matches.map(match => <li key={match}><CheckCircleIcon weight="fill" aria-hidden="true" />{match}</li>)}</ul>}{budgetNote && <p className="cui-source">{budgetNote}</p>}{unknown.length > 0 && <p className="cui-source">Not established from listed features: {unknown.join(", ")}. Missing evidence does not mean a feature is absent.</p>}</section>;
 }
 
 export function concernTitle(id: string) {

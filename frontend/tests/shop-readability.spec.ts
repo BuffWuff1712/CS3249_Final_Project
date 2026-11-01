@@ -16,7 +16,7 @@ test("priorities, fractional ratings, unique evidence and compact seller control
   await page.goto("/");
   const current = page.getByRole("article", { name: "Current recommendation", exact: true });
   const matches = current.getByRole("region", { name: "Priority matches", exact: true });
-  await expect(matches.locator("li")).toHaveText(["wireless", "noise cancellation"]);
+  await expect(matches.locator("li")).toHaveText(["Within your SGD200 budget (currency assumed)", "wireless", "noise cancellation"]);
   await expect(matches).toContainText(/Not established from listed features: long[- ]battery/);
   await expect(current.getByRole("img", { name: "4.6 out of 5 stars", exact: true })).toBeVisible();
   await expect(current.getByRole("img", { name: "4 out of 5 stars", exact: true })).toBeVisible();
@@ -62,4 +62,44 @@ test("missing ratings and assessments remain unknown rather than reassuring", as
   await expect(current.getByRole("img", { name: /out of 5 stars/ })).toHaveCount(0);
   await expect(current).toContainText("Merchant risk: Unknown");
   await expect(current).toContainText("Website reputation: Unknown");
+});
+
+test("budget-only matches respect limits, targets, currency and missing values", async ({ page, request }) => {
+  const created = await (await request.post(API)).json();
+  const view = await (await request.post(`${API}/${created.session.id}/messages`, { data: { revision: created.revision, text: "Find headphones under SGD200; no feature preference" } })).json();
+  expect(view.current).toBeTruthy();
+  const price = view.current.product.price;
+  let brief: Record<string, { value: string; source: string; hard: boolean }> = {};
+  // Only replace saved-brief presentation to exercise impossible and unknown UI states;
+  // the backend's actual budget/approval policy is unchanged.
+  await page.route(`**/shop/sessions/${created.session.id}`, async route => {
+    const response = await route.fetch(); const body = await response.json();
+    body.session.brief = brief;
+    await route.fulfill({ response, json: body });
+  });
+  await page.addInitScript(id => localStorage.setItem("beany-shop-backend-session", id), created.session.id);
+  const budget = (value: string, hard = true, source = "confirmed") => ({ value, hard, source });
+  const currency = (value: string) => budget(value, false);
+  const cases = [
+    { brief: { budget: budget("200"), currency: currency("SGD") }, chip: "Within your SGD200 budget", note: "" },
+    { brief: { budget: budget(String(price)), currency: currency("SGD") }, chip: `Within your SGD${price} budget`, note: "" },
+    { brief: { budget: budget("200", false), currency: currency("SGD") }, chip: "Within your SGD200 target budget", note: "" },
+    { brief: { budget: budget(String(price - 1)), currency: currency("SGD") }, chip: "", note: `Above your SGD${price - 1} budget` },
+    { brief: { budget: budget("200"), currency: currency("USD") }, chip: "", note: "Budget match unconfirmed" },
+    { brief: { budget: budget("200") }, chip: "Within your SGD200 budget (currency assumed)", note: "" },
+    { brief: { budget: budget("200", true, "suggested"), currency: currency("SGD") }, chip: "", note: "" },
+    { brief: { budget: budget("not a number"), currency: currency("SGD") }, chip: "", note: "" },
+    { brief: {}, chip: "", note: "" },
+  ];
+  for (const scenario of cases) {
+    brief = scenario.brief as typeof brief;
+    await page.goto("/");
+    const current = page.getByRole("article", { name: "Current recommendation", exact: true });
+    await expect(current).toBeVisible();
+    const matches = current.getByRole("region", { name: "Priority matches", exact: true });
+    if (scenario.chip) await expect(matches.locator("li")).toHaveText([scenario.chip]);
+    else await expect(matches.locator("li")).toHaveCount(0);
+    if (scenario.note) await expect(matches).toContainText(scenario.note);
+    if (!scenario.chip && !scenario.note) await expect(matches).toHaveCount(0);
+  }
 });

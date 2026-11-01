@@ -186,7 +186,7 @@ export function ShoppingWorkspace() {
           {!busy && !!session?.suggestions.length && <div className="cui-actions cui-suggestions" aria-label="Suggested replies">{session.suggestions.map(suggestion => <button key={suggestion} disabled={disabled} onClick={() => void mutate("messages", { text: suggestion }, "POST", suggestion)}>{suggestion}</button>)}</div>}
           {!busy && session && session.stage !== "clarifying" && !current && !receipt && !!session.brief.category && <div className="cui-actions"><button disabled={disabled} onClick={() => void mutate("compare")}>Compare current needs</button></div>}
         </div>
-        {session && <div className="cui-actions">{busy && activeRequest.current && !!liveSteps.length ? <button disabled={stopping} onClick={() => void stop()}>{stopping ? "Stopping…" : "Stop"}</button> : <button disabled={disabled || session.stage === "cancelled"} onClick={() => void mutate("cancel")}>Cancel shopping task</button>}</div>}
+        {session && busy && activeRequest.current && !!liveSteps.length && <div className="cui-actions"><button disabled={stopping} onClick={() => void stop()}>{stopping ? "Stopping…" : "Stop"}</button></div>}
         <PurchaseComposer text={text} setText={setText} send={value => void mutate("messages", { text: value }, "POST", value)} loaded={!!session} busy={disabled} started={!!session && session.messages.length > 1} />
       </section>
       <section ref={panel} className="cui-decision-column" id="shopping-decision" aria-label="Current decision">

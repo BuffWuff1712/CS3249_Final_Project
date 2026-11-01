@@ -434,8 +434,8 @@
 .cui-matched-priorities ul { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; list-style: none; }
 .cui-matched-priorities li { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border: 1px solid #c3d3fb; border-radius: 6px; background: #edf3ff; color: #214caa; font-size: 12px; font-weight: 600; }
 .cui-matched-priorities svg { width: 15px; height: 15px; }
-.cui-product-points .cui-battery-fact { display: flex; align-items: flex-start; gap: 6px; margin-left: -17px; }
-.cui-battery-fact > svg { width: 17px; height: 17px; margin-top: 2px; color: #315480; }
+.cui-product-points .cui-icon-fact { display: flex; align-items: flex-start; gap: 6px; margin-left: -17px; }
+.cui-icon-fact > svg { width: 17px; height: 17px; margin-top: 2px; color: #315480; }
 .cui-key-spec { background: #edf3ff; color: #214caa; padding: 1px 4px; border-radius: 3px; }
 .cui-rating, .cui-rating-value { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .cui-rating { align-items: flex-start; flex-direction: column; gap: 3px; }
@@ -483,3 +483,11 @@
 @media (max-width: 600px) {
   .cui-compare-table caption, .cui-offer-table caption { display: block; width: 100%; }
 }
+
+/* Status at a glance; supporting explanations stay in one quiet info box. */
+.cui-assessment-badges { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; margin: 12px 0 8px; }
+.cui-assessment-info { display: flex; align-items: flex-start; gap: 8px; padding: 11px 12px; margin: 8px 0 12px; background: #f4f7fc; border: 1px solid #dce4f1; border-radius: 8px; color: var(--muted); }
+.cui-assessment-info > svg { width: 17px; height: 17px; flex: 0 0 17px; color: #4167a3; margin-top: 1px; }
+.cui-assessment-info > div { min-width: 0; }
+.cui-assessment-info strong { font-size: 11px; color: var(--ink); }
+.cui-assessment-info p { margin: 4px 0 0; font-size: 11px; line-height: 1.55; }
