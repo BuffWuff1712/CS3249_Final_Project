@@ -207,11 +207,19 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
         else:
             a.risk = assess(p, merchant, (catalogue(s) if catalogue_snapshot is None else catalogue_snapshot), session_config(s))
         if a.risk and a.risk.recommended_decision != "ALLOW":
+            # The rule states the consequence; the assessment itself stays in a.risk.
+            level = a.risk.level.lower()
+            if a.risk.recommended_decision == "REVIEW":
+                consequence = f"Seller risk is estimated {level}, so this offer needs your review before simulated checkout."
+            elif session_config(s).decisions[a.risk.level] == "BLOCK":
+                consequence = f"Seller risk is estimated {level}, so this offer is blocked."
+            else:
+                consequence = "The seller shows a signal that always blocks checkout, so this offer is blocked."
             rule(
                 "merchant_risk",
                 a.risk.recommended_decision,
                 "merchant_risk",
-                a.risk.explanation,
+                consequence,
             )
         if a.payment_method not in merchant.payment_methods:
             rule(
@@ -383,3 +391,15 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
         else "ALLOW"
     )
     return a
+
+
+def reasons(a, decision=None):
+    """User-facing rule text, with the seller assessment after its consequence."""
+    parts = []
+    for r in a.rules:
+        if decision and r.decision != decision:
+            continue
+        parts.append(r.explanation)
+        if r.rule_id == "merchant_risk" and a.risk:
+            parts.append(a.risk.explanation)
+    return " ".join(parts)

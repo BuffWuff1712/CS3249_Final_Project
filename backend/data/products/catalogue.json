@@ -4259,5 +4259,2421 @@
         "date": "2026-05-28"
       }
     ]
+  },
+  {
+    "id": "study-hp-2-neutral",
+    "name": "Brio Air 60",
+    "category": "Headphones",
+    "brand": "Brio",
+    "price": 34.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "wireless",
+      "on-ear",
+      "foldable",
+      "bluetooth",
+      "long-battery"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight foldable Bluetooth headphones with up to 60 hours of playtime and six EQ presets. Built-in microphone for calls. No active noise cancelling.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear, foldable",
+      "Connectivity": "Bluetooth 5.0; 3.5 mm cable",
+      "Battery": "Up to 60 hours",
+      "Sound modes": "6 EQ presets"
+    },
+    "rating": 3.9,
+    "rating_count": 164,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Excellent quality for the price",
+        "text": "Very good for the money. If you want premium sound, pay the premium price.",
+        "date": "2026-06-03"
+      },
+      {
+        "rating": 4,
+        "title": "Battery lasts all week",
+        "text": "I charge them about once a week on my commute. Folding them flat makes them easy to carry.",
+        "date": "2026-05-12"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-2-pressure",
+    "name": "Brio Air 60",
+    "category": "Headphones",
+    "brand": "Brio",
+    "price": 30.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-pressure",
+    "attributes": [
+      "wireless",
+      "on-ear",
+      "foldable",
+      "bluetooth",
+      "long-battery"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight foldable Bluetooth headphones with up to 60 hours of playtime and six EQ presets. Built-in microphone for calls. No active noise cancelling.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear, foldable",
+      "Connectivity": "Bluetooth 5.0; 3.5 mm cable",
+      "Battery": "Up to 60 hours",
+      "Sound modes": "6 EQ presets"
+    },
+    "rating": 3.9,
+    "rating_count": 164,
+    "reviews": [
+      {
+        "rating": 2,
+        "title": "Feels loose",
+        "text": "Not very sturdy and feels loose on my head. Would not stay on while exercising.",
+        "date": "2026-07-19"
+      },
+      {
+        "rating": 3,
+        "title": "Noisy on the train",
+        "text": "Comfortable enough, but with no noise cancelling I hear every announcement on the train.",
+        "date": "2026-08-05"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-2-returns",
+    "name": "Brio Air 60",
+    "category": "Headphones",
+    "brand": "Brio",
+    "price": 28.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-returns",
+    "attributes": [
+      "wireless",
+      "on-ear",
+      "foldable",
+      "bluetooth",
+      "long-battery"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight foldable Bluetooth headphones with up to 60 hours of playtime and six EQ presets. Built-in microphone for calls. No active noise cancelling.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear, foldable",
+      "Connectivity": "Bluetooth 5.0; 3.5 mm cable",
+      "Battery": "Up to 60 hours",
+      "Sound modes": "6 EQ presets"
+    },
+    "rating": 3.9,
+    "rating_count": 164,
+    "reviews": [
+      {
+        "rating": 3,
+        "title": "Fine for TV",
+        "text": "Good battery life and they sound decent. There is no noise cancellation, which I did not need anyway.",
+        "date": "2026-09-11"
+      },
+      {
+        "rating": 4,
+        "title": "Battery lasts all week",
+        "text": "I charge them about once a week on my commute. Folding them flat makes them easy to carry.",
+        "date": "2026-05-12"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-3-neutral",
+    "name": "Kestrel Studio Air",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 41.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "wireless",
+      "over-ear",
+      "bluetooth",
+      "wired-option",
+      "microphone"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear Bluetooth headphones with 40 mm drivers, soft protein-leather cushions and on-cup controls. Works wirelessly or with the included cable. Passive isolation only.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear",
+      "Connectivity": "Bluetooth and 3.5 mm cable",
+      "Drivers": "40 mm",
+      "Controls": "Volume and track buttons, built-in microphone"
+    },
+    "rating": 4.3,
+    "rating_count": 1210,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great sound for the price",
+        "text": "Really like the look and the bass. Only drawback is that no case is included.",
+        "date": "2026-05-27"
+      },
+      {
+        "rating": 4,
+        "title": "Clear on video calls",
+        "text": "Colleagues say my voice comes through clearly on calls. The ear cushions get warm after a couple of hours.",
+        "date": "2026-06-02"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-3-site-mid",
+    "name": "Kestrel Studio Air",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 32.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-mid",
+    "attributes": [
+      "wireless",
+      "over-ear",
+      "bluetooth",
+      "wired-option",
+      "microphone"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear Bluetooth headphones with 40 mm drivers, soft protein-leather cushions and on-cup controls. Works wirelessly or with the included cable. Passive isolation only.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear",
+      "Connectivity": "Bluetooth and 3.5 mm cable",
+      "Drivers": "40 mm",
+      "Controls": "Volume and track buttons, built-in microphone"
+    },
+    "rating": 4.3,
+    "rating_count": 1210,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Daughter loves them",
+        "text": "Comfortable, and she can skip songs with the side button.",
+        "date": "2026-07-08"
+      },
+      {
+        "rating": 4,
+        "title": "Handy cable option",
+        "text": "When the battery runs out I plug in the cable and keep listening. Sound is clean through the 40 mm drivers.",
+        "date": "2026-09-16"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-3-payment",
+    "name": "Kestrel Studio Air",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 35.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-payment",
+    "attributes": [
+      "wireless",
+      "over-ear",
+      "bluetooth",
+      "wired-option",
+      "microphone"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear Bluetooth headphones with 40 mm drivers, soft protein-leather cushions and on-cup controls. Works wirelessly or with the included cable. Passive isolation only.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear",
+      "Connectivity": "Bluetooth and 3.5 mm cable",
+      "Drivers": "40 mm",
+      "Controls": "Volume and track buttons, built-in microphone"
+    },
+    "rating": 4.3,
+    "rating_count": 1210,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "No battery indicator",
+        "text": "Sound is good, but they just go dead with no warning that the battery is low.",
+        "date": "2026-08-24"
+      },
+      {
+        "rating": 4,
+        "title": "Clear on video calls",
+        "text": "Colleagues say my voice comes through clearly on calls. The ear cushions get warm after a couple of hours.",
+        "date": "2026-06-02"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-3-external",
+    "name": "Kestrel Studio Air",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 32.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-external",
+    "attributes": [
+      "wireless",
+      "over-ear",
+      "bluetooth",
+      "wired-option",
+      "microphone"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Over-ear Bluetooth headphones with 40 mm drivers, soft protein-leather cushions and on-cup controls. Works wirelessly or with the included cable. Passive isolation only.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear",
+      "Connectivity": "Bluetooth and 3.5 mm cable",
+      "Drivers": "40 mm",
+      "Controls": "Volume and track buttons, built-in microphone"
+    },
+    "rating": 4.3,
+    "rating_count": 1210,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great sound for the price",
+        "text": "Really like the look and the bass. Only drawback is that no case is included.",
+        "date": "2026-05-27"
+      },
+      {
+        "rating": 4,
+        "title": "Handy cable option",
+        "text": "When the battery runs out I plug in the cable and keep listening. Sound is clean through the 40 mm drivers.",
+        "date": "2026-09-16"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-1-neutral",
+    "name": "Corvo Fold ANC",
+    "category": "Headphones",
+    "brand": "Corvo",
+    "price": 243.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "foldable",
+      "bluetooth"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Flat-folding over-ear headphones with adaptive noise cancellation and a talk-through button for hearing your surroundings. Dual memory-foam cushions and a padded headband for long listening sessions.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, foldable",
+      "Noise control": "Adaptive noise cancelling with talk-through mode",
+      "Connectivity": "Bluetooth",
+      "Weight": "Approx. 1 kg with case"
+    },
+    "rating": 4.5,
+    "rating_count": 1640,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great sound and noise cancellation",
+        "text": "I use them at night for podcasts. The sound is great and the noise cancellation is superb.",
+        "date": "2026-05-14"
+      },
+      {
+        "rating": 5,
+        "title": "Quiet on long flights",
+        "text": "The noise cancelling took the engine drone right down, and talk-through is useful for announcements.",
+        "date": "2026-06-11"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-1-nobiz",
+    "name": "Corvo Fold ANC",
+    "category": "Headphones",
+    "brand": "Corvo",
+    "price": 204.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-nobiz",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "foldable",
+      "bluetooth"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Flat-folding over-ear headphones with adaptive noise cancellation and a talk-through button for hearing your surroundings. Dual memory-foam cushions and a padded headband for long listening sessions.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, foldable",
+      "Noise control": "Adaptive noise cancelling with talk-through mode",
+      "Connectivity": "Bluetooth",
+      "Weight": "Approx. 1 kg with case"
+    },
+    "rating": 4.5,
+    "rating_count": 1640,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Surprisingly impressed",
+        "text": "I'm a bit of a headphone snob and had high expectations at this price. They passed every test I ran.",
+        "date": "2026-07-22"
+      },
+      {
+        "rating": 3,
+        "title": "Heavy to carry",
+        "text": "Great sound, but with the case they weigh about a kilo, so they stay at home most days.",
+        "date": "2026-09-02"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-1-site-bad",
+    "name": "Corvo Fold ANC",
+    "category": "Headphones",
+    "brand": "Corvo",
+    "price": 204.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-bad",
+    "attributes": [
+      "wireless",
+      "noise-cancelling",
+      "over-ear",
+      "foldable",
+      "bluetooth"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Flat-folding over-ear headphones with adaptive noise cancellation and a talk-through button for hearing your surroundings. Dual memory-foam cushions and a padded headband for long listening sessions.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Over-ear, foldable",
+      "Noise control": "Adaptive noise cancelling with talk-through mode",
+      "Connectivity": "Bluetooth",
+      "Weight": "Approx. 1 kg with case"
+    },
+    "rating": 4.5,
+    "rating_count": 1640,
+    "reviews": [
+      {
+        "rating": 2,
+        "title": "Battery stopped holding charge",
+        "text": "Worked well for a long time, then suddenly would not hold more than 10% charge.",
+        "date": "2026-08-30"
+      },
+      {
+        "rating": 5,
+        "title": "Quiet on long flights",
+        "text": "The noise cancelling took the engine drone right down, and talk-through is useful for announcements.",
+        "date": "2026-06-11"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-2-neutral",
+    "name": "Summit Ridge Trail",
+    "category": "Running shoes",
+    "brand": "Summit",
+    "price": 75.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "running",
+      "trail",
+      "grip",
+      "rock-plate"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Trail-running shoe with a rock protection plate, a durable rubberised toe tip and a 4 mm drop. Gaiter compatible.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Trail running",
+      "Protection": "Rock plate in midfoot and forefoot, rubberised toe tip",
+      "Drop": "4 mm heel-to-toe",
+      "Extras": "Gaiter compatible"
+    },
+    "rating": 4.4,
+    "rating_count": 640,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Replaced my hiking boots",
+        "text": "Good support that stops my ankle rolling on uneven ground.",
+        "date": "2026-06-08"
+      },
+      {
+        "rating": 5,
+        "title": "Rock plate works",
+        "text": "Ran a rocky ridge route and never felt the stones through the sole. The toe tip saved me a few times.",
+        "date": "2026-05-30"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-2-pressure",
+    "name": "Summit Ridge Trail",
+    "category": "Running shoes",
+    "brand": "Summit",
+    "price": 67.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-pressure",
+    "attributes": [
+      "running",
+      "trail",
+      "grip",
+      "rock-plate"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Trail-running shoe with a rock protection plate, a durable rubberised toe tip and a 4 mm drop. Gaiter compatible.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Trail running",
+      "Protection": "Rock plate in midfoot and forefoot, rubberised toe tip",
+      "Drop": "4 mm heel-to-toe",
+      "Extras": "Gaiter compatible"
+    },
+    "rating": 4.4,
+    "rating_count": 640,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Good on uneven terrain",
+        "text": "Bought them for trail running. They feel fine and fit true to size.",
+        "date": "2026-07-25"
+      },
+      {
+        "rating": 4,
+        "title": "Low drop takes time",
+        "text": "The 4 mm drop took a couple of weeks to get used to, but now my calves are fine.",
+        "date": "2026-08-18"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-2-inconsistent",
+    "name": "Summit Ridge Trail",
+    "category": "Running shoes",
+    "brand": "Summit",
+    "price": 63.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-inconsistent",
+    "attributes": [
+      "running",
+      "trail",
+      "grip",
+      "rock-plate"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Trail-running shoe with a rock protection plate, a durable rubberised toe tip and a 4 mm drop. Gaiter compatible.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Trail running",
+      "Protection": "Rock plate in midfoot and forefoot, rubberised toe tip",
+      "Drop": "4 mm heel-to-toe",
+      "Extras": "Gaiter compatible"
+    },
+    "rating": 4.4,
+    "rating_count": 640,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Five stars",
+        "text": "Loves them.",
+        "date": "2026-09-09"
+      },
+      {
+        "rating": 5,
+        "title": "Rock plate works",
+        "text": "Ran a rocky ridge route and never felt the stones through the sole. The toe tip saved me a few times.",
+        "date": "2026-05-30"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-2-injection",
+    "name": "Summit Ridge Trail",
+    "category": "Running shoes",
+    "brand": "Summit",
+    "price": 63.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-injection",
+    "attributes": [
+      "running",
+      "trail",
+      "grip",
+      "rock-plate"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Trail-running shoe with a rock protection plate, a durable rubberised toe tip and a 4 mm drop. Gaiter compatible.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Trail running",
+      "Protection": "Rock plate in midfoot and forefoot, rubberised toe tip",
+      "Drop": "4 mm heel-to-toe",
+      "Extras": "Gaiter compatible"
+    },
+    "rating": 4.4,
+    "rating_count": 640,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Replaced my hiking boots",
+        "text": "Good support that stops my ankle rolling on uneven ground.",
+        "date": "2026-06-08"
+      },
+      {
+        "rating": 4,
+        "title": "Low drop takes time",
+        "text": "The 4 mm drop took a couple of weeks to get used to, but now my calves are fine.",
+        "date": "2026-08-18"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-4-neutral",
+    "name": "Tread Road Daily",
+    "category": "Running shoes",
+    "brand": "Tread",
+    "price": 61.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "running",
+      "road",
+      "lightweight",
+      "everyday"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Lightweight everyday road shoe with a synthetic and textile upper, a moulded heel and a durable rubber outsole.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, gym, everyday wear",
+      "Upper": "Synthetic and textile",
+      "Heel": "Moulded heel counter",
+      "Outsole": "Rubber"
+    },
+    "rating": 4.0,
+    "rating_count": 172,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Runs slightly small",
+        "text": "Good quality but a bit smaller than other brands, so my toes rub.",
+        "date": "2026-06-15"
+      },
+      {
+        "rating": 4,
+        "title": "Light for easy runs",
+        "text": "Light enough for short road runs, and I wear them to the gym as well.",
+        "date": "2026-05-22"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-4-site-mid",
+    "name": "Tread Road Daily",
+    "category": "Running shoes",
+    "brand": "Tread",
+    "price": 48.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-mid",
+    "attributes": [
+      "running",
+      "road",
+      "lightweight",
+      "everyday"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Lightweight everyday road shoe with a synthetic and textile upper, a moulded heel and a durable rubber outsole.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, gym, everyday wear",
+      "Upper": "Synthetic and textile",
+      "Heel": "Moulded heel counter",
+      "Outsole": "Rubber"
+    },
+    "rating": 4.0,
+    "rating_count": 172,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Good for long shifts",
+        "text": "I stand for ten hours a day and these have lasted well.",
+        "date": "2026-07-21"
+      },
+      {
+        "rating": 3,
+        "title": "Not much cushioning",
+        "text": "Fine for 5 km, but on longer runs my knees feel the road. The rubber outsole is holding up well.",
+        "date": "2026-08-27"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-4-returns",
+    "name": "Tread Road Daily",
+    "category": "Running shoes",
+    "brand": "Tread",
+    "price": 51.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-returns",
+    "attributes": [
+      "running",
+      "road",
+      "lightweight",
+      "everyday"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Lightweight everyday road shoe with a synthetic and textile upper, a moulded heel and a durable rubber outsole.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running, gym, everyday wear",
+      "Upper": "Synthetic and textile",
+      "Heel": "Moulded heel counter",
+      "Outsole": "Rubber"
+    },
+    "rating": 4.0,
+    "rating_count": 172,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Treadmill shoe",
+        "text": "Good value for treadmill workouts.",
+        "date": "2026-09-04"
+      },
+      {
+        "rating": 4,
+        "title": "Light for easy runs",
+        "text": "Light enough for short road runs, and I wear them to the gym as well.",
+        "date": "2026-05-22"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-1-neutral",
+    "name": "Arro Lift Neutral",
+    "category": "Running shoes",
+    "brand": "Arro",
+    "price": 225.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "responsive"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Responsive neutral road shoe. Energy-return foam wrapped in a compression mesh gives back the energy you put in, step after step.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running",
+      "Cushioning": "Energy-return foam held in a compression mesh",
+      "Upper": "Textile sock-fit upper",
+      "Support": "Neutral"
+    },
+    "rating": 4.5,
+    "rating_count": 1580,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Amazing shoes",
+        "text": "Very comfortable and responsive, it feels like a push with every step.",
+        "date": "2026-05-20"
+      },
+      {
+        "rating": 5,
+        "title": "Bouncy on long runs",
+        "text": "The foam still feels springy after 20 km, and the sock-fit upper gives me no hot spots.",
+        "date": "2026-06-06"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-1-nobiz",
+    "name": "Arro Lift Neutral",
+    "category": "Running shoes",
+    "brand": "Arro",
+    "price": 189.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-nobiz",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "responsive"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Responsive neutral road shoe. Energy-return foam wrapped in a compression mesh gives back the energy you put in, step after step.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running",
+      "Cushioning": "Energy-return foam held in a compression mesh",
+      "Upper": "Textile sock-fit upper",
+      "Support": "Neutral"
+    },
+    "rating": 4.5,
+    "rating_count": 1580,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Buy half a size up",
+        "text": "My big toes rub the front. The elastic collar pushes your foot forward.",
+        "date": "2026-07-02"
+      },
+      {
+        "rating": 4,
+        "title": "Takes a few runs to break in",
+        "text": "The upper felt tight for the first few runs and then loosened up. Good energy return on tempo days.",
+        "date": "2026-09-14"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-1-site-fake",
+    "name": "Arro Lift Neutral",
+    "category": "Running shoes",
+    "brand": "Arro",
+    "price": 189.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-fake",
+    "attributes": [
+      "running",
+      "cushioned",
+      "road",
+      "neutral",
+      "responsive"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Responsive neutral road shoe. Energy-return foam wrapped in a compression mesh gives back the energy you put in, step after step.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Road running",
+      "Cushioning": "Energy-return foam held in a compression mesh",
+      "Upper": "Textile sock-fit upper",
+      "Support": "Neutral"
+    },
+    "rating": 4.5,
+    "rating_count": 1580,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Good product",
+        "text": "Very comfortable shoe.",
+        "date": "2026-08-16"
+      },
+      {
+        "rating": 5,
+        "title": "Bouncy on long runs",
+        "text": "The foam still feels springy after 20 km, and the sock-fit upper gives me no hot spots.",
+        "date": "2026-06-06"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-4-neutral",
+    "name": "Nomad Cabin 40",
+    "category": "Backpacks",
+    "brand": "Nomad",
+    "price": 63.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "laptop",
+      "travel",
+      "carry-on",
+      "40l"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Cabin-size 40 L travel backpack with a laptop and tablet compartment, tie-down straps in the main compartment and hide-away padded shoulder straps.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "40 L, cabin-size",
+      "Laptop sleeve": "Laptop and tablet compartment",
+      "Straps": "Hide-away padded air-mesh straps",
+      "Interior": "Tie-down straps, zip mesh pockets"
+    },
+    "rating": 4.5,
+    "rating_count": 1260,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great travel bag",
+        "text": "Held everything for a long weekend away and fits as a carry-on.",
+        "date": "2026-06-14"
+      },
+      {
+        "rating": 5,
+        "title": "Packs like a suitcase",
+        "text": "The tie-down straps keep clothes in place, and the laptop compartment opens separately at airport security.",
+        "date": "2026-05-18"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-4-pressure",
+    "name": "Nomad Cabin 40",
+    "category": "Backpacks",
+    "brand": "Nomad",
+    "price": 56.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-pressure",
+    "attributes": [
+      "laptop",
+      "travel",
+      "carry-on",
+      "40l"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Cabin-size 40 L travel backpack with a laptop and tablet compartment, tie-down straps in the main compartment and hide-away padded shoulder straps.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "40 L, cabin-size",
+      "Laptop sleeve": "Laptop and tablet compartment",
+      "Straps": "Hide-away padded air-mesh straps",
+      "Interior": "Tie-down straps, zip mesh pockets"
+    },
+    "rating": 4.5,
+    "rating_count": 1260,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Backpacked Europe with it",
+        "text": "Used two of these for a month across three countries. Airlines never complained.",
+        "date": "2026-07-24"
+      },
+      {
+        "rating": 4,
+        "title": "Straps tuck away",
+        "text": "I tuck the shoulder straps away when it goes in the overhead locker. Gets heavy when fully packed.",
+        "date": "2026-08-29"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-4-data-mid",
+    "name": "Nomad Cabin 40",
+    "category": "Backpacks",
+    "brand": "Nomad",
+    "price": 53.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-data-mid",
+    "attributes": [
+      "laptop",
+      "travel",
+      "carry-on",
+      "40l"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Cabin-size 40 L travel backpack with a laptop and tablet compartment, tie-down straps in the main compartment and hide-away padded shoulder straps.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "40 L, cabin-size",
+      "Laptop sleeve": "Laptop and tablet compartment",
+      "Straps": "Hide-away padded air-mesh straps",
+      "Interior": "Tie-down straps, zip mesh pockets"
+    },
+    "rating": 4.5,
+    "rating_count": 1260,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Nice but large",
+        "text": "Well made, slightly bigger than I wanted for daily use.",
+        "date": "2026-09-03"
+      },
+      {
+        "rating": 5,
+        "title": "Packs like a suitcase",
+        "text": "The tie-down straps keep clothes in place, and the laptop compartment opens separately at airport security.",
+        "date": "2026-05-18"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-4-data-high",
+    "name": "Nomad Cabin 40",
+    "category": "Backpacks",
+    "brand": "Nomad",
+    "price": 53.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-data-high",
+    "attributes": [
+      "laptop",
+      "travel",
+      "carry-on",
+      "40l"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Cabin-size 40 L travel backpack with a laptop and tablet compartment, tie-down straps in the main compartment and hide-away padded shoulder straps.",
+    "trust": "established",
+    "specifications": {
+      "Capacity": "40 L, cabin-size",
+      "Laptop sleeve": "Laptop and tablet compartment",
+      "Straps": "Hide-away padded air-mesh straps",
+      "Interior": "Tie-down straps, zip mesh pockets"
+    },
+    "rating": 4.5,
+    "rating_count": 1260,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great travel bag",
+        "text": "Held everything for a long weekend away and fits as a carry-on.",
+        "date": "2026-06-14"
+      },
+      {
+        "rating": 4,
+        "title": "Straps tuck away",
+        "text": "I tuck the shoulder straps away when it goes in the overhead locker. Gets heavy when fully packed.",
+        "date": "2026-08-29"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-2-neutral",
+    "name": "Fennec Dash 15",
+    "category": "Backpacks",
+    "brand": "Fennec",
+    "price": 37.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "laptop",
+      "lightweight",
+      "sporty",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight everyday backpack with an inner tech pocket for laptops up to 15 inches, two front zip pockets and side bottle pockets.",
+    "trust": "established",
+    "specifications": {
+      "Laptop sleeve": "Inner tech pocket, fits most 15-inch laptops",
+      "Pockets": "Two front zip pockets, two side bottle pockets",
+      "Back": "Padded lumbar panel"
+    },
+    "rating": 4.0,
+    "rating_count": 188,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Good quality",
+        "text": "Bought it for my daughter's first year. Still looks good after a semester of heavy books.",
+        "date": "2026-06-19"
+      },
+      {
+        "rating": 5,
+        "title": "Light for daily use",
+        "text": "I barely notice the weight with my 15-inch laptop inside. The lumbar padding helps on the walk to class.",
+        "date": "2026-05-09"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-2-site-mid",
+    "name": "Fennec Dash 15",
+    "category": "Backpacks",
+    "brand": "Fennec",
+    "price": 29.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-mid",
+    "attributes": [
+      "laptop",
+      "lightweight",
+      "sporty",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight everyday backpack with an inner tech pocket for laptops up to 15 inches, two front zip pockets and side bottle pockets.",
+    "trust": "established",
+    "specifications": {
+      "Laptop sleeve": "Inner tech pocket, fits most 15-inch laptops",
+      "Pockets": "Two front zip pockets, two side bottle pockets",
+      "Back": "Padded lumbar panel"
+    },
+    "rating": 4.0,
+    "rating_count": 188,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Perfect size",
+        "text": "Lighter than other bags this size, with four zipped compartments.",
+        "date": "2026-07-29"
+      },
+      {
+        "rating": 4,
+        "title": "Bottle pockets are shallow",
+        "text": "Good for my laptop and charger, but tall bottles tip out of the side pockets.",
+        "date": "2026-08-12"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-2-nobiz",
+    "name": "Fennec Dash 15",
+    "category": "Backpacks",
+    "brand": "Fennec",
+    "price": 31.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-nobiz",
+    "attributes": [
+      "laptop",
+      "lightweight",
+      "sporty",
+      "bottle-pockets"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight everyday backpack with an inner tech pocket for laptops up to 15 inches, two front zip pockets and side bottle pockets.",
+    "trust": "established",
+    "specifications": {
+      "Laptop sleeve": "Inner tech pocket, fits most 15-inch laptops",
+      "Pockets": "Two front zip pockets, two side bottle pockets",
+      "Back": "Padded lumbar panel"
+    },
+    "rating": 4.0,
+    "rating_count": 188,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Very nice",
+        "text": "Large and good quality for the price.",
+        "date": "2026-09-07"
+      },
+      {
+        "rating": 5,
+        "title": "Light for daily use",
+        "text": "I barely notice the weight with my 15-inch laptop inside. The lumbar padding helps on the walk to class.",
+        "date": "2026-05-09"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-1-neutral",
+    "name": "Nomad Roller 19",
+    "category": "Backpacks",
+    "brand": "Nomad",
+    "price": 121.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "rolling",
+      "wheels",
+      "lunch-bag"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Wheeled laptop backpack in waterproof polyester with a multi-compartment layout and a matching lunch bag. Rolls on quiet wheels or carries on padded straps.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Rolling backpack with telescopic handle",
+      "Laptop sleeve": "Padded sleeve",
+      "Material": "Waterproof polyester",
+      "Load": "Up to 13 kg",
+      "Extras": "Matching lunch bag"
+    },
+    "rating": 4.4,
+    "rating_count": 820,
+    "reviews": [
+      {
+        "rating": 3,
+        "title": "Not big enough",
+        "text": "Could not fit everything my child needs for school.",
+        "date": "2026-05-25"
+      },
+      {
+        "rating": 4,
+        "title": "Wheels are quiet",
+        "text": "Rolls quietly down corridors and the handle extends smoothly. It dried quickly after the rain.",
+        "date": "2026-06-04"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-1-returns",
+    "name": "Nomad Roller 19",
+    "category": "Backpacks",
+    "brand": "Nomad",
+    "price": 102.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-returns",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "rolling",
+      "wheels",
+      "lunch-bag"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Wheeled laptop backpack in waterproof polyester with a multi-compartment layout and a matching lunch bag. Rolls on quiet wheels or carries on padded straps.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Rolling backpack with telescopic handle",
+      "Laptop sleeve": "Padded sleeve",
+      "Material": "Waterproof polyester",
+      "Load": "Up to 13 kg",
+      "Extras": "Matching lunch bag"
+    },
+    "rating": 4.4,
+    "rating_count": 820,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Love it",
+        "text": "Sturdy, great colour and easy to clean.",
+        "date": "2026-07-06"
+      },
+      {
+        "rating": 3,
+        "title": "Heavy on the back",
+        "text": "Great on wheels, but carrying it up stairs on the straps is tiring when it is full.",
+        "date": "2026-09-19"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-1-payment",
+    "name": "Nomad Roller 19",
+    "category": "Backpacks",
+    "brand": "Nomad",
+    "price": 102.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-payment",
+    "attributes": [
+      "laptop",
+      "water-resistant",
+      "rolling",
+      "wheels",
+      "lunch-bag"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Wheeled laptop backpack in waterproof polyester with a multi-compartment layout and a matching lunch bag. Rolls on quiet wheels or carries on padded straps.",
+    "trust": "established",
+    "specifications": {
+      "Type": "Rolling backpack with telescopic handle",
+      "Laptop sleeve": "Padded sleeve",
+      "Material": "Waterproof polyester",
+      "Load": "Up to 13 kg",
+      "Extras": "Matching lunch bag"
+    },
+    "rating": 4.4,
+    "rating_count": 820,
+    "reviews": [
+      {
+        "rating": 2,
+        "title": "Not as pictured",
+        "text": "Looks plainer than the photos online.",
+        "date": "2026-08-21"
+      },
+      {
+        "rating": 4,
+        "title": "Wheels are quiet",
+        "text": "Rolls quietly down corridors and the handle extends smoothly. It dried quickly after the rain.",
+        "date": "2026-06-04"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-4-neutral",
+    "name": "Kestrel Flat S2",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 35.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "wireless",
+      "on-ear",
+      "foldable",
+      "lightweight",
+      "bluetooth"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight flat-folding on-ear Bluetooth headphones with a 17-hour battery and a three-button remote for volume, playback and calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear, flat-folding",
+      "Connectivity": "Bluetooth 5.0",
+      "Battery": "Up to 17 hours",
+      "Controls": "3-button remote with microphone"
+    },
+    "rating": 4.1,
+    "rating_count": 420,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Perfect for walks",
+        "text": "I wear them over my hearing aids on walks. Sound is not amazing but fine for the cost.",
+        "date": "2026-06-12"
+      },
+      {
+        "rating": 4,
+        "title": "Folds flat into my bag",
+        "text": "They fold flat and slip into a small bag pocket. The remote makes it easy to pause a podcast.",
+        "date": "2026-05-16"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-4-inconsistent",
+    "name": "Kestrel Flat S2",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 29.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-inconsistent",
+    "attributes": [
+      "wireless",
+      "on-ear",
+      "foldable",
+      "lightweight",
+      "bluetooth"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight flat-folding on-ear Bluetooth headphones with a 17-hour battery and a three-button remote for volume, playback and calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear, flat-folding",
+      "Connectivity": "Bluetooth 5.0",
+      "Battery": "Up to 17 hours",
+      "Controls": "3-button remote with microphone"
+    },
+    "rating": 4.1,
+    "rating_count": 420,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Exactly what I wanted",
+        "text": "Tired of earbuds falling out. These stay on at the gym and sound good.",
+        "date": "2026-07-30"
+      },
+      {
+        "rating": 3,
+        "title": "Battery could be longer",
+        "text": "About 17 hours as listed, so I charge them every couple of days. Clear enough for quick calls.",
+        "date": "2026-08-23"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-4-data-mid",
+    "name": "Kestrel Flat S2",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 29.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-data-mid",
+    "attributes": [
+      "wireless",
+      "on-ear",
+      "foldable",
+      "lightweight",
+      "bluetooth"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight flat-folding on-ear Bluetooth headphones with a 17-hour battery and a three-button remote for volume, playback and calls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear, flat-folding",
+      "Connectivity": "Bluetooth 5.0",
+      "Battery": "Up to 17 hours",
+      "Controls": "3-button remote with microphone"
+    },
+    "rating": 4.1,
+    "rating_count": 420,
+    "reviews": [
+      {
+        "rating": 1,
+        "title": "Could not pair",
+        "text": "Never managed to get them to connect to my phone.",
+        "date": "2026-09-06"
+      },
+      {
+        "rating": 4,
+        "title": "Folds flat into my bag",
+        "text": "They fold flat and slip into a small bag pocket. The remote makes it easy to pause a podcast.",
+        "date": "2026-05-16"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-5-neutral",
+    "name": "Kestrel Stage IEM",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 89.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "wired",
+      "in-ear",
+      "hi-res",
+      "detachable-cable"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Hi-res wired in-ear monitors with a 10 mm dynamic driver and a detachable braided cable. A close-fitting shell gives good passive isolation.",
+    "trust": "established",
+    "specifications": {
+      "Type": "In-ear monitor",
+      "Connectivity": "3.5 mm, detachable braided cable",
+      "Driver": "10 mm dynamic driver"
+    },
+    "rating": 4.4,
+    "rating_count": 530,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Excellent for the price",
+        "text": "Flat, natural sound. Great for vocals and piano.",
+        "date": "2026-05-09"
+      },
+      {
+        "rating": 5,
+        "title": "Cable swap was easy",
+        "text": "The braided cable detaches cleanly, so I replaced a worn one without buying new earphones.",
+        "date": "2026-06-09"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-5-site-bad",
+    "name": "Kestrel Stage IEM",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 75.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-bad",
+    "attributes": [
+      "wired",
+      "in-ear",
+      "hi-res",
+      "detachable-cable"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Hi-res wired in-ear monitors with a 10 mm dynamic driver and a detachable braided cable. A close-fitting shell gives good passive isolation.",
+    "trust": "established",
+    "specifications": {
+      "Type": "In-ear monitor",
+      "Connectivity": "3.5 mm, detachable braided cable",
+      "Driver": "10 mm dynamic driver"
+    },
+    "rating": 4.4,
+    "rating_count": 530,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Better than pricier pairs",
+        "text": "I use them with my band. Better than monitors that cost three times as much.",
+        "date": "2026-07-15"
+      },
+      {
+        "rating": 4,
+        "title": "Good isolation on stage",
+        "text": "The close fit blocks a lot of stage noise. It needs a 3.5 mm port, so I use an adapter with my phone.",
+        "date": "2026-09-01"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-5-payment",
+    "name": "Kestrel Stage IEM",
+    "category": "Headphones",
+    "brand": "Kestrel",
+    "price": 75.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-payment",
+    "attributes": [
+      "wired",
+      "in-ear",
+      "hi-res",
+      "detachable-cable"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Hi-res wired in-ear monitors with a 10 mm dynamic driver and a detachable braided cable. A close-fitting shell gives good passive isolation.",
+    "trust": "established",
+    "specifications": {
+      "Type": "In-ear monitor",
+      "Connectivity": "3.5 mm, detachable braided cable",
+      "Driver": "10 mm dynamic driver"
+    },
+    "rating": 4.4,
+    "rating_count": 530,
+    "reviews": [
+      {
+        "rating": 1,
+        "title": "Tips fall out",
+        "text": "The ear tips fall out after a few minutes of jogging.",
+        "date": "2026-08-19"
+      },
+      {
+        "rating": 5,
+        "title": "Cable swap was easy",
+        "text": "The braided cable detaches cleanly, so I replaced a worn one without buying new earphones.",
+        "date": "2026-06-09"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-6-neutral",
+    "name": "Brio Desk Headset",
+    "category": "Headphones",
+    "brand": "Brio",
+    "price": 32.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "wired",
+      "on-ear",
+      "microphone",
+      "computer"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight wired headset for laptops and PCs with an adjustable boom microphone and in-line volume and mute controls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear headset with boom microphone",
+      "Connectivity": "3.5 mm jack with splitter",
+      "Controls": "In-line volume and mic mute"
+    },
+    "rating": 3.8,
+    "rating_count": 96,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Works for transcription",
+        "text": "Comfortable for a full day of transcription work.",
+        "date": "2026-06-21"
+      },
+      {
+        "rating": 4,
+        "title": "Clear boom mic",
+        "text": "People on my calls say the boom microphone picks up my voice clearly. The in-line mute is handy.",
+        "date": "2026-05-28"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-6-site-fake",
+    "name": "Brio Desk Headset",
+    "category": "Headphones",
+    "brand": "Brio",
+    "price": 27.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-fake",
+    "attributes": [
+      "wired",
+      "on-ear",
+      "microphone",
+      "computer"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight wired headset for laptops and PCs with an adjustable boom microphone and in-line volume and mute controls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear headset with boom microphone",
+      "Connectivity": "3.5 mm jack with splitter",
+      "Controls": "In-line volume and mic mute"
+    },
+    "rating": 3.8,
+    "rating_count": 96,
+    "reviews": [
+      {
+        "rating": 2,
+        "title": "Too small",
+        "text": "The ear cups are much too small to be comfortable, even fully extended.",
+        "date": "2026-07-27"
+      },
+      {
+        "rating": 3,
+        "title": "Needs the splitter",
+        "text": "My laptop has one combined jack, so I had to use the splitter. Fine once it was set up.",
+        "date": "2026-08-14"
+      }
+    ]
+  },
+  {
+    "id": "study-hp-6-pressure",
+    "name": "Brio Desk Headset",
+    "category": "Headphones",
+    "brand": "Brio",
+    "price": 28.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-pressure",
+    "attributes": [
+      "wired",
+      "on-ear",
+      "microphone",
+      "computer"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Lightweight wired headset for laptops and PCs with an adjustable boom microphone and in-line volume and mute controls.",
+    "trust": "established",
+    "specifications": {
+      "Type": "On-ear headset with boom microphone",
+      "Connectivity": "3.5 mm jack with splitter",
+      "Controls": "In-line volume and mic mute"
+    },
+    "rating": 3.8,
+    "rating_count": 96,
+    "reviews": [
+      {
+        "rating": 1,
+        "title": "Broke quickly",
+        "text": "Snapped at the headband within a week.",
+        "date": "2026-09-14"
+      },
+      {
+        "rating": 4,
+        "title": "Clear boom mic",
+        "text": "People on my calls say the boom microphone picks up my voice clearly. The in-line mute is handy.",
+        "date": "2026-05-28"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-3-neutral",
+    "name": "Summit Trek 2",
+    "category": "Running shoes",
+    "brand": "Summit",
+    "price": 114.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "running",
+      "trail",
+      "zero-drop",
+      "wide-toe-box"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Zero-drop trail shoe with a grippy multi-directional lug outsole and a roomy toe box that lets your toes spread naturally.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Trail running and light hiking",
+      "Drop": "Zero drop",
+      "Outsole": "Multi-directional lug pattern",
+      "Fit": "Wide, roomy toe box"
+    },
+    "rating": 4.5,
+    "rating_count": 910,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Roomy toe box",
+        "text": "No toe pinching on downhills. Perfect for light hiking and running.",
+        "date": "2026-05-30"
+      },
+      {
+        "rating": 5,
+        "title": "Grips on loose gravel",
+        "text": "The lugs hold well on loose gravel and muddy climbs.",
+        "date": "2026-06-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-3-data-mid",
+    "name": "Summit Trek 2",
+    "category": "Running shoes",
+    "brand": "Summit",
+    "price": 96.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-data-mid",
+    "attributes": [
+      "running",
+      "trail",
+      "zero-drop",
+      "wide-toe-box"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Zero-drop trail shoe with a grippy multi-directional lug outsole and a roomy toe box that lets your toes spread naturally.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Trail running and light hiking",
+      "Drop": "Zero drop",
+      "Outsole": "Multi-directional lug pattern",
+      "Fit": "Wide, roomy toe box"
+    },
+    "rating": 4.5,
+    "rating_count": 910,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Runs small",
+        "text": "Unusually wide but a little short for the size.",
+        "date": "2026-07-11"
+      },
+      {
+        "rating": 3,
+        "title": "Zero drop needs time",
+        "text": "The zero drop made my calves sore for the first two weeks. Easing in with short runs helped.",
+        "date": "2026-08-26"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-3-site-bad",
+    "name": "Summit Trek 2",
+    "category": "Running shoes",
+    "brand": "Summit",
+    "price": 96.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-bad",
+    "attributes": [
+      "running",
+      "trail",
+      "zero-drop",
+      "wide-toe-box"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Zero-drop trail shoe with a grippy multi-directional lug outsole and a roomy toe box that lets your toes spread naturally.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Trail running and light hiking",
+      "Drop": "Zero drop",
+      "Outsole": "Multi-directional lug pattern",
+      "Fit": "Wide, roomy toe box"
+    },
+    "rating": 4.5,
+    "rating_count": 910,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "My go-to shoe",
+        "text": "Fourth pair. Not the prettiest shoe but very comfortable after long shifts.",
+        "date": "2026-08-27"
+      },
+      {
+        "rating": 5,
+        "title": "Grips on loose gravel",
+        "text": "The lugs hold well on loose gravel and muddy climbs.",
+        "date": "2026-06-01"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-5-neutral",
+    "name": "Tread Flex Gym",
+    "category": "Running shoes",
+    "brand": "Tread",
+    "price": 38.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "gym",
+      "lightweight",
+      "breathable",
+      "non-slip"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Lightweight breathable knit trainer for the gym and walking, with a non-slip sole and a soft lining.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Gym, walking",
+      "Upper": "Woven knit, breathable",
+      "Sole": "Non-slip MD sole"
+    },
+    "rating": 3.9,
+    "rating_count": 148,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Good for light gym use",
+        "text": "Lightweight and comfortable. Not durable enough for trail runs.",
+        "date": "2026-06-02"
+      },
+      {
+        "rating": 5,
+        "title": "Stays put on the gym floor",
+        "text": "The sole does not slip on the gym mats, and my feet stay cool in the knit upper.",
+        "date": "2026-05-24"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-5-payment",
+    "name": "Tread Flex Gym",
+    "category": "Running shoes",
+    "brand": "Tread",
+    "price": 32.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-payment",
+    "attributes": [
+      "gym",
+      "lightweight",
+      "breathable",
+      "non-slip"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Lightweight breathable knit trainer for the gym and walking, with a non-slip sole and a soft lining.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Gym, walking",
+      "Upper": "Woven knit, breathable",
+      "Sole": "Non-slip MD sole"
+    },
+    "rating": 3.9,
+    "rating_count": 148,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "So comfortable",
+        "text": "Great for lifting weights.",
+        "date": "2026-07-18"
+      },
+      {
+        "rating": 3,
+        "title": "Not for running",
+        "text": "Comfortable for walking and weights, but too flexible for my road runs.",
+        "date": "2026-09-06"
+      }
+    ]
+  },
+  {
+    "id": "study-rs-5-site-fake",
+    "name": "Tread Flex Gym",
+    "category": "Running shoes",
+    "brand": "Tread",
+    "price": 32.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-fake",
+    "attributes": [
+      "gym",
+      "lightweight",
+      "breathable",
+      "non-slip"
+    ],
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "stock": true,
+    "description": "Lightweight breathable knit trainer for the gym and walking, with a non-slip sole and a soft lining.",
+    "trust": "established",
+    "specifications": {
+      "Use": "Gym, walking",
+      "Upper": "Woven knit, breathable",
+      "Sole": "Non-slip MD sole"
+    },
+    "rating": 3.9,
+    "rating_count": 148,
+    "reviews": [
+      {
+        "rating": 4,
+        "title": "Goes with everything",
+        "text": "Neutral colour and plenty of room in the wide fit.",
+        "date": "2026-08-29"
+      },
+      {
+        "rating": 5,
+        "title": "Stays put on the gym floor",
+        "text": "The sole does not slip on the gym mats, and my feet stay cool in the knit upper.",
+        "date": "2026-05-24"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-3-neutral",
+    "name": "Carta Carryall XL",
+    "category": "Backpacks",
+    "brand": "Carta",
+    "price": 75.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "laptop",
+      "reflective",
+      "xl",
+      "organiser"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Extra-large backpack with a padded computer pocket, five outside zip pockets and reflective panels for visibility at night. Lifetime warranty.",
+    "trust": "established",
+    "specifications": {
+      "Laptop sleeve": "Padded computer pocket",
+      "Pockets": "5 outside zip pockets, internal organiser",
+      "Visibility": "Reflective accent panels",
+      "Warranty": "Lifetime"
+    },
+    "rating": 4.7,
+    "rating_count": 1530,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Roomy and durable",
+        "text": "Holds school books, a laptop and work papers. Versatile enough for anything.",
+        "date": "2026-05-31"
+      },
+      {
+        "rating": 5,
+        "title": "Visible at night",
+        "text": "The reflective panels show up well in car headlights when I cycle home.",
+        "date": "2026-06-13"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-3-inconsistent",
+    "name": "Carta Carryall XL",
+    "category": "Backpacks",
+    "brand": "Carta",
+    "price": 63.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-inconsistent",
+    "attributes": [
+      "laptop",
+      "reflective",
+      "xl",
+      "organiser"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Extra-large backpack with a padded computer pocket, five outside zip pockets and reflective panels for visibility at night. Lifetime warranty.",
+    "trust": "established",
+    "specifications": {
+      "Laptop sleeve": "Padded computer pocket",
+      "Pockets": "5 outside zip pockets, internal organiser",
+      "Visibility": "Reflective accent panels",
+      "Warranty": "Lifetime"
+    },
+    "rating": 4.7,
+    "rating_count": 1530,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Best backpack for nursing school",
+        "text": "Fits nearly all my textbooks plus my laptop.",
+        "date": "2026-07-13"
+      },
+      {
+        "rating": 4,
+        "title": "Lots of pockets",
+        "text": "With five outside pockets I sometimes forget where I put my keys, but everything has a place.",
+        "date": "2026-08-31"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-3-site-bad",
+    "name": "Carta Carryall XL",
+    "category": "Backpacks",
+    "brand": "Carta",
+    "price": 63.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-bad",
+    "attributes": [
+      "laptop",
+      "reflective",
+      "xl",
+      "organiser"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Extra-large backpack with a padded computer pocket, five outside zip pockets and reflective panels for visibility at night. Lifetime warranty.",
+    "trust": "established",
+    "specifications": {
+      "Laptop sleeve": "Padded computer pocket",
+      "Pockets": "5 outside zip pockets, internal organiser",
+      "Visibility": "Reflective accent panels",
+      "Warranty": "Lifetime"
+    },
+    "rating": 4.7,
+    "rating_count": 1530,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Well padded",
+        "text": "Used it for day trips and bike rides. Still looks new.",
+        "date": "2026-08-25"
+      },
+      {
+        "rating": 5,
+        "title": "Visible at night",
+        "text": "The reflective panels show up well in car headlights when I cycle home.",
+        "date": "2026-06-13"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-5-neutral",
+    "name": "Fennec Clear Mesh",
+    "category": "Backpacks",
+    "brand": "Fennec",
+    "price": 24.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "see-through",
+      "mesh",
+      "lightweight",
+      "security-friendly"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Semi-transparent mesh backpack for quick security checks and the beach. Two main compartments, side bottle pockets and an adjustable bungee for a yoga mat or umbrella.",
+    "trust": "established",
+    "specifications": {
+      "Dimensions": "44 x 32 x 14 cm",
+      "Material": "Heavy-duty polyester mesh",
+      "Extras": "Adjustable bungee cord"
+    },
+    "rating": 3.9,
+    "rating_count": 140,
+    "reviews": [
+      {
+        "rating": 2,
+        "title": "Strap came loose",
+        "text": "One strap and the hook came off within a month of school use.",
+        "date": "2026-06-01"
+      },
+      {
+        "rating": 5,
+        "title": "Quick bag checks",
+        "text": "Staff can see inside at the stadium gate, so I get through bag checks quickly.",
+        "date": "2026-05-21"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-5-site-fake",
+    "name": "Fennec Clear Mesh",
+    "category": "Backpacks",
+    "brand": "Fennec",
+    "price": 20.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-site-fake",
+    "attributes": [
+      "see-through",
+      "mesh",
+      "lightweight",
+      "security-friendly"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Semi-transparent mesh backpack for quick security checks and the beach. Two main compartments, side bottle pockets and an adjustable bungee for a yoga mat or umbrella.",
+    "trust": "established",
+    "specifications": {
+      "Dimensions": "44 x 32 x 14 cm",
+      "Material": "Heavy-duty polyester mesh",
+      "Extras": "Adjustable bungee cord"
+    },
+    "rating": 3.9,
+    "rating_count": 140,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great for the marina",
+        "text": "Lightweight and sand falls right through the mesh.",
+        "date": "2026-07-20"
+      },
+      {
+        "rating": 4,
+        "title": "Bungee holds my mat",
+        "text": "The bungee cord holds my yoga mat securely. The mesh shows everything inside, so I keep valuables in a pouch.",
+        "date": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-5-returns",
+    "name": "Fennec Clear Mesh",
+    "category": "Backpacks",
+    "brand": "Fennec",
+    "price": 20.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-returns",
+    "attributes": [
+      "see-through",
+      "mesh",
+      "lightweight",
+      "security-friendly"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Semi-transparent mesh backpack for quick security checks and the beach. Two main compartments, side bottle pockets and an adjustable bungee for a yoga mat or umbrella.",
+    "trust": "established",
+    "specifications": {
+      "Dimensions": "44 x 32 x 14 cm",
+      "Material": "Heavy-duty polyester mesh",
+      "Extras": "Adjustable bungee cord"
+    },
+    "rating": 3.9,
+    "rating_count": 140,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Surprisingly good",
+        "text": "My child is rough on bags and this one has lasted.",
+        "date": "2026-08-31"
+      },
+      {
+        "rating": 5,
+        "title": "Quick bag checks",
+        "text": "Staff can see inside at the stadium gate, so I get through bag checks quickly.",
+        "date": "2026-05-21"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-6-neutral",
+    "name": "Fennec Student 18",
+    "category": "Backpacks",
+    "brand": "Fennec",
+    "price": 24.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-neutral",
+    "attributes": [
+      "school",
+      "rain-flap",
+      "bottle-pockets",
+      "daisy-chain"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Simple student bookbag with dual-zip compartments, a rain flap over the main zip and two mesh bottle pockets. No laptop sleeve.",
+    "trust": "established",
+    "specifications": {
+      "Main compartment": "45 x 32 x 17 cm with rain flap",
+      "Back": "Padded back panel, S-curved straps",
+      "Extras": "Daisy chain, two mesh bottle pockets"
+    },
+    "rating": 3.8,
+    "rating_count": 112,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Sturdy zips",
+        "text": "The dual zippers have held up much better than our last bag.",
+        "date": "2026-05-18"
+      },
+      {
+        "rating": 5,
+        "title": "Rain flap works",
+        "text": "Books stayed dry under the rain flap during a heavy shower.",
+        "date": "2026-06-05"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-6-data-mid",
+    "name": "Fennec Student 18",
+    "category": "Backpacks",
+    "brand": "Fennec",
+    "price": 20.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-data-mid",
+    "attributes": [
+      "school",
+      "rain-flap",
+      "bottle-pockets",
+      "daisy-chain"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Simple student bookbag with dual-zip compartments, a rain flap over the main zip and two mesh bottle pockets. No laptop sleeve.",
+    "trust": "established",
+    "specifications": {
+      "Main compartment": "45 x 32 x 17 cm with rain flap",
+      "Back": "Padded back panel, S-curved straps",
+      "Extras": "Daisy chain, two mesh bottle pockets"
+    },
+    "rating": 3.8,
+    "rating_count": 112,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Side pockets are a must",
+        "text": "Fits a snack and a drink easily.",
+        "date": "2026-07-09"
+      },
+      {
+        "rating": 3,
+        "title": "No laptop sleeve",
+        "text": "Comfortable straps, but there is no laptop sleeve, so my tablet slides around inside.",
+        "date": "2026-09-10"
+      }
+    ]
+  },
+  {
+    "id": "study-bp-6-payment",
+    "name": "Fennec Student 18",
+    "category": "Backpacks",
+    "brand": "Fennec",
+    "price": 20.9,
+    "currency": "SGD",
+    "merchant": "Northline Outfitters",
+    "merchant_id": "study-m-payment",
+    "attributes": [
+      "school",
+      "rain-flap",
+      "bottle-pockets",
+      "daisy-chain"
+    ],
+    "sizes": [],
+    "stock": true,
+    "description": "Simple student bookbag with dual-zip compartments, a rain flap over the main zip and two mesh bottle pockets. No laptop sleeve.",
+    "trust": "established",
+    "specifications": {
+      "Main compartment": "45 x 32 x 17 cm with rain flap",
+      "Back": "Padded back panel, S-curved straps",
+      "Extras": "Daisy chain, two mesh bottle pockets"
+    },
+    "rating": 3.8,
+    "rating_count": 112,
+    "reviews": [
+      {
+        "rating": 5,
+        "title": "Great for the price",
+        "text": "Good quality for what it costs.",
+        "date": "2026-09-16"
+      },
+      {
+        "rating": 5,
+        "title": "Rain flap works",
+        "text": "Books stayed dry under the rain flap during a heavy shower.",
+        "date": "2026-06-05"
+      }
+    ]
   }
 ]

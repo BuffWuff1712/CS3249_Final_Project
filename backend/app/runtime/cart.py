@@ -1,7 +1,7 @@
 """Cart entries retain their original shopping brief, but use current permissions."""
 from . import service
 from .schemas import CartItem, Approval
-from .policy import catalogue, evaluate, fingerprint
+from .policy import catalogue, evaluate, fingerprint, reasons
 
 
 def checked_context(session, item):
@@ -15,7 +15,7 @@ def checked_context(session, item):
     if fingerprint(action) != item.action.fingerprint:
         raise ValueError("Merchant terms or policy changed. Remove this item and search again.")
     if action.decision == "BLOCK":
-        raise ValueError(" ".join(r.explanation for r in action.rules if r.decision == "BLOCK"))
+        raise ValueError(reasons(action, "BLOCK"))
     return context, action
 
 

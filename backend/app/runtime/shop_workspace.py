@@ -215,7 +215,7 @@ def propose(s, product_id):
     checked = Action(product=p, merchant_details=merchant_for(p, context))
     policy.evaluate(context, checked)
     if checked.decision == "BLOCK":
-        raise ValueError("This offer is blocked by the backend policy. " + " ".join(r.explanation for r in checked.rules if r.decision == "BLOCK"))
+        raise ValueError("This offer is blocked by the backend policy. " + policy.reasons(checked, "BLOCK"))
     s.messages.append(Message(role="user", text=f"Compare {p.name} from {p.merchant}."))
     clear_selection(s)
     events, proposals = len(s.events), len(s.proposals)

@@ -32,7 +32,8 @@ There are three parallel categories, and each has the same structure:
 | Running shoes | `rs` | Vela Tempo Daily | SGD 159 | `cushioned, road` |
 | Backpacks | `bp` | Atlas Scholar 30 | SGD 99 | `laptop, water-resistant` |
 
-- **Candidates.** `study-{cat}-1` onward (5–6 per category) are other products in the category. Only the target has every goal feature within budget. One candidate has the features but is over budget, and the rest miss at least one feature.
+- **Candidates.** `study-{cat}-1` onward (5–6 per category) are other products in the category, each sold by `study-m-trusted`. Among these candidate records only the target has every goal feature within budget. One candidate has the features but is over budget, and the rest miss at least one feature.
+- **Candidate sellers.** Every candidate is also sold by `neutral` and two or three risk merchants, as `study-{cat}-{n}-{variant}`. These offers copy the candidate's product fields, take the variant price ratios, and pair one of the candidate's reviews with one of two new ones. They never use `lowprice` or `benign` (too few same-brand offers for a stable `low_price` median), `lookalike` (a genuine candidate is not a knockoff) or `concealed`. See [`docs/data/2026-11-01-candidate-sellers-design.md`](../../docs/data/2026-11-01-candidate-sellers-design.md).
 - **Target offers.** `study-{cat}-target-{variant}` are 18 listings of the same target product. Except for `lookalike`, which is a knockoff with its own name and brand, they share name, brand, attributes, specifications, rating and rating count, and differ in merchant, price, description and their 3 product reviews. Any two listings share at most one review.
 - **Merchants.** `study-m-trusted` (established store), `study-m-neutral` (small clean store) and one merchant per risk variant. Each merchant sells the target offer of all three categories.
 - **Websites.** Every study merchant's domain is in `sites/site_registry.json`. Marketplace stores use `https://<platform>/store/<slug>`; independent stores use their own domain. Variants without a website-reputation signal sit on `good` sites. See [`docs/data/2026-10-29-website-reputation-design.md`](../../docs/data/2026-10-29-website-reputation-design.md).
@@ -70,6 +71,8 @@ Signals are a property of the data. Risk levels, weights, thresholds and the fin
 4. Run the tests. `test_study_scenarios_match_manifest` re-checks every scenario that lists `study-*` products against the manifest.
 
 Search recommends at most four offers (`recommendation_limit` in `config/policy.json`), cheapest first among equal matches. Offers beyond the four cheapest only appear after the participant rejects earlier ones. `site-reputation` is a worked example: it lists `trusted` and the three website-reputation variants, and leaves out `neutral` so all four are recommended.
+
+`demo` lists every study product, has no trigger and no initial brief, and is opened from `/research` for demonstrations. A test keeps its `product_ids` equal to all `study-*` products. It lists `lowprice` and `benign` together, an exception to rule 3 that `test_study_scenarios_match_manifest[demo]` checks. Its sessions mix many variants, so they are not for analysis. The original scenarios without `product_ids` (`normal` to `rejection`) see the whole catalogue, candidate sellers included.
 
 ## Editing study records
 
