@@ -143,6 +143,34 @@ KNOCKOFF = {
     "bp": ("Atlis Scholar 30", "Atlis"),
 }
 
+# Extra sellers of existing candidates (docs/data/2026-11-01-candidate-sellers-design.md §2).
+SELLERS = {
+    "study-hp-2": ["neutral", "pressure", "returns"],
+    "study-hp-3": ["neutral", "site-mid", "payment", "external"],
+    "study-hp-1": ["neutral", "nobiz", "site-bad"],
+    "study-rs-2": ["neutral", "pressure", "inconsistent", "injection"],
+    "study-rs-4": ["neutral", "site-mid", "returns"],
+    "study-rs-1": ["neutral", "nobiz", "site-fake"],
+    "study-bp-4": ["neutral", "pressure", "data-mid", "data-high"],
+    "study-bp-2": ["neutral", "site-mid", "nobiz"],
+    "study-bp-1": ["neutral", "returns", "payment"],
+}
+SELLER_RATIOS = {
+    "neutral": 0.95,
+    "pressure": 0.85,
+    "site-mid": 0.75,
+    "external": 0.75,
+    **{v: 0.80 for v in ["returns", "payment", "nobiz", "site-bad", "inconsistent", "injection", "site-fake", "data-mid", "data-high"]},
+}
+
+
+def seller_offer(candidate, v):
+    return f"{candidate}-{v}"
+
+
+def seller_offers():
+    return [(c, v) for c, vs in SELLERS.items() for v in vs]
+
 
 def test_study_merchants_exist():
     assert {f"study-m-{v}" for v in ALL_MERCHANT_KEYS} <= set(merchants())
@@ -462,3 +490,57 @@ def test_each_offer_has_its_own_reviews(cat):
     for i, a in enumerate(keys):
         for b in keys[i + 1 :]:
             assert len(sets[a] & sets[b]) <= 1, (a, b)
+
+
+def test_catalogue_ids_unique():
+    ids = [p["id"] for p in json.loads((ROOT / "data/products/catalogue.json").read_text(encoding="utf-8-sig"))]
+    assert len(ids) == len(set(ids))
+
+
+def test_seller_offers_complete():
+    ps = products()
+    assert len(seller_offers()) == 30
+    for c, v in seller_offers():
+        o, base = ps[seller_offer(c, v)], ps[c]
+        assert o.merchant_id == f"study-m-{v}" and base.merchant_id == "study-m-trusted"
+        for f in [*SHARED, "description", "stock"]:
+            assert getattr(o, f) == getattr(base, f), (o.id, f)
+
+
+def test_seller_offers_share_model_key():
+    from app.runtime.shop_workspace import model_key
+
+    ps = products()
+    assert all(model_key(ps[seller_offer(c, v)]) == model_key(ps[c]) for c, v in seller_offers())
+
+
+@pytest.mark.parametrize("c,v", seller_offers())
+def test_seller_offer_prices(c, v):
+    ps = products()
+    price, base = ps[seller_offer(c, v)].price, ps[c].price
+    assert abs(price / base - SELLER_RATIOS[v]) <= 0.03 and price < base
+    assert round(price * 10) % 10 == 9
+
+
+@pytest.mark.parametrize("c", list(SELLERS))
+def test_seller_offers_pair_reviews(c):
+    ps = products()
+    a, b, c3 = [r.text for r in ps[c].reviews]
+    new = [seller_offer(c, v) for v in SELLERS[c]]
+    texts = [[r.text for r in ps[i].reviews] for i in new]
+    d, e = texts[0][1], texts[1][1]
+    assert d != e and not {d, e} & {a, b, c3}
+    assert texts == [[a, d], [b, e], [c3, d], [a, e]][: len(new)]
+    family = [{a, b, c3}, *(set(t) for t in texts)]
+    for i, x in enumerate(family):
+        for y in family[i + 1 :]:
+            assert len(x & y) <= 1
+
+
+@pytest.mark.parametrize("c,v", seller_offers())
+@pytest.mark.parametrize("width", ["category", "catalogue"])
+def test_seller_signals_hold_in_wider_scopes(c, v, width):
+    ps = products()
+    prefix = c.rsplit("-", 1)[0] + "-"
+    ids = [i for i in ps if i.startswith(prefix)] if width == "category" else list(ps)
+    assert fired(seller_offer(c, v), [ps[i] for i in ids]) == set(EXPECTED[v]["signals"])
