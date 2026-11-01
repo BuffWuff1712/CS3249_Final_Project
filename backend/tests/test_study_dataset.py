@@ -410,7 +410,7 @@ def test_no_real_brands_or_placeholder_text():
 
 def test_manifest_complete():
     entries = manifest()
-    assert len(entries) == 48
+    assert len(entries) == 69
     assert {e["category"] for e in entries.values()} == {"Headphones", "Running shoes", "Backpacks"}
 
 
@@ -544,3 +544,24 @@ def test_seller_signals_hold_in_wider_scopes(c, v, width):
     prefix = c.rsplit("-", 1)[0] + "-"
     ids = [i for i in ps if i.startswith(prefix)] if width == "category" else list(ps)
     assert fired(seller_offer(c, v), [ps[i] for i in ids]) == set(EXPECTED[v]["signals"])
+
+
+@pytest.mark.parametrize("c,v", [(c, v) for c, v in seller_offers() if v != "neutral"])
+def test_seller_manifest_matches_engine(c, v):
+    ps, entries = products(), manifest()
+    entry = entries[seller_offer(c, v)]
+    cat = c.split("-")[1]
+    target = entries[offer(cat, v)]
+    assert entry["merchant_id"] == f"study-m-{v}" and entry["variant"] == v
+    assert entry["category"] == PINNED[cat]["category"]
+    assert entry["price_ratio"] == SELLER_RATIOS[v]
+    assert entry["visible_in"] == target["visible_in"]
+    assert entry["reference_set"] == [c, seller_offer(c, "neutral")]
+    scope = [ps[i] for i in entry["reference_set"]] + [ps[entry["product_id"]]]
+    r = assess(ps[entry["product_id"]], merchants()[entry["merchant_id"]], scope, load_config())
+    assert {e.rule_id for e in r.evidence} == set(EXPECTED[v]["signals"]) == set(entry["signals"])
+    assert entry["ground_truth"] == EXPECTED[v]["ground_truth"]
+
+
+def test_neutral_sellers_have_no_manifest_entry():
+    assert not any(seller_offer(c, "neutral") in manifest() for c in SELLERS)
