@@ -292,6 +292,7 @@ def chat(s, text):
             event(s, "refine", change.field)
     if result.intent in ("search", "new_task", "clarify", "alternative"):
         from .clarification import clarify_before_search
+        type_was_missing = s.clarification_answers.get("product_type") == "missing"
         question = clarify_before_search(s, result, text)
         if question:
             if (result.intent != "clarify" or "category" in s.brief
@@ -344,6 +345,8 @@ def chat(s, text):
             fallback = " ".join(m.text for m in s.messages[first_message:])
             del s.messages[first_message:]
             message(s, explanation or fallback)
+        if type_was_missing and s.clarification_answers.get("product_type") == "unknown":
+            s.messages[-1].text += f" You didn't name a specific type, so I searched {s.brief['category'].value}, the closest catalogue category. Tell me if you meant something else."
         if explanation:
             event(s, "outcome_explanation", "Explained verified shopping result")
         elif s.mode != "mock":

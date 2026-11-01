@@ -156,7 +156,7 @@ def mock_interpret(session, text):
             add("features", feature)
             break
     if re.search(r"unsure|don't know|dont know|no preference|not sure|no budget|no particular features|no feature preference", lower):
-        fields = (["features"] if "feature" in lower else ["budget"] if "budget" in lower else session.clarification_asked)
+        fields = [f for f, word in (("budget", "budget"), ("features", "feature")) if word in lower] or session.clarification_asked
         brief_fields = {"product_type": "category", "budget": "budget", "features": "features"}
         answers.extend(ClarificationAnswer(field=f, status="unknown", evidence=text) for f in fields
                        if not any(c.field == brief_fields[f] and c.source == "confirmed" for c in changes))

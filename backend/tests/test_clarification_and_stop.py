@@ -22,6 +22,27 @@ def test_broad_shoes_asks_all_then_accepts_uncertainty(monkeypatch):
     assert not s.receipts and "budget" not in s.brief
 
 
+@pytest.mark.parametrize("reply", ["Just shoes, any kind", "I don't mind, any shoes"])
+def test_shoe_type_is_asked_once_then_searches_the_family(reply):
+    s = Session(mode="mock")
+    service.chat(s, "Find shoes under $100, no feature preference")
+    assert s.stage == "clarifying" and not s.proposals
+    service.chat(s, reply)
+    assert s.proposals and s.clarification_answers["product_type"] == "unknown"
+    # The narrower catalogue category is only suggested, and the reply says so.
+    assert s.brief["category"].source == "suggested"
+    assert "didn't name a specific type" in s.messages[-1].text
+
+
+def test_unrelated_type_answer_still_asks_remaining_fields_only():
+    s = Session(mode="mock")
+    service.chat(s, "I need some shoes")
+    service.chat(s, "everyday wear")
+    assert s.stage == "clarifying" and not s.proposals
+    assert "type of product" not in s.messages[-1].text and "your budget" in s.messages[-1].text
+    service.chat(s, "no budget, no feature preference")
+    assert s.proposals
+
 def test_partial_answer_does_not_skip_remaining_questions():
     s = Session(mode="mock")
     service.chat(s, "I need shoes")
