@@ -382,6 +382,13 @@
 .cui-secondary-actions { gap: 6px; }
 .cui-secondary-actions button { padding: 7px 9px; min-height: 36px; font-size: 11px; }
 .cui-table-wrap { max-width: 100%; margin: 12px 0; }
+.cui-seller-table { position: relative; }
+.cui-seller-sort { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin-bottom: 8px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.cui-seller-sort select { padding: 4px 6px; font-size: 12px; color: var(--ink); }
+@media (min-width: 761px) {
+  .cui-seller-sort { position: absolute; top: 0; right: 0; margin: 0; }
+  .cui-seller-table .cui-offer-table caption { padding-right: 210px; }
+}
 .cui-compare-table, .cui-offer-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; line-height: 1.5; }
 .cui-compare-table caption, .cui-offer-table caption { text-align: left; font-size: 16px; font-weight: 600; margin-bottom: 12px; }
 .cui-compare-table th, .cui-compare-table td, .cui-offer-table th, .cui-offer-table td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); padding: 10px 7px; overflow-wrap: anywhere; }
