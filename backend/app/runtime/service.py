@@ -81,6 +81,7 @@ def switches_category(s, changes, text):
 
 def reset_request(s):
     invalidate(s)
+    s.task_start_message = max(0, len(s.messages) - 1)
     s.brief = {}
     s.clarification_asked = []
     s.clarification_answers = {}
@@ -112,6 +113,8 @@ def create(*, search_provider=None):
         s.messages[-1].text = "Hi, I’m Beany. Tell me what you’re shopping for. I can search public product listings using Browser Use. Prices and merchant details need review; checkout here is always simulated."
         if s.search_replay:
             s.messages[-1].text = "Hi, I’m Beany. Tell me what you’re shopping for. This session replays saved study listings instead of searching the web. Prices and merchant details need review; checkout here is always simulated."
+    if s.search_provider in ("shopify_catalog", "hybrid"):
+        s.messages[-1].text = "Hi, I’m Beany. Tell me what you’re shopping for. I can search Shopify products" + (" and use Browser Use when needed" if s.search_provider == "hybrid" else "") + ". Prices and seller details need review; checkout is always simulated."
     event(s, "session_started", "Fresh shopping session")
     return s
 
@@ -169,7 +172,7 @@ def propose(s, product=None, *, recommendations=None, **kwargs):
         product = s.recommendations[0]
     with step(f"Checking {product.name} and {product.merchant}…", "Checked seller terms, budget and permissions") as activity:
         merchant = merchant_for(product, s)
-        if product.source == "browser_use":
+        if product.source in ("browser_use", "shopify_catalog"):
             # One cached agent review per snapshot; later policy rechecks reuse it.
             review_listing(s, product, merchant)
         elif s.risk_detection == "ai":
@@ -247,10 +250,7 @@ def chat(s, text):
         message(s, reply)
         event(s, "cart_review_requested", "User requested checkout review; no purchase authorized")
         return s
-    # The interpreter decides whether this is a new task, including within one category.
-    # A different category always is one: sizes, features and budget belong to the old product.
-    if result.intent in ("search", "clarify", "alternative") and switches_category(s, result.changes, text):
-        result.intent = "new_task"
+    # Only an interpreted new task resets the brief; subtype wording is a refinement.
     if result.intent == "new_task":
         reset_request(s)
     for change in result.changes:
@@ -270,10 +270,8 @@ def chat(s, text):
                 change.source = "suggested"
                 change.value = elicitation["default_currency"]
         old = s.brief.get(change.field)
-        grounded = (
-            bool(change.evidence.strip())
-            and change.evidence.casefold() in text.casefold()
-        )
+        from .preferences import grounded_change, apply_change
+        grounded = grounded_change(s, change, text, allow_history=result.intent != "new_task")
         if change.source == "confirmed" and not grounded:
             event(s, "unverified_change", change.field)
             continue
@@ -287,6 +285,7 @@ def chat(s, text):
         )
         if fact is None and change.source != "confirmed":
             continue
+        fact = apply_change(old, change, fact)
         edit(s, change.field, fact)
         if old:
             event(s, "refine", change.field)
@@ -327,7 +326,15 @@ def chat(s, text):
         event(s, "alternative", previous.id)
     if "category" in s.brief:
         invalidate(s)
-        outcome = run_shopping(s)
+        from .search_errors import SearchProviderError, report_failure, USER_MESSAGE
+        try:
+            outcome = run_shopping(s)
+        except SearchProviderError as exc:
+            report_failure(s, exc)
+            s.stage = "ready"
+            s.suggestions = []
+            message(s, USER_MESSAGE)
+            return s
         event(s, "shopping_result", outcome.model_dump_json())
         if outcome.status != "proposed":
             s.stage = "no_match" if outcome.status == "no_match" else "ready"

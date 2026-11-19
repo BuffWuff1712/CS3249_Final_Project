@@ -75,7 +75,9 @@ export type WebEvidence = {
   notices: string[];
 };
 export type Product = {
-  source?: "catalogue" | "browser_use";
+  image_url?: string;
+  image_alt?: string;
+  source?: "catalogue" | "browser_use" | "shopify_catalog";
   source_url?: string;
   observed_at?: string;
   web_evidence?: WebEvidence | null;
@@ -109,7 +111,7 @@ export type Action = {
   shares_personal_data: boolean;
 };
 export type Session = {
-  search_provider: "catalogue" | "browser_use";
+  search_provider: "catalogue" | "browser_use" | "shopify_catalog" | "hybrid";
   search_replay?: string;
   id: string;
   participant: string;

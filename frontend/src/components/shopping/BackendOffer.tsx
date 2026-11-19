@@ -1,4 +1,5 @@
 "use client";
+import { ProductImage } from "./ProductImage";
 import type { ReactNode } from "react";
 import type { Action, Fact, Merchant, MerchantRisk, Product } from "@/lib/beany";
 import { MerchantDetails } from "@/components/MerchantDetails";
@@ -41,19 +42,20 @@ export function BackendProductEvidence({ product, merchant, replay = false }: { 
     <p>{product.description || "Description not supplied."}</p>
     <dl className="cui-spec-grid">{Object.entries(product.specifications).map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value || "Unknown; not supplied"}</dd></div>)}</dl>
     <p>{product.rating === null || product.rating === undefined ? "Unknown product rating" : `${product.rating}/5`} · {product.rating_count ?? 0} aggregate product ratings</p>
-    <p className="cui-source">{product.reviews?.length || 0} supplied product review excerpts. Aggregate counts do not mean all reviews were read; {product.source === "browser_use" ? "captured excerpts are unverified." : "these catalogue reviews are fictional."}</p>
+    <p className="cui-source">{product.reviews?.length || 0} supplied product review excerpts. Aggregate counts do not mean all reviews were read; {["browser_use", "shopify_catalog"].includes(product.source || "") ? "captured excerpts are unverified." : "these catalogue reviews are fictional."}</p>
     {product.reviews?.map((review, index) => <blockquote key={index}><strong>{review.title}</strong> · {review.rating}/5<p>{review.text}</p></blockquote>)}
     {!product.reviews?.length && <p className="cui-source">Product review excerpts: Unknown; not supplied.</p>}
     <h4>Seller terms</h4><dl className="cui-spec-grid"><div><dt>Returns</dt><dd>{merchant?.return_policy || "Unknown; not supplied"}</dd></div><div><dt>Payment</dt><dd>{merchant?.payment_methods.join(", ") || "Unknown; not supplied"}</dd></div><div><dt>Website</dt><dd>{merchant?.website || "Unknown; not supplied"}</dd></div><div><dt>Contact</dt><dd>{merchant?.contact || "Unknown; not supplied"}</dd></div></dl>
     {merchant?.merchant_reviews?.map((review, index) => <blockquote key={index}><strong>Seller review: {review.title}</strong> · {review.rating}/5<p>{review.text}</p></blockquote>)}
     <MerchantDetails replay={replay} action={{ product, merchant_details: merchant, risk: null, id: "evidence", fingerprint: "", status: "snapshot", decision: "REVIEW", rules: [], payment_method: "", shares_personal_data: false }} />
-    <p className="cui-source">Offer: {product.id}. {product.source === "browser_use" ? "Listing evidence is unverified; prices and stock may change." : "No website was visited and authenticity has not been verified."}</p>
+    <p className="cui-source">Source: {product.source === "shopify_catalog" ? "Shopify Catalog" : product.source === "browser_use" ? "Browser Use" : "Demo catalogue"}. Offer: {product.id}. {["browser_use", "shopify_catalog"].includes(product.source || "") ? "Listing evidence is unverified; prices and stock may change." : "No website was visited and authenticity has not been verified."}</p>
   </section>;
 }
 
 export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, selected, disabled, selectionInvalid = false, select, seller, addCart, alternative, replay = false, evidenceId }: { sellerPreferences?: ReactNode; action: Action; brief?: Record<string, Fact>; selected: boolean; disabled: boolean; selectionInvalid?: boolean; select: () => void; addCart: () => void; alternative: () => void; seller: () => void; replay?: boolean; evidenceId?: number }) {
   return <article className="cui-recommendation" aria-label="Current recommendation">
     <h2 className="cui-panel-title">Your current match</h2><div className="cui-product-heading"><h3>{action.product.name}</h3><div><strong>{money(action.product)}</strong><span>{action.product.merchant}</span></div></div>
+    <ProductImage key={action.product.id + (action.product.image_url || "")} product={action.product} />
     <MatchedPriorities product={action.product} brief={brief} />
     <ul className="cui-product-points">
       <li className="cui-icon-fact"><ListBulletsIcon aria-hidden="true" /><span><strong>Listed features:</strong> {action.product.attributes.join(", ") || "Not supplied"}</span></li>

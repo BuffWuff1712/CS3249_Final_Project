@@ -36,7 +36,7 @@ def confirmed(s, key):
 
 
 def catalogue(s):
-    if s.search_provider == "browser_use" and not s.scenario_id:
+    if s.search_provider != "catalogue" and not s.scenario_id:
         return list(s.live_products.values())
     products = [
         Product.model_validate(p)
@@ -73,10 +73,15 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
         ):
             continue
         if (
-            value(s, "category")
+            not (p.source in ("browser_use", "shopify_catalog") and not s.search_replay)
+            and value(s, "category")
             and p.category.casefold() != value(s, "category").casefold()
         ):
             continue
+        if p.source in ("browser_use", "shopify_catalog") and not s.search_replay:
+            from .relevance import status
+            if status(s, p) == "mismatch":
+                continue
         if confirmed(s, "currency") and p.currency != value(s, "currency"):
             continue
         if (
@@ -136,13 +141,16 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
 
 def fingerprint(a):
     payload = {
-        "product": a.product.model_dump(),
+        "product": a.product.model_dump(exclude={"image_url", "image_alt"}),
         "merchant": a.merchant_details.model_dump() if a.merchant_details else None,
         "risk_config": a.risk.config_hash if a.risk else None,
         "payment": a.payment_method,
         "sharing": a.shares_personal_data,
         "substitute": a.substitute,
     }
+    for key in ("observed_type", "type_evidence", "relevance_binding", "relevance", "provider_ids", "inferred_attributes", "detail_checked"):
+        if payload["product"].get(key) in ("", "unknown", None, {}, [], False):
+            payload["product"].pop(key, None)
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
@@ -173,7 +181,7 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
                 "merchant",
                 "Merchant terms changed or are missing. Request a new proposal.",
             )
-        if p.source == "browser_use":
+        if p.source in ("browser_use", "shopify_catalog"):
             import re
             from datetime import datetime, timezone
             config = session_config(s)  # Invalid policy configuration still blocks.
@@ -245,6 +253,8 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
             "configuration",
             "Merchant risk data or configuration is invalid. Checkout is blocked until the researcher repairs it.",
         )
+    if p.source == "shopify_catalog" and not p.detail_checked:
+        rule("variant_unresolved", "BLOCK", "variant", "Inspect this seller and variant before simulated checkout.")
     if not p.stock:
         rule(
             "stock", "BLOCK", "availability", "This fictional product is out of stock."
@@ -298,7 +308,13 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
             "substitutions",
             "This is a substitution; approve this specific alternative or refine your request.",
         )
-    if confirmed(s, "category") and p.category != value(s, "category"):
+    if p.source in ("browser_use", "shopify_catalog") and not s.search_replay:
+        from .relevance import status
+        relevance = status(s, p)
+        if relevance != "match":
+            rule("product_relevance", "BLOCK" if relevance == "mismatch" else "REVIEW", "category",
+                 "This listing is not the requested product." if relevance == "mismatch" else "The listing’s fit to your request needs your review.")
+    elif confirmed(s, "category") and p.category != value(s, "category"):
         rule(
             "category",
             "REVIEW",

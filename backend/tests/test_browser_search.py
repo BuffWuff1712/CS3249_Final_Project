@@ -59,7 +59,7 @@ def test_timeout_requests_cancellation(config, monkeypatch):
 def test_errors_sanitized_no_retry(config):
     def handler(req): return httpx.Response(401, json={"detail": "test-secret"})
     with httpx.Client(transport=httpx.MockTransport(handler)) as client:
-        with pytest.raises(LLMError, match="HTTP 401") as exc:
+        with pytest.raises(LLMError, match="credentials") as exc:
             browser.run_task({}, "", client=client)
     assert "test-secret" not in str(exc.value)
 
@@ -98,7 +98,7 @@ def test_default_off_and_research_stays_catalogue(config, monkeypatch):
 
 def test_missing_key_fails_before_network(monkeypatch):
     monkeypatch.delenv("BROWSER_USE_API_KEY", raising=False)
-    with pytest.raises(LLMError, match="BROWSER_USE_API_KEY"):
+    with pytest.raises(LLMError, match="credentials"):
         browser.run_task({}, "")
 
 
@@ -146,7 +146,7 @@ def test_invalid_rows_are_skipped_not_fatal(config, monkeypatch):
 
 
 def test_all_rows_invalid_reports_why(config, monkeypatch):
-    with pytest.raises(LLMError, match="none had an SGD/USD price"):
+    with pytest.raises(LLMError, match="output schema"):
         completed([{**AMAZON, "currency": "JPY"}], monkeypatch)
 
 

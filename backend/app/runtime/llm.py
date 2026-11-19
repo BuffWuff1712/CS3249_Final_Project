@@ -22,6 +22,7 @@ class OpenAIConversation:
         if os.getenv("BEANY_LLM_MODE", "openai") == "mock":
             return mock_interpret(session, text)
         instructions = (ROOT / "config/prompts/dialogue.txt").read_text(encoding="utf-8-sig")
+        from .preferences import task_start
         payload = {
                 "supported_categories": supported_categories(session),
                 "search_vocabulary": search_vocabulary(session),
@@ -40,6 +41,7 @@ class OpenAIConversation:
                 # Keep whole recent messages for references/banter; IDs and timestamps
                 # add no conversational meaning. Durable preferences live in brief.
                 "history": [{"role": m.role, "text": m.text} for m in session.messages[-20:]],
+                "current_task_messages": [{"index": i, "text": m.text} for i, m in enumerate(session.messages) if i >= task_start(session) and m.role == "user"][-20:],
                 "latest_message": text,
             }
         result = structured_call(Interpretation, instructions, payload)
@@ -49,7 +51,7 @@ class OpenAIConversation:
             # One corrective call only; Python still validates the second result.
             result = structured_call(Interpretation, instructions, {
                 **payload, "validation_feedback": issues,
-                "repair_instruction": "Regenerate the complete interpretation. Quote literal contiguous text from latest_message, never ellipses or older messages. A provided answer needs a matching non-null preference change unless already in brief. If a fact cannot be grounded, ask for it; do not promise a search without a category.",
+                "repair_instruction": "Regenerate the complete interpretation. Quote literal contiguous text from latest_message, never ellipses. Only for a missing category, you may quote an indexed current_task_messages entry and set evidence_message_index to its index; otherwise leave it null. A provided answer needs a matching non-null preference change unless already in brief. If a fact cannot be grounded, ask for it; do not promise a search without a category.",
             })
         return result
 

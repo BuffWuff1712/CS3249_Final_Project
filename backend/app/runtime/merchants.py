@@ -27,7 +27,7 @@ def merchants():
 
 
 def merchant_for(product, session=None):
-    if product.source == "browser_use":
+    if product.source in ("browser_use", "shopify_catalog"):
         if session is None or product.merchant_id not in session.live_merchants:
             raise ValueError("Missing live listing source")
         return session.live_merchants[product.merchant_id]

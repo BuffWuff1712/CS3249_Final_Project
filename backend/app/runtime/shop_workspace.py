@@ -31,9 +31,12 @@ def adopt(s):
 
 
 def model_key(product):
+    if product.source == "shopify_catalog":
+        # Do not merge distinct variants based on fuzzy names or inferred options.
+        return hashlib.sha256(json.dumps(product.provider_ids, sort_keys=True).encode()).hexdigest()
     identity = [product.name.casefold(), product.brand.casefold(), product.category.casefold(),
                 product.currency, sorted(product.sizes), sorted(product.specifications.items())]
-    if product.source == "browser_use":
+    if product.source in ("browser_use", "shopify_catalog"):
         # No canonical cross-seller model/variant identifier is supplied by the live adapter.
         identity += [product.source_url, product.id]
     return hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
@@ -45,9 +48,11 @@ def preview(s):
         return []
     offers = []
     context = s.model_copy(deep=True)
-    records = s.live_merchants if s.search_provider == "browser_use" and not s.scenario_id else merchants()
+    records = s.live_merchants if s.search_provider != "catalogue" and not s.scenario_id else merchants()
     products = policy.catalogue(s)
     for p in policy.search(s, limit=None)[:MAX_OFFERS]:
+        if p.source != "catalogue" and p.id not in {item.id for item in s.recommendations}:
+            continue
         a = Action(id="", product=p, merchant_details=records[p.merchant_id])
         policy.evaluate(context, a, catalogue_snapshot=products, merchant_snapshot=records)
         offers.append({"product": p.model_dump(), "model_key": model_key(p),
@@ -78,7 +83,12 @@ def view(s):
         except (ValueError, LookupError) as exc:
             selection_error = str(exc)
     # Only explicitly selected participant-facing state is exposed, never experiment labels.
-    return {"session": SessionView.model_validate(s.model_dump()).model_dump(),
+    from .shopping_tools import supported_categories
+    try:
+        categories = supported_categories(s)
+    except (StopIteration, ValueError, OSError):
+        categories = []  # Unavailable legacy/demo metadata must not prevent opening saved state.
+    return {"available_categories": categories, "session": SessionView.model_validate(s.model_dump()).model_dump(),
             "revision": state["revision"], "offers": preview(s),
             "current": current.model_dump() if current else None, "current_error": current_error,
             "current_model_key": model_key(current.product) if current else None,
@@ -305,7 +315,14 @@ def compare(s):
     service.invalidate(s)
     meta(s).pop("browsed", None)
     events, proposals = len(s.events), len(s.proposals)
-    outcome = run_shopping(s)
+    from .search_errors import SearchProviderError, report_failure, USER_MESSAGE
+    try:
+        outcome = run_shopping(s)
+    except SearchProviderError as exc:
+        report_failure(s, exc)
+        s.stage = "ready"
+        service.message(s, USER_MESSAGE)
+        return
     if outcome.status != "proposed":
         s.stage = "no_match" if outcome.status == "no_match" else "ready"
         service.message(s, "No eligible offer was proposed. Your limits were kept. Refine your needs or retry the comparison.")

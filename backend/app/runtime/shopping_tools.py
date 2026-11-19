@@ -7,7 +7,7 @@ from .progress import step
 
 
 def supported_categories(session):
-    if session.search_provider == "browser_use" and not session.scenario_id:
+    if session.search_provider != "catalogue" and not session.scenario_id:
         if session.search_replay:
             from .browser_search import replay_categories
             return replay_categories(session.search_replay)
@@ -17,7 +17,7 @@ def supported_categories(session):
 
 def search_vocabulary(session):
     """Exact attribute and size spellings search matches literally, per category."""
-    if session.search_provider == "browser_use" and not session.scenario_id:
+    if session.search_provider != "catalogue" and not session.scenario_id:
         return {}  # Open web listings have no fixed vocabulary.
     vocab = {}
     for p in policy.catalogue(session):
@@ -50,8 +50,8 @@ def listed_spelling(session, field, value):
 
 
 def _search_products(session, query=""):
-    if session.search_provider == "browser_use" and not session.scenario_id:
-        from .browser_search import discover
+    if session.search_provider != "catalogue" and not session.scenario_id:
+        from .discovery import discover
         ids = discover(session, query)
         return [p for p in policy.search(session, limit=None) if p.id in ids][:policy.CONFIG["recommendation_limit"]]
     # Apply every existing eligibility filter before optional keyword filtering.
@@ -73,6 +73,13 @@ def _get_product_details(session, product_id):
                     if p.id == product_id), None)
     if product is None:
         raise ValueError("Product is unavailable or outside the current constraints")
+    if product.source == "shopify_catalog" and not product.detail_checked:
+        from .shopify_catalog import details
+        product = details(session, product)
+        if product.id not in {p.id for p in policy.search(session, limit=None)}:
+            raise ValueError("Updated offer no longer meets your requirements")
+    from .relevance import inspect
+    product = inspect(session, product)
     return product, merchant_for(product, session)
 
 

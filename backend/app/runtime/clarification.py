@@ -8,11 +8,14 @@ def extraction_issues(session, result, text):
     issues = []
     available = set() if result.intent == "new_task" else set(session.brief)
     for change in result.changes:
-        grounded = bool(change.evidence.strip()) and change.evidence.casefold() in text.casefold()
+        from .preferences import grounded_change
+        grounded = grounded_change(session, change, text, allow_history=result.intent != "new_task")
         if change.source == "confirmed" and not grounded:
             issues.append(f"{change.field}: evidence is not a literal quote from the latest message.")
         elif change.value is not None:
             available.add(change.field)
+    if "category" not in available:
+        issues.append("Extract the stated product family as category even when asking about its subtype. Recover from an indexed current-task user message if needed.")
     for answer in result.clarification_answers:
         if answer.status == "provided" and FIELDS[answer.field] not in available:
             issues.append(f"{answer.field}: marked provided but the corresponding preference was not saved or extracted.")
@@ -29,7 +32,11 @@ def resume_uncertainty(session, result, text):
         missing = [f for f in session.clarification_asked if session.clarification_answers.get(f) not in ("provided", "unknown")]
         if missing:
             result.intent = "search"
-            result.changes = []  # Uncertainty cannot erase a stated requirement.
+            from .preferences import grounded_change
+            # A repaired missing family may survive; uncertainty cannot erase requirements.
+            result.changes = [c for c in result.changes if c.field == "category"
+                              and "category" not in session.brief and c.value is not None
+                              and grounded_change(session, c, text)]
             result.clarification_answers = [ClarificationAnswer(field=f, status="unknown", evidence=text) for f in missing]
 
 
@@ -65,7 +72,7 @@ def clarify_before_search(session, result, text):
         return None
     session.clarification_asked = list(dict.fromkeys([*session.clarification_asked, *missing]))
     questions = {
-        "product_type": "what type of product you want (for example, running or hiking shoes if you're looking for shoes)",
+        "product_type": "what type of " + session.brief["category"].value + " you want" if "category" in session.brief else "what type of product you want",
         "budget": "your budget",
         "features": "any features that matter to you",
     }

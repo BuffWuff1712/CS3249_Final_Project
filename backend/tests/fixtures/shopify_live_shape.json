@@ -1,0 +1,89 @@
+{
+  "id": "gid://shopify/p/2WfClCPn5p2r2v2UvLxjBd",
+  "title": "FlexiLight\u2122 Desk Lamp",
+  "media": [
+    {
+      "type": "image",
+      "url": "https://cdn.shopify.com/s/files/1/0526/5929/0273/files/FlexLight_8.jpg",
+      "alt_text": "FlexiLight\u2122 Desk Lamp",
+      "preview": {
+        "url": "https://cdn.shopify.com/s/files/1/0526/5929/0273/files/FlexLight_8.jpg",
+        "width": 1358,
+        "height": 1358
+      },
+      "width": 1358,
+      "height": 1358
+    }
+  ],
+  "options": [
+    {
+      "name": "Power source",
+      "values": [
+        {
+          "label": "Plug-in"
+        },
+        {
+          "label": "USB-Rechargeable"
+        }
+      ]
+    }
+  ],
+  "variants": [
+    {
+      "id": "gid://shopify/ProductVariant/50687484952905",
+      "title": "FlexiLight\u2122 Desk Lamp",
+      "url": "https://creative.lighting/products/flexilight-desk-lamp?variant=50687484952905&_gsid=BEK9uCePHqJn&utm_source=shopify&utm_medium=catalog",
+      "price": {
+        "amount": 4300,
+        "currency": "SGD"
+      },
+      "availability": {
+        "available": true
+      },
+      "media": [
+        {
+          "type": "image",
+          "url": "https://cdn.shopify.com/s/files/1/0526/5929/0273/files/FlexLight_8.jpg",
+          "alt_text": "FlexiLight\u2122 Desk Lamp",
+          "preview": {
+            "url": "https://cdn.shopify.com/s/files/1/0526/5929/0273/files/FlexLight_8.jpg",
+            "width": 1358,
+            "height": 1358
+          },
+          "width": 1358,
+          "height": 1358
+        }
+      ],
+      "seller": {
+        "id": "gid://shopify/Shop/52659290273",
+        "name": "Creative.Lighting",
+        "url": "https://creative.lighting",
+        "domain": "creative-lighting-store.myshopify.com",
+        "links": [
+          {
+            "type": "privacy_policy",
+            "url": "https://checkout.shopify.com/52659290273/policies/22707830945.html"
+          },
+          {
+            "type": "terms_of_service",
+            "url": "https://checkout.shopify.com/52659290273/policies/22707863713.html"
+          },
+          {
+            "type": "refund_policy",
+            "url": "https://checkout.shopify.com/52659290273/policies/22707798177.html"
+          },
+          {
+            "type": "shipping_policy",
+            "url": "https://checkout.shopify.com/52659290273/policies/22707896481.html"
+          }
+        ]
+      },
+      "options": [
+        {
+          "name": "Power source",
+          "label": "Plug-in"
+        }
+      ]
+    }
+  ]
+}

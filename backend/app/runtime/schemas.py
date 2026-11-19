@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from typing import Literal
 from uuid import uuid4
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
 
 
 def uid():
@@ -168,7 +168,23 @@ class LiveRiskReview(Model):
 
 
 class Product(Model):
-    source: Literal["catalogue", "browser_use"] = "catalogue"
+    image_url: str = ""
+    image_alt: str = ""
+
+    @field_validator("image_url", mode="before")
+    @classmethod
+    def safe_image(cls, value):
+        from .product_images import image_url
+        return image_url(value)
+
+    provider_ids: dict[str, str] = Field(default_factory=dict)
+    inferred_attributes: list[str] = Field(default_factory=list)
+    detail_checked: bool = False
+    observed_type: str = ""
+    type_evidence: str = ""
+    relevance: Literal["match", "mismatch", "unknown"] = "unknown"
+    relevance_binding: str = ""
+    source: Literal["catalogue", "browser_use", "shopify_catalog"] = "catalogue"
     source_url: str = ""
     observed_at: str = ""
     # A dict with local-only keys validates as LocalEvidence; anything else stays WebEvidence.
@@ -259,7 +275,7 @@ class CartCheckout(Model):
 
 
 class Session(Model):
-    search_provider: Literal["catalogue", "browser_use"] = "catalogue"
+    search_provider: Literal["catalogue", "browser_use", "shopify_catalog", "hybrid"] = "catalogue"
     # Who finds risk signals in local products; fixed per session like the search provider.
     risk_detection: Literal["rules", "ai"] = "rules"
     live_products: dict[str, Product] = Field(default_factory=dict)
@@ -283,6 +299,7 @@ class Session(Model):
     rejected_merchants: list[str] = Field(default_factory=list)
     rejected_products: list[str] = Field(default_factory=list)
     clarification_count: int = 0
+    task_start_message: int | None = None
     clarification_asked: list[str] = Field(default_factory=list)
     clarification_answers: dict[str, str] = Field(default_factory=dict)
     intervention_count: int = 0
@@ -293,6 +310,8 @@ class Session(Model):
 
 
 class Change(Model):
+    operation: Literal["set", "add", "remove"] = "set"
+    evidence_message_index: int | None = None
     field: Literal[
         "category",
         "usage",

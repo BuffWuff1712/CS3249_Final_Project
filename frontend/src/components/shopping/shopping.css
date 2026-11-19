@@ -539,3 +539,7 @@
 @media (max-width: 380px) {
   .cui-offer-primary, .cui-offer-actions .cui-actions { grid-template-columns: minmax(0, 1fr); }
 }
+
+.cui-product-image { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 120px; margin: 20px 0; padding: 16px; border: 1px solid #d8e5fa; border-radius: 16px; background: #fff; overflow: hidden; }
+.cui-product-image img { display: block; width: 100%; max-width: 440px; height: 280px; object-fit: contain; }
+@media (max-width: 600px) { .cui-product-image img { height: 220px; } }
