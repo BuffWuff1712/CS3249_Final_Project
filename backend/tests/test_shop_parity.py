@@ -22,7 +22,12 @@ def change(v, path, body=None, method='POST', status=200):
 
 def offer(v=None, product='study-hp-target-trusted'):
     v = change(v or fresh(), 'messages', {'text': 'Find headphones under SGD200; no feature preference'})
-    return change(v, 'propose', {'product_id': product})
+    s = storage.load(v['session']['id'])
+    products = shopping_tools.screen_candidates(s, [product])
+    products += [p for p in s.recommendations if p.id != product][:2]
+    service.propose(s, products[0], recommendations=products)
+    storage.save(s)
+    return shop.view(s)
 
 
 def chosen(v):
@@ -121,8 +126,13 @@ def test_soft_budget_and_revision_bound_cart_removal():
     v = change(v, 'brief', {'field': 'budget', 'fact': {'value': '100', 'hard': False, 'source': 'confirmed'}}, method='PUT')
     assert not v['session']['brief']['budget']['hard']
     v = change(v, 'compare')
-    assert any(row['product']['price'] > 100 for row in v['offers'])
-    v = change(v, 'propose', {'product_id': 'study-hp-target-trusted'}); selection = chosen(v)
+    # A soft limit permits expensive offers; it does not force one into the top three.
+    s = storage.load(v['session']['id'])
+    products = shopping_tools.screen_candidates(s, ['study-hp-target-trusted'])
+    assert products and products[0].price > 100
+    service.propose(s, products[0], recommendations=products)
+    storage.save(s)
+    v = shop.view(s); selection = chosen(v)
     v = change(v, 'cart', selection); old = copy.deepcopy(v)
     v = change(v, 'cart/' + selection['proposal_id'], method='DELETE')
     assert not v['session']['cart']

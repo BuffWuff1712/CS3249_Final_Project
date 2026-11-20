@@ -26,7 +26,7 @@ def resume_uncertainty(session, result, text):
     """A short answer to a pending question is not unrelated small talk."""
     import re
     from .schemas import ClarificationAnswer
-    if session.stage != "clarifying" or result.intent not in ("respond", "clarify", "search"):
+    if not session.search_requested or session.stage != "clarifying" or result.intent not in ("respond", "clarify", "search"):
         return
     if re.fullmatch(r"\s*(?:(?:i['’]?m|i am)\s+)?(?:unsure|not sure|(?:i\s+)?don['’]?t know|no preference)[.!?\s]*", text, re.I):
         missing = [f for f in session.clarification_asked if session.clarification_answers.get(f) not in ("provided", "unknown")]

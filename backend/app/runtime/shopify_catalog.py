@@ -13,6 +13,7 @@ from .schemas import Product, Merchant, Event, WebEvidence, now
 from .search_errors import SearchProviderError
 from .progress import cancellable_call, check_cancelled
 
+from .timing import timed
 ENDPOINT = "https://catalog.shopify.com/api/ucp/mcp"
 PROFILE = "https://shopify.dev/ucp/agent-profiles/examples/2026-08-25/valid-with-capabilities.json"
 ALLOWED = {"search_catalog", "lookup_catalog", "get_product"}
@@ -126,6 +127,77 @@ def context(session):
             "currency":currency.value if currency else "SGD"}
 
 
+def product_title(title, variant_title):
+    title = " ".join(str(title).split())
+    variant = " ".join(str(variant_title or "").split())
+    if not variant or variant.casefold() in (title.casefold(), "default title"):
+        return title
+    if variant.casefold().startswith(title.casefold()):
+        suffix = variant[len(title):]
+        if re.match(r"^\s*[\u00b7|:/\u2013\u2014-]", suffix):
+            variant = re.sub(r"^[\s\u00b7|:/\u2013\u2014-]+", "", suffix)
+    return title + " \u00b7 " + variant if variant else title
+
+
+def plain_description(value):
+    """Descriptions may contain HTML even in Shopify's `plain` field."""
+    from html.parser import HTMLParser
+    class Text(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=True)
+            self.parts = []
+            self.hidden = 0
+        def handle_starttag(self, tag, attrs):
+            if tag in ("script", "style"): self.hidden += 1
+            if tag in ("p", "li", "br", "div", "h2", "h3", "tr"): self.parts.append("\n")
+        def handle_endtag(self, tag):
+            if tag in ("script", "style"): self.hidden = max(0, self.hidden - 1)
+            if tag in ("p", "li", "div", "tr"): self.parts.append("\n")
+        def handle_data(self, data):
+            if not self.hidden: self.parts.append(data)
+    if not isinstance(value, dict): return ""
+    raw = value.get("plain") or value.get("html") or ""
+    if not isinstance(raw, str): return ""
+    parser = Text()
+    parser.feed(raw)
+    return "\n".join(line for part in "".join(parser.parts).splitlines()
+                     if (line := " ".join(part.split())))
+
+
+def summaries(value):
+    return list(dict.fromkeys(x.strip() for x in value if isinstance(x, str) and x.strip()))[:20] if isinstance(value, list) else []
+
+
+def rating_fields(row, variant):
+    """Prefer variant aggregates; never turn an aggregate into review excerpts."""
+    import math
+    for scope, obj in (("variant", variant), ("product", row)):
+        rating = obj.get("rating")
+        if not isinstance(rating, dict): continue
+        value, low, high, count = (rating.get(k) for k in ("value", "scale_min", "scale_max", "count"))
+        if (isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value)
+            or high != 5 or low not in (0, 1) or not low <= value <= high): continue
+        count = count if type(count) is int and count >= 0 else 0
+        return {"rating": value, "rating_count": count, "rating_scope": scope}
+    return {}
+
+
+def seller_policy_links(seller):
+    links = {}
+    values = seller.get("links")
+    for item in values if isinstance(values, list) else []:
+        if not isinstance(item, dict) or item.get("type") not in (
+            "refund_policy", "shipping_policy", "privacy_policy", "terms_of_service"
+        ): continue
+        try:
+            url = public_url(item.get("url", ""))
+            # Policy documents on checkout.shopify.com are not checkout actions.
+            if re.search(r"/(cart|checkout)(/|$)", urlparse(url).path): continue
+            links[item["type"]] = url
+        except (ValueError, TypeError): pass
+    return links
+
+
 def normalize(row):
     """Each record is one seller/variant, never a product-level from-price."""
     products=[]
@@ -148,21 +220,36 @@ def normalize(row):
             if variant.get("requires",{}).get("selling_plan") or variant.get("requires",{}).get("components"): continue
             available=variant.get("availability",{}).get("available") is True
             options=variant.get("options",[])
-            description=row.get("description",{})
-            text=re.sub("<[^>]+>"," ",description.get("plain") or description.get("html",""))
+            descriptions = [plain_description(variant.get("description")), plain_description(row.get("description"))]
+            text = "\n\n".join(dict.fromkeys(x for x in descriptions if x))
+            specs = {o["name"]: o["label"] for o in options
+                     if isinstance(o, dict) and isinstance(o.get("name"), str) and isinstance(o.get("label"), str)}
+            condition = variant.get("condition")
+            if isinstance(condition, str): specs["Condition"] = condition
+            elif isinstance(condition, list) and summaries(condition): specs["Condition"] = ", ".join(summaries(condition))
+            sizes = [v for k, v in specs.items() if k.casefold() in ("size", "shoe size", "clothing size")]
+            list_price = variant.get("list_price") or {}
+            listed_amount = list_price.get("amount") if isinstance(list_price, dict) else None
+            original_price = listed_amount / 100 if (type(listed_amount) is int and listed_amount > 0
+                             and list_price.get("currency") == price["currency"]) else None
             pid="shopify-"+hashlib.sha256((shop+vid).encode()).hexdigest()[:24]
             mid="shopify-"+hashlib.sha256(shop.encode()).hexdigest()[:16]
             category=next((c["value"] for c in row.get("categories",[]) if c.get("taxonomy")=="merchant"),"Unknown")
-            inferred=[str(x) for x in row.get("metadata",{}).get("top_features",[])][:20]
+            metadata = row.get("metadata")
+            metadata = metadata if isinstance(metadata, dict) else {}
+            inferred = summaries(metadata.get("top_features"))
             from .product_images import select_image
             img,alt=select_image(variant,row)
-            p=Product(image_url=img,image_alt=alt,id=pid,name=row["title"]+" · "+variant.get("title",vid.rsplit("/",1)[-1]),
+            p=Product(image_url=img,image_alt=alt,id=pid,name=product_title(row["title"], variant.get("title")),
                 category=category,brand="",price=amount/100,currency=price["currency"],merchant=seller["name"],merchant_id=mid,
                 source="shopify_catalog",source_url=url,observed_at=now(),stock=available,trust="unverified",
-                attributes=[],sizes=[],description=text[:2000],inferred_attributes=inferred,
-                specifications={o["name"]:o["label"] for o in options},
-                provider_ids={"product":row["id"],"variant":vid,"shop":shop},web_evidence=WebEvidence())
-            m=Merchant(id=mid,name=seller["name"],website=site,description="Shopify catalog seller; identity and policies need review.",
+                attributes=[],sizes=sizes,description=text,inferred_attributes=inferred,
+                selling_points=summaries(metadata.get("unique_selling_points")),
+                policy_links=seller_policy_links(seller), list_price=original_price,
+                **rating_fields(row, variant), specifications=specs,
+                provider_ids={"product":row["id"],"variant":vid,"shop":shop},
+                web_evidence=WebEvidence(return_policy_url=seller_policy_links(seller).get("refund_policy", "")))
+            m=Merchant(id=mid,name=seller["name"],website=site,description="Seller identity and policies need review.",
                 payment_methods=["Demo Visa","Demo Wallet"],return_policy="Unknown; check the merchant.",
                 contact="",review_count=0,verified_business=False,requested_information=[])
             products.append((p,m))
@@ -171,6 +258,7 @@ def normalize(row):
     return products
 
 
+@timed("provider.shopify.search")
 def discover(session,query=""):
     ctx=context(session)
     catalog={"query":"; ".join([query,*[k+": "+f.value for k,f in session.brief.items()]]),
@@ -192,12 +280,38 @@ def discover(session,query=""):
     return ids
 
 
+@timed("provider.shopify.details")
 def details(session,product):
     data=call("get_product",{"id":product.provider_ids["variant"],"context":context(session)})
     row=data.get("product")
     if not isinstance(row,dict): raise error("invalid_output")
     for fresh,merchant in normalize(row):
         if fresh.id==product.id and fresh.provider_ids["variant"]==product.provider_ids["variant"]:
+            variant = next(v for v in row["variants"] if v.get("id") == product.provider_ids["variant"])
+            # A sparse detail response is not evidence that search metadata was withdrawn.
+            # Explicit empty/null fields do replace old values. Price/availability never fall back.
+            if "media" not in row and "media" not in variant:
+                fresh.image_url, fresh.image_alt = product.image_url, product.image_alt
+            if "list_price" not in variant:
+                fresh.list_price = product.list_price
+            if "options" not in variant:
+                fresh.specifications = {**{k: v for k, v in product.specifications.items() if k != "Condition"}, **fresh.specifications}
+                fresh.sizes = list(product.sizes)
+            if "condition" not in variant and "Condition" in product.specifications:
+                fresh.specifications["Condition"] = product.specifications["Condition"]
+            if "description" not in row and "description" not in variant:
+                fresh.description = product.description
+            metadata = row.get("metadata")
+            if "metadata" not in row or isinstance(metadata, dict):
+                if not isinstance(metadata, dict) or "top_features" not in metadata:
+                    fresh.inferred_attributes = list(product.inferred_attributes)
+                if not isinstance(metadata, dict) or "unique_selling_points" not in metadata:
+                    fresh.selling_points = list(product.selling_points)
+            if "rating" not in row and "rating" not in variant:
+                fresh.rating, fresh.rating_count, fresh.rating_scope = product.rating, product.rating_count, product.rating_scope
+            if "links" not in variant.get("seller", {}):
+                fresh.policy_links = dict(product.policy_links)
+                fresh.web_evidence.return_policy_url = fresh.policy_links.get("refund_policy", "")
             fresh.detail_checked=True
             session.live_products[fresh.id]=fresh;session.live_merchants[merchant.id]=merchant
             return fresh

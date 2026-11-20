@@ -1,4 +1,5 @@
 "use client";
+import { productTitle } from "@/lib/productTitle";
 import { useEffect, useState } from "react";
 import { Action } from "@/lib/beany";
 import { activeShop, rememberShop, shopRequest, SHOP_KEY, type ShopView } from "@/lib/shopBackend";
@@ -50,7 +51,7 @@ export function CartPage({ checkout = false }: { checkout?: boolean }) {
       {done && <div role="status" className="notice"><p>Simulated checkout complete. No real payment or order was made.</p><a className="action-link" href="/receipts">View receipts</a></div>}
       {!busy && !rows.length && !done && <div><p>Your cart has no items to review.</p><a className="action-link primary" href="/">Find something with Beany</a></div>}
       {rows.map(({action: a, error: issue}) => <article className="panel boundaries" key={a.id}>
-        <h2>{a.product.name}</h2><p>{a.product.merchant} · Quantity: 1</p>
+        <h2>{productTitle(a.product)}</h2><p>{a.product.merchant} · Quantity: 1</p>
         <p className="price">{a.product.currency} {a.product.price.toFixed(2)}</p>
         <p>Payment: {a.payment_method} · Data sharing: {a.shares_personal_data ? "requested" : "none"}</p>
         <MerchantDetails action={a} replay={!!workspace?.session.search_replay} />
@@ -58,7 +59,7 @@ export function CartPage({ checkout = false }: { checkout?: boolean }) {
         {issue && <p className="error" role="alert">{issue}</p>}
         <button disabled={busy} onClick={() => void act(async () => {
           const next = await shopRequest(`/${sid}/cart/${a.id}`, "DELETE", { revision: workspace!.revision }); rememberShop(next); await load(sid);
-        })}>Remove {a.product.name}</button>
+        })}>Remove {productTitle(a.product)}</button>
       </article>)}
       {!!rows.length && <section className="panel boundaries">
         <h2>Total ({rows.length} items)</h2>

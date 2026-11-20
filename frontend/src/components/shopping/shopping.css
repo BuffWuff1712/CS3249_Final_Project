@@ -543,3 +543,33 @@
 .cui-product-image { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 120px; margin: 20px 0; padding: 16px; border: 1px solid #d8e5fa; border-radius: 16px; background: #fff; overflow: hidden; }
 .cui-product-image img { display: block; width: 100%; max-width: 440px; height: 280px; object-fit: contain; }
 @media (max-width: 600px) { .cui-product-image img { height: 220px; } }
+
+/* Resizable desktop panes; narrow layouts remain stacked. */
+.cui-resizable { grid-template-columns: minmax(0, var(--pane-left)) 24px minmax(0, var(--pane-right)); }
+.cui-resizable > .cui-conversation { grid-column: 1; grid-row: 1; padding-right: 12px; }
+.cui-resizable > .cui-decision-column { grid-column: 3; grid-row: 1; padding-left: 12px; border-left: 0; }
+.cui-pane-controls { grid-column: 2; grid-row: 1; position: relative; min-height: 0; }
+.cui-pane-divider { height: 100%; cursor: col-resize; touch-action: none; border-radius: 6px; background: linear-gradient(var(--line), var(--line)) center / 2px 100% no-repeat; }
+.cui-pane-divider:focus-visible { background-color: #dce7ff; outline: 2px solid #2855df; outline-offset: -2px; }
+.cui-panes-dragging { user-select: none; cursor: col-resize; }
+.cui-panes-stacked { display: flex; flex-direction: column; overflow: visible; }
+.cui-panes-stacked > .cui-pane-controls { display: none; }
+.cui-panes-stacked > .cui-conversation { height: 500px; flex: none; padding: 20px 0; }
+.cui-panes-stacked > .cui-decision-column { height: auto; overflow: visible; padding: 24px 0; border-top: 1px solid var(--line); }
+@media (max-width: 760px) {
+  .cui-resizable { grid-template-columns: minmax(0, 1fr); }
+  .cui-resizable > .cui-conversation { grid-column: 1; grid-row: 1; padding-right: 0; }
+  .cui-resizable > .cui-decision-column { grid-column: 1; grid-row: 2; padding-left: 0; }
+  .cui-pane-controls { display: none; }
+}
+
+.cui-listing-summary { margin: 16px 0; padding: 16px; background: #f4f7ff; border: 1px solid #d6e2ff; border-radius: 12px; }
+.cui-listing-summary h4 { margin: 0 0 8px; }
+.cui-listing-summary ul { padding-left: 22px; }
+.cui-listing-summary li { margin: 6px 0; }
+.cui-listing-description { white-space: pre-line; overflow-wrap: anywhere; }
+.cui-listing-details { margin: 16px 0; }
+.cui-policy-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.cui-policy-link { display: inline-flex; padding: 9px 12px; border: 1px solid #b9cdfb; border-radius: 8px; color: #1946b9; background: #f4f7ff; text-decoration: none; }
+.cui-policy-link:hover { background: #e5edff; }
+.cui-policy-link:focus-visible { outline: 2px solid #2455ef; outline-offset: 3px; }

@@ -75,6 +75,16 @@ export type WebEvidence = {
   notices: string[];
 };
 export type Product = {
+  availability_note?: string;
+  product_rating_text?: string;
+  seller_rating_text?: string;
+  review_excerpts?: string[];
+  stock?: boolean;
+  inferred_attributes?: string[];
+  selling_points?: string[];
+  policy_links?: Record<string, string>;
+  rating_scope?: "" | "product" | "variant";
+  list_price?: number | null;
   image_url?: string;
   image_alt?: string;
   source?: "catalogue" | "browser_use" | "shopify_catalog";

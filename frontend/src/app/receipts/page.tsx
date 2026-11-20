@@ -1,4 +1,5 @@
 "use client";
+import { productTitle } from "@/lib/productTitle";
 import { useEffect, useState } from "react";
 import { request, Session } from "@/lib/beany";
 export default function Receipts() {
@@ -24,7 +25,7 @@ export default function Receipts() {
       {error && <p role="alert" className="error">{error}</p>}
       {!busy && !receipts.length && <p>No receipts yet.</p>}
       {receipts.map(r => <article className="panel boundaries" key={r.id}>
-        <h2>Simulated receipt</h2><h3>{r.product.name}</h3><p>{r.product.merchant} · Quantity: 1</p>
+        <h2>Simulated receipt</h2><h3>{productTitle(r.product)}</h3><p>{r.product.merchant} · Quantity: 1</p>
         <p>{r.product.currency} {r.product.price.toFixed(2)}</p>
         <p>{new Date(r.timestamp).toLocaleString()}</p><p className="receipt-id">Receipt: {r.id}</p>
       </article>)}

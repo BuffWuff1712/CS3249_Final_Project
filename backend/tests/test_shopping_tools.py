@@ -15,15 +15,6 @@ def session(monkeypatch):
     })
 
 
-def steps(*items):
-    pending = iter(items)
-    return lambda *_: next(pending)
-
-
-def step(action, query="", product_id=""):
-    return workflow.ShoppingStep(action=action, query=query, product_id=product_id)
-
-
 def test_tools_preserve_constraints_and_exclusions(session):
     before = session.model_dump()
     found = search_products(session)
@@ -35,59 +26,17 @@ def test_tools_preserve_constraints_and_exclusions(session):
         get_product_details(session, found[0].id)
 
 
-def test_refinement_inspection_then_proposal(session):
-    p = search_products(session)[0]
-    before = session.brief.copy()
-    result = workflow.run_shopping(session, steps(
-        step("search_products", "nonexistentkeyword"),
-        step("search_products"),
-        step("get_product_details", product_id=p.id),
-        step("propose", product_id=p.id),
-    ))
-    assert result.product.id == p.id and result.status == "proposed"
-    assert session.brief == before and not session.receipts and not session.proposals
-    assert [json.loads(e.detail)["action"] for e in session.events] == [
-        "search_products", "search_products", "get_product_details", "propose"]
-
-
-@pytest.mark.parametrize("action", ["propose", "get_product_details"])
-def test_cannot_invent_or_skip_search(session, action):
-    result = workflow.run_shopping(session, steps(step(action, product_id="audio-1")))
-    assert result.status == "stopped" and result.product is None
-
-
-def test_cannot_propose_without_inspection(session):
-    p = search_products(session)[0]
-    result = workflow.run_shopping(session, steps(
-        step("search_products"), step("propose", product_id=p.id)))
-    assert result.product is None
-
-
-def test_search_budget(session):
-    calls = []
-    def repeat(*_):
-        calls.append(1)
-        return step("search_products")
-    assert workflow.run_shopping(session, repeat).status == "stopped"
-    assert len(calls) == 3
-
-
-def test_step_budget(session):
-    p = search_products(session)[0]
-    calls = []
-    def repeat(*_):
-        calls.append(1)
-        return step("search_products") if len(calls) == 1 else step(
-            "get_product_details", product_id=p.id)
-    assert workflow.run_shopping(session, repeat).status == "stopped"
-    assert len(calls) == workflow.MAX_STEPS
-
-
-def test_unavailable_model_does_not_fallback_to_selection(session):
-    def unavailable(*_):
-        raise workflow.LLMError("provider failure")
-    assert workflow.run_shopping(session, unavailable).product is None
-    assert not session.receipts
+def test_deterministic_search_inspects_before_proposal(session, monkeypatch):
+    from app.runtime import gateway
+    monkeypatch.setattr(gateway, "structured_call", lambda *_: pytest.fail("No planner call permitted"))
+    result = workflow.run_shopping(session)
+    assert result.status == "proposed" and 1 <= len(result.candidates) <= 3
+    actions = [json.loads(e.detail) for e in session.events if e.kind == "shopping_tool"]
+    assert actions[0]["action"] == "search_products"
+    inspected = {a["product"]["id"] for a in actions if a["action"] == "get_product_details"}
+    assert {p.id for p in result.candidates} <= inspected
+    assert actions[-1]["action"] == "propose"
+    assert not session.receipts and not session.proposals
 
 
 def test_no_match_does_not_relax_budget(session):
@@ -110,38 +59,16 @@ def test_failed_run_invalidates_previous_proposal(session, monkeypatch):
     old = session.proposals[-1]
     monkeypatch.setattr(service.llm, "interpret", lambda *_: Interpretation(
         reply="Searching", changes=[], intent="search", suggestions=[]))
-    monkeypatch.setattr(workflow, "choose_step", lambda *_: step("propose", product_id="invented"))
+    monkeypatch.setattr(service, "run_shopping", lambda *_: workflow.ShoppingResult(status="stopped"))
     service.chat(session, "Try again")
     assert old.status == "superseded" and not session.receipts
     assert len(session.proposals) == 1 and session.stage == "ready"
 
 
-def test_planner_payload_excludes_hidden_research_labels(session, monkeypatch):
-    monkeypatch.setenv("BEANY_LLM_MODE", "openai")
-    session.experiment = {"secret_label": "MALICIOUS"}
-    captured = {}
-    def fake(schema, instructions, payload):
-        captured.update(payload)
-        return step("stop")
-    monkeypatch.setattr(workflow, "structured_call", fake)
-    workflow.choose_step(session, [])
-    assert "MALICIOUS" not in json.dumps(captured)
-    assert set(captured) == {"brief", "tool_results", "steps_remaining"}
-
-
-def test_injection_offer_still_blocked_after_agent_selection(session, monkeypatch):
+def test_injection_offer_excluded_before_recommendation(session):
     session.scenario_id = "risk-f"
-    assert "offer-injection" in {p.id for p in search_products(session)}
-    monkeypatch.setattr(workflow, "choose_step", steps(
-        step("search_products"),
-        step("get_product_details", product_id="offer-injection"),
-        step("propose", product_id="offer-injection"),
-    ))
-    service.chat(session, "Find headphones under $150; no feature preference")
-    a = session.proposals[-1]
-    assert a.decision == "BLOCK" and session.stage == "blocked"
-    with pytest.raises(ValueError):
-        service.decide(session, a.id, Decision(action="approve", fingerprint=a.fingerprint))
+    result = workflow.run_shopping(session)
+    assert "offer-injection" not in {p.id for p in result.candidates}
     assert not session.receipts
     with pytest.raises(ValueError):
         get_product_details(session, "study-hp-target-trusted")

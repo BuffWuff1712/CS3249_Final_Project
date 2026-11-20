@@ -9,11 +9,12 @@ from pathlib import Path
 from urllib.parse import urlparse
 from uuid import UUID
 import httpx
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from .schemas import Model, Field, Product, Merchant, Event, WebEvidence, LocalEvidence, now
 from .gateway import LLMError
 from .search_errors import SearchProviderError, provider_reason
 
+from .timing import timed
 BASE = "https://api.browser-use.com/api/v4"
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -55,7 +56,12 @@ class Listing(Model):
     image_alt: str = Field(default="", max_length=500)
     observed_type: str = Field(default="", max_length=200)
     type_evidence: str = Field(default="", max_length=1000)
-    name: str = Field(min_length=1, max_length=200)
+    specifications: dict[str, str] = Field(default_factory=dict)
+    availability: str = Field(default="", max_length=2000)
+    product_rating: str = Field(default="", max_length=300)
+    seller_rating: str = Field(default="", max_length=300)
+    review_excerpts: list[str] = Field(default_factory=list, max_length=10)
+    name: str = Field(min_length=1, max_length=500)
     url: str = Field(max_length=2000)
     brand: str = Field(max_length=100)
     price: float = Field(gt=0, allow_inf_nan=False)
@@ -65,6 +71,32 @@ class Listing(Model):
     description: str = Field(max_length=2000)
     in_stock: bool
     evidence: WebEvidence = Field(default_factory=WebEvidence)
+
+    @model_validator(mode="before")
+    @classmethod
+    def compatible_listing(cls, value):
+        """Accept the standalone research shape while retaining nested safety evidence."""
+        if not isinstance(value, dict): return value
+        data = dict(value)
+        if "features" in data:
+            data.setdefault("attributes", data.pop("features"))
+        evidence = dict(data.get("evidence") or {})
+        seller = dict(evidence.get("seller") or {})
+        if "seller" in data: seller.setdefault("name", data.pop("seller"))
+        if data.get("seller_rating"): seller.setdefault("rating", data["seller_rating"])
+        if seller: evidence["seller"] = seller
+        for field in ("return_policy", "return_policy_url"):
+            if field in data: evidence.setdefault(field, data.pop(field))
+        data["evidence"] = evidence
+        specs = data.get("specifications") or {}
+        if isinstance(specs, dict):
+            data.setdefault("brand", next((v for k,v in specs.items() if k.casefold()=="brand"), ""))
+        data.setdefault("sizes", [])
+        if "in_stock" not in data:
+            text = str(data.get("availability", "")).strip().casefold()
+            # Unknown availability must not silently become an in-stock claim.
+            data["in_stock"] = bool(re.match(r"^in stock\b", text))
+        return data
 
     @field_validator("currency", mode="before")
     @classmethod
@@ -99,7 +131,7 @@ def usable_output(raw, hosts):
             allowed_url(row.url, hosts)
             if row.currency not in ("SGD", "USD"):
                 raise ValueError("Unsupported currency")
-        except ValueError:
+        except (ValueError, TypeError):
             continue
         kept.append(row)
     if rows and not kept:
@@ -110,6 +142,7 @@ def usable_output(raw, hosts):
     return SearchOutput(products=kept)
 
 
+@timed("provider.browser_use.run")
 def run_task(brief, query, *, client=None, sleep=time.sleep, clock=time.monotonic):
     from .progress import cancellable_call
     try:
@@ -160,6 +193,10 @@ def _run_task(brief, query, *, client=None, sleep=time.sleep, clock=time.monoton
             "checkout or delivery notes shown on these pages, verbatim). Copy short verbatim text "
             "where possible. Leave a field empty, or a list empty, when it is not visible; never guess or fill in "
             "typical values. "
+            "Also capture specifications as a dictionary, availability as the complete visible stock/delivery notice "
+            "including location restrictions, product_rating and seller_rating as the exact displayed rating and count, "
+            "and review_excerpts as short verbatim excerpts already visible on the product page. Never invent review "
+            "dates or ratings. Keep these fields empty when absent. "
             "Return only the requested structured output. Shopping brief and optional search words: " +
             json.dumps({"brief": brief, "query": query})
         ),
@@ -270,6 +307,16 @@ def replay_task(path, brief, query):
     return "replay-" + version, SearchOutput.model_construct(products=products)
 
 
+def aggregate_rating(text):
+    """Parse only an explicit five-star aggregate, never percentages or review prose."""
+    match = re.fullmatch(r"\s*(\d+(?:\.\d+)?)\s*(?:out of|/)\s*5(?:\s*stars)?(?:\s*\(([\d,]+)\))?\s*", text, re.I)
+    if not match: return None, 0
+    value = float(match[1])
+    if not 0 <= value <= 5: return None, 0
+    return value, int(match[2].replace(",", "")) if match[2] else 0
+
+
+@timed("provider.browser_use.search")
 def discover(session, query):
     # No conversation history, participant identifiers, permissions or researcher labels leave here.
     brief = {k: v.value for k, v in session.brief.items() if k in (
@@ -291,12 +338,17 @@ def discover(session, query):
         identity = host + "|" + seller.casefold() if seller else host
         mid = "web-" + hashlib.sha256(identity.encode()).hexdigest()[:16]
         pid = "web-" + hashlib.sha256(row.url.encode()).hexdigest()[:24]
+        rating, rating_count = aggregate_rating(row.product_rating)
         p = Product(id=pid, name=row.name, category=(brief.get("category", "Products") if session.search_replay else row.observed_type or "Unknown"),
                     observed_type=row.observed_type, type_evidence=row.type_evidence,
                     image_url=row.image_url, image_alt=row.image_alt,
                     brand=row.brand, price=row.price, currency=row.currency,
-                    merchant=host, merchant_id=mid, attributes=row.attributes, sizes=row.sizes,
+                    merchant=f"{seller} ({host})" if seller else host, merchant_id=mid, attributes=row.attributes, sizes=row.sizes,
                     stock=row.in_stock, description=row.description, trust="unverified",
+                    specifications=row.specifications, availability_note=row.availability,
+                    product_rating_text=row.product_rating, seller_rating_text=row.seller_rating or evidence.seller.rating,
+                    rating=rating, rating_count=rating_count, review_excerpts=row.review_excerpts,
+                    policy_links={"refund_policy": evidence.return_policy_url} if evidence.return_policy_url else {},
                     source="browser_use", source_url=row.url, observed_at=captured,
                     web_evidence=evidence)
         # Demo payment fields describe Beany's simulation, not real retailer acceptance.

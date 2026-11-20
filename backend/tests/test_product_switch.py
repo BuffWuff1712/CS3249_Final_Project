@@ -33,7 +33,7 @@ def test_mock_switch_keeps_cart_not_shoe_preferences(session, text):
 
 def test_llm_new_task_resets_brief(session, monkeypatch):
     monkeypatch.setattr(service.llm, "interpret", lambda *_: Interpretation(
-        reply="Let's find a backpack", intent="new_task", suggestions=[], changes=[
+        reply="Let's find a backpack", intent="new_task", search_control="request", new_task_evidence="Find", suggestions=[], changes=[
             Change(field="category", value="Backpacks", source="confirmed", hard=False, evidence="bags"),
             Change(field="budget", value="80", source="confirmed", hard=True, evidence="under 80"),
         ]))
@@ -61,7 +61,7 @@ def test_ungrounded_switch_does_not_clear_brief(session, monkeypatch):
 
 def test_same_category_new_task_only_carries_explicit_values(session, monkeypatch):
     monkeypatch.setattr(service.llm, "interpret", lambda *_: Interpretation(
-        reply="Another pair", intent="new_task", suggestions=[], changes=[
+        reply="Another pair", intent="new_task", search_control="request", new_task_evidence="Find", suggestions=[], changes=[
             Change(field="category", value="Running shoes", source="confirmed", hard=False, evidence="shoes"),
             Change(field="budget", value="200", source="confirmed", hard=True, evidence="same budget"),
         ]))

@@ -6,6 +6,7 @@ from .merchant_risk import assess, assess_live, safeguard_block, session_config
 from .risk_agent import snapshot
 from .local_evidence import review_view
 
+from .timing import timed
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = json.loads((ROOT / "config/policy.json").read_text(encoding="utf-8-sig"))
 FIELDS = {
@@ -148,7 +149,7 @@ def fingerprint(a):
         "sharing": a.shares_personal_data,
         "substitute": a.substitute,
     }
-    for key in ("observed_type", "type_evidence", "relevance_binding", "relevance", "provider_ids", "inferred_attributes", "detail_checked"):
+    for key in ("observed_type", "type_evidence", "relevance_binding", "relevance", "provider_ids", "inferred_attributes", "detail_checked", "selling_points", "policy_links", "rating_scope", "list_price", "availability_note", "product_rating_text", "seller_rating_text", "review_excerpts"):
         if payload["product"].get(key) in ("", "unknown", None, {}, [], False):
             payload["product"].pop(key, None)
     return hashlib.sha256(
@@ -156,6 +157,7 @@ def fingerprint(a):
     ).hexdigest()
 
 
+@timed("policy.evaluate")
 def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
     rules = []
 

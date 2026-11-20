@@ -42,6 +42,12 @@ def model_key(product):
     return hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
 
 
+def current_candidates(s):
+    from .shopping_tools import recommendation_limit
+    eligible = {p.id: p for p in policy.search(s, limit=None)}
+    return [eligible[p.id] for p in s.recommendations if p.id in eligible][:recommendation_limit()]
+
+
 def preview(s):
     """Never call a model, mutate the original, or mint approval fingerprints here."""
     if not s.recommendations:
@@ -50,11 +56,13 @@ def preview(s):
     context = s.model_copy(deep=True)
     records = s.live_merchants if s.search_provider != "catalogue" and not s.scenario_id else merchants()
     products = policy.catalogue(s)
-    for p in policy.search(s, limit=None)[:MAX_OFFERS]:
+    for p in current_candidates(s)[:MAX_OFFERS]:
         if p.source != "catalogue" and p.id not in {item.id for item in s.recommendations}:
             continue
         a = Action(id="", product=p, merchant_details=records[p.merchant_id])
         policy.evaluate(context, a, catalogue_snapshot=products, merchant_snapshot=records)
+        if a.decision == "BLOCK":
+            continue
         offers.append({"product": p.model_dump(), "model_key": model_key(p),
                        "merchant": a.merchant_details.model_dump() if a.merchant_details else None,
                        "risk": a.risk.model_dump() if a.risk else None,
@@ -233,7 +241,7 @@ def different_model(s, models, current):
     if current:
         service.event(s, "alternative", current.id)
     start = len(s.messages)
-    service.propose(s, candidate, recommendations=policy.search(s, limit=None))
+    service.propose(s, candidate, recommendations=current_candidates(s))
     del s.messages[start:]
     action = s.proposals[-1]
     lines = ["A different model to review:" if fresh else f"You have now seen all {len(others) + bool(current)} matching models, so this starts again from the first:",
@@ -336,7 +344,7 @@ def compare(s):
 def propose(s, product_id):
     if not s.recommendations or not policy.value(s, "category"):
         raise ValueError("Compare your current needs before choosing a catalogue offer.")
-    candidates = policy.search(s, limit=None)
+    candidates = current_candidates(s)
     p = next((p for p in candidates if p.id == product_id), None)
     if p is None:
         raise ValueError("That offer is no longer eligible. Compare again.")
@@ -420,11 +428,13 @@ def permissions(s, value):
     clear_selection(s)
     # The offer the user was viewing, possibly one they switched to, is rechecked rather than re-searched.
     current = s.proposals[-1] if s.recommendations and s.proposals and s.proposals[-1].status == "pending" else None
+    saved_candidates = list(s.recommendations)
     service.invalidate(s)
     s.permissions = value
+    s.recommendations = saved_candidates
     s.stage = "ready"
     service.event(s, "permissions", "Permissions explicitly updated through controls")
-    candidates = policy.search(s, limit=None) if current else []
+    candidates = current_candidates(s) if current else []
     product = next((p for p in candidates if p.id == current.product.id), None)
     if product is not None:
         note = f"Permissions saved. I rechecked the offer you were viewing, {product.name} from {product.merchant}, under the new permissions."

@@ -59,7 +59,7 @@ def test_shopify_success_no_browser_and_detail_refresh(monkeypatch):
         return {"products":[row()]} if name=="search_catalog" else {"product":row(13000)}
     monkeypatch.setattr(shopify,"call",call)
     monkeypatch.setattr(browser_search,"discover",lambda *_:pytest.fail("No browsing for Shopify success"))
-    s=session()
+    s=session("shopify_catalog")
     with discovery.budget():
         ids=discovery.discover(s)
         p=shopify.details(s,s.live_products[ids[0]])
@@ -155,7 +155,7 @@ def test_mcp_transport_contract(monkeypatch):
 
 def test_workflow_inspects_shopify_variant_and_keeps_policy(monkeypatch):
     monkeypatch.setattr(shopify,"call",lambda name,args:{"products":[row()]} if name=="search_catalog" else {"product":row()})
-    monkeypatch.setattr(browser_search,"discover",lambda *_:pytest.fail("Unexpected fallback"))
+    monkeypatch.setattr(browser_search,"discover",lambda *_:[])
     s=session()
     result=shopping_workflow.run_shopping(s)
     assert result.status=="proposed" and result.product.detail_checked

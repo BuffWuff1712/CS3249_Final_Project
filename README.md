@@ -123,7 +123,7 @@ Live endpoint probes and synthetic shopping turns were exercised against the sel
 
 ## Merchant-risk extension
 
-Live product discovery uses Shopify Global Catalog first in the default hybrid mode, with Browser Use Cloud V4 as a bounded fallback. Browser-only and fictional catalogue modes remain selectable.
+Live product discovery queries both Shopify Global Catalog and Browser Use Cloud V4 in default hybrid mode and compares their eligible results. Browser-only and fictional catalogue modes remain selectable.
 See [Browser Use setup and switching guide](docs/browser-use-search.md). Catalogue/research records
 remain fictional; Browser Use listings are clearly labelled unverified web snapshots. All checkout
 and receipts remain simulated. Live search was checked manually against amazon.sg.
@@ -190,16 +190,24 @@ passing tests do not establish live reliability.
 
 ### Shopify Global Catalog and hybrid discovery
 
-New sessions default to `BEANY_SEARCH_PROVIDER=hybrid`: Shopify Global Catalog MCP
-searches first; Browser Use is a visible fallback when Shopify fails or provides no
-eligible offers. The two providers share two discovery calls per turn, with at most
-one Browser Use call in hybrid mode. Six workflow steps remain the limit. No fictional
-fallback, remote carts, checkout tools, payment calls or account linking are used.
+New sessions default to `BEANY_SEARCH_PROVIDER=hybrid`: each search queries Shopify
+and Browser Use once, sequentially, with cancellation checked between sources.
+Both sources are searched even if the first succeeds. No automatic paid retry occurs.
+A deterministic workflow cheaply ranks and deduplicates results before inspecting
+up to six candidates total (configurable `screening_budget` in `backend/config/policy.json`).
+It stops once three eligible, distinct products are found: one primary and up to two
+alternatives. `recommendation_limit` defaults to 3 and is capped at 3 in the workflow. Ranking prioritizes
+relevance, grounded preference matches and information completeness, with price
+breaking ties within a currency. This is the best of the bounded results, not a
+claim to compare every available listing. Fewer than three are returned when needed. Blocked and known irrelevant products are excluded.
+Partial source failures are logged; valid results from the other source can still
+be used. A failed search with no usable results remains a service failure.
 
-`shopify_catalog` selects Shopify alone; `browser_use` selects Browser Use alone;
-`catalogue` keeps the demo inventory. Existing sessions retain their stored provider.
-Restart the backend and use Start fresh to pick up hybrid configuration. Browser Use
-fallback may consume its configured credits, subject to its existing per-run cost cap.
+`shopify_catalog`, `browser_use` and `catalogue` remain single-source modes.
+Existing sessions retain their stored provider. Hybrid now invokes Browser Use
+on each search and may consume its configured credits, subject to the existing
+per-run cost cap. No real carts, orders or payments are created. Provider diagnostics
+stay in backend logs; participant UI avoids internal provider/routing labels.
 
 Install backend requirements (including the official `mcp` Python SDK). Anonymous
 Shopify discovery needs no key: leave BOTH `SHOPIFY_CLIENT_ID` and
@@ -251,3 +259,104 @@ returned structuredContent without the MCP SDK's required content array, and pro
 URLs were on variants rather than the parent. Both are now supported, with regression
 fixtures. SGD market context can still return USD listings; normal currency policy
 checks remain authoritative. This verifies those calls, not every category or retailer.
+
+### Diagnosing slow shopping requests
+
+Backend terminal logs include `timing_start`, `timing_end` and `timing_summary` at
+INFO level through the Uvicorn logger. Each workspace mutation has a generated
+`trace` ID; `span` and `parent` connect nested work, including cancellable threads.
+Logs cover database lock waiting/load/save, response construction, conversation,
+LLM schema calls, both discovery providers, each product inspection, relevance,
+risk review and policy evaluation. `elapsed_s` uses a monotonic clock.
+
+At completion, `timing_summary` lists stages sorted by total duration, with call
+count and maximum duration. Durations are inclusive: parent and child spans overlap,
+so do not add them together. A repeated `product.risk_review` or `llm.Review` can
+explain why screening several products is slower than discovery alone. A start
+without an end identifies an in-flight operation. Errors and cancellations are
+labelled without logging exception bodies, prompts, product text or credentials.
+Cancelled remote calls may continue in the background; the request summary measures
+how long Beany waited, not when a remote provider actually stopped. No live search
+is required to test this instrumentation, and it does not change timeout settings.
+
+Additional `diagnostic` lines share the same `trace` and active `span`:
+- `workflow.choose/chosen/override`: iteration, action and why Python overrode it.
+- `workflow.search_results`, `shortlist.*`: candidate references, exclusions and shortlist.
+- `inspection.*`, `relevance.cache/result`, `risk.cache/result`: cache hits/misses,
+  snapshot/binding changes, model failures and whether another assessment was needed.
+- `llm.start/usage/end`: correlated call ID, schema, input character counts, token
+  counts and provider-reported reasoning/cached tokens (null if unavailable).
+
+Product references are stable hashes, not listing titles or URLs. To diagnose a run,
+keep all lines from its first `timing_start` through `timing_summary`, including
+`diagnostic` lines. Join using `trace`, `span`, `call_id` and `product_ref`. These
+metrics identify repeated calls, cache invalidation and large requests; they cannot
+measure provider-internal queue time or time to first token in non-streaming calls.
+
+
+### Phase 1 conversation and deterministic search
+
+`runtime/llm.py` retains the conversational interpreter. `Interpretation.search_control`
+records request/defer/unchanged; `Session.search_requested` remembers a requested search
+while clarifying. Grounded preference changes are saved even during discussion, and
+invalidate old recommendations and approval opportunities. A complete brief is not
+permission to search: `clarify` stays clarification. Explicit deferral prevents search.
+`new_task` additionally requires a grounded product-family change and a literal switch
+quote before resetting the brief. Cart, receipts and permissions survive that reset.
+Existing SQLite snapshots load the new fields with defaults; no migration is required.
+
+Once requested and ready, `shopping_workflow.run_shopping` builds a confirmed-brief
+query, calls existing discovery, then `shopping_tools.screen_candidates` filters,
+ranks, deduplicates, inspects and policy-checks a bounded set. Exact duplicates are
+removed first; other sellers/variants remain available if the preferred one fails.
+After one model is accepted, near-duplicate variants do not fill the alternatives.
+Each candidate still uses its own relevance assessment and risk review, with existing
+snapshot-bound caches. A final snapshot check prevents returning changed offers.
+There are no routine ShoppingStep LLM calls. The explanation model and explicit
+approval/simulated-checkout paths remain intact. Workspace comparisons are limited
+to the saved shortlist; they cannot introduce unscreened alternatives.
+
+Offline verification and measurement are described in `docs/phase1-validation.md`.
+To collect live evidence yourself, run the same request in a fresh session and retain
+the backend timing summary plus `shortlist.start`, `shortlist.result`, relevance/risk
+cache events and LLM token diagnostics. Timings are nested: do not sum parent and child
+stage durations. No live search is needed for the automated tests.
+
+
+### Shopify product-card evidence
+
+The adapter maps product/variant aggregate ratings (variant first, supported five-star
+scales), rating counts, catalogue feature summaries, selling points, variant options,
+condition, same-currency reference price and seller policy links. Product and variant
+HTML descriptions are converted to text and retained without the previous 2,000-character
+cutoff. The card shows catalogue highlights and ratings directly, with full descriptions
+and specifications in an expandable section. Policy links are buttons to read the supplied
+policies; their presence is not a claim that the return terms have been reviewed.
+
+Provider summaries remain separate from confirmed feature evidence and cannot satisfy
+hard constraints by themselves. Aggregate counts do not create written review excerpts or
+seller ratings. Sparse detail responses preserve omitted search evidence for the same
+variant, while explicit empty fields replace it; price and availability never fall back.
+Old saved cards are not backfilled automatically: run a new search to populate the new fields.
+Mapping tests are offline, using the saved response's field shapes; no live provider call
+is necessary (`tests/test_shopify_evidence.py`).
+
+
+### Browser Use product-card evidence
+
+The runtime accepts both its nested listing schema and the flat standalone diagnostic
+shape (`features`, `seller`, `availability`, ratings, review excerpts and return fields).
+Nested safety evidence is retained. The runtime now requests specifications, complete
+stock/delivery notices, visible aggregate ratings and review excerpts already on the page.
+These map to card features, expandable specifications/descriptions, ratings/counts,
+verbatim excerpts, return terms and an allowlisted policy link. Seller percentages remain
+verbatim rather than becoming fabricated star ratings. Only explicit five-star aggregates
+are parsed numerically; unknown ratings remain text. Review excerpts never receive invented
+authors, dates or scores. Availability notices remain visible, including a location that
+cannot receive delivery; in-stock does not establish shipping eligibility.
+
+`tests/fixtures/browser_use_listing_output.json` contains only the four public product
+records from the successful standalone run, excluding workspace/session identifiers and
+polling metadata. Offline tests replay it through the actual parser and discovery mapper.
+No live Browser Use run is required. Older saved product cards need a new search to collect
+fields that were never requested or stored previously.

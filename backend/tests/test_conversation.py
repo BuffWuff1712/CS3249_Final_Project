@@ -32,16 +32,17 @@ def test_small_talk_preserves_shopping_state(session, monkeypatch, text, carted)
 
 
 @pytest.mark.parametrize("intent", ["respond", "explain"])
-def test_conversation_uses_reply_and_ignores_proposed_edits(session, monkeypatch, intent):
+def test_conversation_saves_grounded_edits_without_search(session, monkeypatch, intent):
     before = session.model_dump(exclude={"messages", "events"})
     monkeypatch.setattr(service.llm, "interpret", lambda *_: Interpretation(
         intent=intent, reply="You can review your items before confirming simulated checkout.",
         changes=[Change(field="budget", value="500", source="confirmed", hard=True, evidence="500")],
         suggestions=[],
     ))
-    service.chat(session, "Explain how a budget of 500 works")
+    service.chat(session, "Set my budget to 500, but do not search yet")
     assert session.messages[-1].text == "You can review your items before confirming simulated checkout."
-    assert session.model_dump(exclude={"messages", "events"}) == before
+    assert session.brief["budget"].value == "500"
+    assert not session.recommendations and session.proposals[-1].status == "superseded"
 
 
 def test_greeting_with_shopping_request_still_searches(session):
@@ -62,7 +63,7 @@ def test_switching_category_drops_needs_from_the_old_product(session, monkeypatc
     assert {"budget", "features"} <= set(session.brief)
     # A different product target is explicitly classified as a new task.
     monkeypatch.setattr(service.llm, "interpret", lambda *_: Interpretation(
-        intent=intent, reply="Looking for backpacks.",
+        intent=intent, search_control="request", new_task_evidence="Now", reply="Looking for backpacks.",
         changes=[Change(field="category", value="Backpacks", source="confirmed", hard=True, evidence="backpack")],
         suggestions=[],
     ))
@@ -73,7 +74,7 @@ def test_switching_category_drops_needs_from_the_old_product(session, monkeypatc
 def test_new_needs_in_the_switching_message_are_kept(session, monkeypatch):
     service.chat(session, "Find running shoes for running under $150, size 10, cushioned")
     monkeypatch.setattr(service.llm, "interpret", lambda *_: Interpretation(
-        intent="new_task", reply="Looking for backpacks.",
+        intent="new_task", search_control="request", new_task_evidence="Now", reply="Looking for backpacks.",
         changes=[Change(field="budget", value="80", source="confirmed", hard=True, evidence="80"),
                  Change(field="category", value="Backpacks", source="confirmed", hard=True, evidence="backpack")],
         suggestions=[],

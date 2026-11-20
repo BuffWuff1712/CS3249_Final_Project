@@ -11,6 +11,7 @@ from .risk_agent import review as review_listing
 from .local_evidence import configured_detection, review_view
 from .progress import step
 
+from .timing import timed
 llm = OpenAIConversation()
 ELICITATION_PATH = Path(__file__).resolve().parents[2] / "config/elicitation.json"
 
@@ -82,6 +83,7 @@ def switches_category(s, changes, text):
 def reset_request(s):
     invalidate(s)
     s.task_start_message = max(0, len(s.messages) - 1)
+    s.search_requested = False
     s.brief = {}
     s.clarification_asked = []
     s.clarification_answers = {}
@@ -109,12 +111,10 @@ def create(*, search_provider=None):
         s,
         "Hi, I’m Beany. Tell me what you’re shopping for, even if you’re unsure. We can compare fictional running shoes, headphones and backpacks. All purchases are simulated. You control the brief and permissions.",
     )
-    if s.search_provider == "browser_use":
-        s.messages[-1].text = "Hi, I’m Beany. Tell me what you’re shopping for. I can search public product listings using Browser Use. Prices and merchant details need review; checkout here is always simulated."
+    if s.search_provider != "catalogue":
+        s.messages[-1].text = "Hi, I’m Beany! Tell me what you’re shopping for, even if you’re unsure. I’ll help you find and compare options that fit your needs."
         if s.search_replay:
-            s.messages[-1].text = "Hi, I’m Beany. Tell me what you’re shopping for. This session replays saved study listings instead of searching the web. Prices and merchant details need review; checkout here is always simulated."
-    if s.search_provider in ("shopify_catalog", "hybrid"):
-        s.messages[-1].text = "Hi, I’m Beany. Tell me what you’re shopping for. I can search Shopify products" + (" and use Browser Use when needed" if s.search_provider == "hybrid" else "") + ". Prices and seller details need review; checkout is always simulated."
+            s.messages[-1].text += " This session replays saved study listings rather than current store listings."
     event(s, "session_started", "Fresh shopping session")
     return s
 
@@ -157,6 +157,7 @@ def checkout(s, a):
     message(s, "Simulated checkout complete. No real order or payment was created.")
 
 
+@timed("recommendation.propose")
 def propose(s, product=None, *, recommendations=None, **kwargs):
     invalidate(s)
     s.recommendations = search(s) if recommendations is None else recommendations
@@ -222,6 +223,7 @@ def propose(s, product=None, *, recommendations=None, **kwargs):
         event(s, "intervention", a.decision)
 
 
+@timed("conversation.process")
 def chat(s, text):
     text = text.strip()
     if not text:
@@ -232,15 +234,14 @@ def chat(s, text):
     s.messages.append(Message(role="user", text=text))
     event(s, "user_message", "Message received")
     from .clarification import resume_uncertainty
+    previous_search_requested = s.search_requested
+    if result.search_control == "defer":
+        s.search_requested = False
+    elif result.search_control == "request" or result.intent in ("search", "alternative"):
+        s.search_requested = True
     resume_uncertainty(s, result, text)
-    if result.intent in ("respond", "explain"):
-        # Conversation cannot edit the brief, invalidate a proposal, or authorize checkout.
-        # The interpreter has current proposal facts; keep its answer to this question
-        # instead of replacing it with rules from an unrelated historical proposal.
-        event(s, "interpretation", result.model_dump_json())
-        message(s, result.reply)
-        return s
     if result.intent == "checkout":
+        s.search_requested = False
         s.stage = "cart_review" if s.cart else "ready"
         s.suggestions = []
         if s.experiment.get("shop_workspace"):
@@ -252,7 +253,21 @@ def chat(s, text):
         return s
     # Only an interpreted new task resets the brief; subtype wording is a refinement.
     if result.intent == "new_task":
-        reset_request(s)
+        # An intent label alone must never erase a confirmed brief.
+        from .preferences import grounded_change
+        evidence = result.new_task_evidence.strip()
+        grounded_family = any(c.field == "category" and c.value and c.source == "confirmed"
+                              and grounded_change(s, c, text, allow_history=False)
+                              for c in result.changes)
+        if grounded_family and evidence and evidence.casefold() in text.casefold():
+            reset_request(s)
+            s.search_requested = result.search_control == "request"
+            result.intent = "search" if s.search_requested else "respond"
+        else:
+            s.search_requested = previous_search_requested
+            event(s, "protected_task", "New-task reset lacked grounded explicit evidence")
+            message(s, "Are you starting a new shopping task, or changing the current one? Your existing preferences are still saved.")
+            return s
     for change in result.changes:
         unknown_fields = {"product_type": "category", "budget": "budget", "features": "features"}
         if change.value is None and any(
@@ -289,7 +304,7 @@ def chat(s, text):
         edit(s, change.field, fact)
         if old:
             event(s, "refine", change.field)
-    if result.intent in ("search", "new_task", "clarify", "alternative"):
+    if result.intent == "clarify" or (s.search_requested and result.intent in ("search", "alternative")):
         from .clarification import clarify_before_search
         type_was_missing = s.clarification_answers.get("product_type") == "missing"
         question = clarify_before_search(s, result, text)
@@ -300,12 +315,12 @@ def chat(s, text):
                 result.reply = question
             result.intent = "clarify"
             result.suggestions = ["I'm unsure about those; show me some options"]
-        elif result.intent == "clarify" and "category" in s.brief:
-            result.intent = "search"
+
     s.suggestions = result.suggestions[:4]
     event(s, "interpretation", result.model_dump_json())
     if result.intent == "cancel":
         invalidate(s)
+        s.search_requested = False
         s.stage = "cancelled"
         event(s, "cancel", "Task cancelled")
         message(s, "Cancelled. No pending proposal can be approved.")
@@ -316,6 +331,9 @@ def chat(s, text):
         s.stage = "clarifying"
         event(s, "clarification", "Question asked")
         return s
+    if result.intent in ("respond", "explain") or not s.search_requested:
+        message(s, result.reply)
+        return s
     if result.intent == "alternative" and s.proposals:
         previous = s.proposals[-1]
         previous.status = (
@@ -324,7 +342,8 @@ def chat(s, text):
         s.rejected_products.append(previous.product.id)
         s.rejected_merchants.append(previous.product.merchant_id)
         event(s, "alternative", previous.id)
-    if "category" in s.brief:
+    if result.intent in ("search", "alternative") and "category" in s.brief:
+        s.search_requested = False
         invalidate(s)
         from .search_errors import SearchProviderError, report_failure, USER_MESSAGE
         try:

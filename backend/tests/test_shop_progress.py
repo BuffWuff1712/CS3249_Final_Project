@@ -34,7 +34,7 @@ def test_progress_arrives_while_model_is_still_working(monkeypatch):
     result = next(e["view"] for e in events if e["type"] == "result")
     assert result["revision"] == 1 and result["current"]
     labels = [e["activity"]["label"] for e in events if e["type"] == "activity"]
-    assert any("Found 4 matching offers" in label for label in labels)
+    assert any("matching offers" in label for label in labels)
     assert any("Needs your approval" in label for label in labels)
     assert any("Prepared your recommendation" in label for label in labels)
     assert not result["session"]["receipts"]

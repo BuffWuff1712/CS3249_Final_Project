@@ -179,6 +179,14 @@ class Product(Model):
 
     provider_ids: dict[str, str] = Field(default_factory=dict)
     inferred_attributes: list[str] = Field(default_factory=list)
+    selling_points: list[str] = Field(default_factory=list)
+    availability_note: str = ""
+    product_rating_text: str = ""
+    seller_rating_text: str = ""
+    review_excerpts: list[str] = Field(default_factory=list)
+    policy_links: dict[str, str] = Field(default_factory=dict)
+    rating_scope: Literal["", "product", "variant"] = ""
+    list_price: float | None = Field(default=None, gt=0, allow_inf_nan=False)
     detail_checked: bool = False
     observed_type: str = ""
     type_evidence: str = ""
@@ -299,6 +307,7 @@ class Session(Model):
     rejected_merchants: list[str] = Field(default_factory=list)
     rejected_products: list[str] = Field(default_factory=list)
     clarification_count: int = 0
+    search_requested: bool = False
     task_start_message: int | None = None
     clarification_asked: list[str] = Field(default_factory=list)
     clarification_answers: dict[str, str] = Field(default_factory=dict)
@@ -337,6 +346,8 @@ class ClarificationAnswer(Model):
 
 
 class Interpretation(Model):
+    search_control: Literal["unchanged", "request", "defer"] = "unchanged"
+    new_task_evidence: str = ""
     reply: str = Field(
         min_length=1,
         description="Complete user-facing message, including one question when intent is clarify.",
