@@ -83,7 +83,10 @@ fields that live Browser Use search is never asked to capture. Only shopper-visi
 The boolean risk flags are never converted: they are not page text. The site registry is never
 converted either, so the agent does not judge website reputation. For local products, code adds the
 `site_reputation_mid` and `site_reputation_poor` evidence from the registry in both `rules` and `ai`
-mode. Replayed and live listings have no registry entry and never carry a website-reputation signal. A local record knows when a
+mode. Replayed listings have no registry entry and never carry a website-reputation signal. Live
+listings from a retailer in `data/sites/live_site_registry.json` (matched by host or subdomain, e.g.
+`www.amazon.sg`) carry that site's tier: amazon.sg is `good`, qoo10.sg is `mid` and adds
+`site_reputation_mid`. Other hosts, such as independent Shopify stores, have none. A local record knows when a
 detail is absent, so a missing contact or verification becomes explicit text; live listings keep
 "blank means not visible", and blank fields are never evidence. The agent may quote a review only
 when it reports concrete seller conduct, and its reason then starts with "Buyer report:".
@@ -116,7 +119,10 @@ agent: these behavioural instructions are not a hard read-only browser sandbox. 
 constrains accepted results and instructs navigation; it is not a provider-enforced network allowlist.
 
 Results are unverified snapshots saved with the session. Details inspection reads that snapshot,
-not another paid browse. Existing brief filters still apply. Fictional fraud classifications are not
+not another paid browse. Existing brief filters still apply. When an edit only filters (for example a
+must-have feature made preferred or a lower budget), the next search rechecks the last search's
+listings for up to 25 minutes instead of starting another run; new or changed needs, a higher budget
+or a failed source start a new run. See "Shopify Global Catalog and hybrid discovery" in the README. Fictional fraud classifications are not
 reused; live risk comes from the captured evidence and review agent described below. Live proposals
 always require review; detected instruction injection and existing hard-constraint checks still block.
 Snapshots older than 30 minutes cannot check out.
@@ -152,6 +158,11 @@ browsing. The review is cached per product snapshot, so cart review and checkout
 calling the model again. If the agent fails, the proposal shows "Automated risk review of this listing is
 unavailable" and stays at REVIEW. Mock mode flags only the verbatim evidence lists, so it can run offline.
 The agent can make a proposal stricter but never less strict than REVIEW.
+
+`misleading_returns` covers only a refund or return promise that the stated policy contradicts to the
+buyer's disadvantage ("free returns" with buyer-paid shipping, a "full refund" paid as store credit, a
+return window for a non-returnable item). A longer product-specific, promotional or seasonal window,
+such as Amazon's holiday "returnable until Jan 31" next to its 30-day policy, is not a conflict.
 
 ## Validation
 

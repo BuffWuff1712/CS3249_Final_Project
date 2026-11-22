@@ -12,9 +12,9 @@ This route runs entirely in the frontend with a bounded deterministic interprete
 
 Needs, the last request and any selected offer are stored in this browser. Refresh rechecks the offer against the current fixture and needs. Editing needs clears selection; `Start fresh` clears only this CUI decision. Storage failures are visible. Unsupported categories and USD requests ask for clarification, and budgets never silently increase.
 
-The `/` route remains the classic backend-connected simulation described below. Its SQLite sessions, research exports, cart and receipts are independent of `/shop`. See the [demo/presentation script](docs/final-demo.md), [study protocol](docs/evaluation-guide.md), and [CUI delivery and verification notes](docs/cui-v2-delivery.md).
+The `/` route remains the classic backend-connected simulation described below. Its SQLite sessions, research exports, cart and receipts are independent of `/shop`.
 
-The [complete change list and pre-merge review checklist](docs/cui-v2-change-list.md) explains the intent → reasoning → flagged concern → decision flow. Blocked seller offers use a prominent red flag with the affected seller/price, evidence, consequence and an action to select the recommended alternative. Missing information remains a separate caution; colour never substitutes for the reason or next action.
+Blocked seller offers use a prominent red flag with the affected seller/price, evidence, consequence and an action to select the recommended alternative. Missing information remains a separate caution; colour never substitutes for the reason or next action.
 
 ## Requirements
 
@@ -96,14 +96,14 @@ Your original learning modules (`workflow.py`, `review.py`, `checkout.py`, `shop
 
 ## Study sessions
 
-Open http://localhost:3000/research and enter the backend researcher key. Start a fresh scenario participant, open the participant interface, and trigger a predefined condition if applicable. Triggering a condition proposes a fixture product; it does not script the conversation. Refresh study results and export anonymous CSV. See `docs/evaluation-guide.md`.
+Open http://localhost:3000/research and enter the backend researcher key. Start a fresh scenario participant, open the participant interface, and trigger a predefined condition if applicable. Triggering a condition proposes a fixture product; it does not script the conversation. Refresh study results and export anonymous CSV.
 
 ## Editing and architecture
 
 - Conversation instructions: `backend/config/prompts/dialogue.txt`
 - Policy thresholds: `backend/config/policy.json`; rule logic: `backend/app/runtime/policy.py`
 - Products: `backend/data/products/catalogue.json`
-- Merchants: `backend/data/merchants/merchants.json`; website reputation registry: `backend/data/sites/site_registry.json`, matched by exact host in `backend/app/runtime/sites.py`
+- Merchants: `backend/data/merchants/merchants.json`; website reputation registries in `backend/app/runtime/sites.py`: `backend/data/sites/site_registry.json` (fictional local sites, exact host) and `backend/data/sites/live_site_registry.json` (live retailers, host or subdomain)
 - Scenarios: `backend/data/scenarios/scenarios.json`
 - UI: `frontend/src/app/page.tsx`, `frontend/src/components/Brief.tsx`, `frontend/src/app/globals.css`
 - Backend state/orchestration: `backend/app/runtime/`
@@ -111,13 +111,11 @@ Open http://localhost:3000/research and enter the backend researcher key. Start 
 - Live-listing risk review prompt and grounding: `backend/app/runtime/risk_agent.py`; weights and levels: `backend/config/merchant_risk_rules.json`
 - Replay fixture: `backend/data/replay/study_listings.json`, rebuilt by `python -m scripts.build_replay_fixture`
 
-See `docs/architecture.md` and `docs/editing-guide.md` for details.
-
 ## Limits
 
 This is a local, single-worker study application, not an internet deployment. Session UUIDs act as local access tokens; there is no participant account authentication. The researcher key protects study controls, not a production research-data security perimeter. SQLite stores raw conversation and model interpretations locally; anonymous CSV deliberately omits that free text. Researchers must manage consent, retention and local database access. Do not use real personal/payment data.
 
-LLM extraction remains probabilistic. Confirmed changes need a supporting quote and pass deterministic field validation; quote matching cannot prove semantic correctness. The editable brief and receipts make interpretation inspectable. Unknown free-text requirements require review. Search uses deterministic keyword/brand matching, not semantic retrieval. USD requests may have no matches because the seeded catalogue uses SGD. Prices use fixed catalogue decimals; no real financial processing occurs.
+LLM extraction remains probabilistic. Confirmed changes need a supporting quote and pass deterministic field validation; quote matching cannot prove semantic correctness. The editable brief and receipts make interpretation inspectable. Unknown free-text requirements require review. Catalogue search uses deterministic keyword/brand matching, not semantic retrieval; live listings use tolerant feature matching with an LLM check (see "Open-ended live product search"). USD requests may have no matches because the seeded catalogue uses SGD. Prices use fixed catalogue decimals; no real financial processing occurs.
 
 Live endpoint probes and synthetic shopping turns were exercised against the selected NUS model. Broader conversational quality still requires human-reviewed evaluations. Automated tests validate deterministic behaviour and gateway contracts. LangGraph, RAG and real checkout are absent from the integrated runtime. MCP is used only for read-only Shopify Global Catalog discovery; website automation uses read-only Browser Use.
 
@@ -145,8 +143,7 @@ receipt history uses session IDs stored in this browser, not a user account. Cle
 loses access to that history. No real payment, tax, shipping or order processing is performed.
 
 Chat requests now use a bounded search-and-inspect workflow over the fictional catalogue before
-policy evaluation. See [the shopping workflow guide](docs/shopping-workflow.md) for tool contracts,
-limits, audit events and offline testing. The new planner has offline regression coverage. Its
+policy evaluation. The new planner has offline regression coverage. Its
 multi-step behaviour was exercised manually with DeepSeek (replay and live search), not yet with the NUS model.
 
 Separate product and merchant databases support fictional multi-merchant offers. Risk is predicted from observable signals; hidden labels are joined only in authenticated researcher reports. Configure thresholds, warning profiles, scenarios and evaluation using [docs/configuration-guide.md](docs/configuration-guide.md). The participant UI offers merchant details and deterministic “Find another seller” (same model) and “Find another product” (different model) controls; repeated presses walk through every option before starting again. Every checkout still passes policy rechecks and action-specific approval checks.
@@ -174,6 +171,22 @@ an LLM assessment, not independent verification or checkout authority. It is bou
 the request and listing snapshot; mismatches are blocked and unknown relevance requires
 review. Existing cart receipts are not rewritten. Changed snapshots invalidate approvals.
 
+Features are matched differently for live listings (`app/runtime/feature_match.py`,
+`app/runtime/feature_check.py`). Rules first: a feature counts when the listing's name,
+description, attributes or specifications show the same concept (noise control, comfort,
+portability, durability, water resistance, battery, sound, storage) or most of its words.
+Must-have features the rules cannot confirm go to one batched LLM call per search. Each
+verdict is met, absent or unstated and must quote the listing; an ungrounded or skipped
+verdict counts as unstated. Absent excludes the listing; unstated keeps it with a REVIEW
+note ("The listing doesn't mention …"); if the model is unavailable, an unconfirmed
+must-have still excludes. Provider-inferred features and selling points never confirm a
+feature. Catalogue products keep exact matching against their attributes. The offer card's
+"How this matches your needs" chips show these per-feature verdicts (`feature_fit`).
+
+Live merchants on a retailer in `backend/data/sites/live_site_registry.json` show its
+website reputation (amazon.sg good, qoo10.sg mid); other hosts, such as independent
+Shopify stores, show Unknown.
+
 If Browser Use fails, chat displays a saved search-unavailable response instead of no
 matches. Read the backend terminal (`uvicorn.error`) for `Search failure`: reason code,
 HTTP status, run ID where available, and diagnostic reference. Only explicit recognized
@@ -190,9 +203,20 @@ passing tests do not establish live reliability.
 
 ### Shopify Global Catalog and hybrid discovery
 
-New sessions default to `BEANY_SEARCH_PROVIDER=hybrid`: each search queries Shopify
+New sessions default to `BEANY_SEARCH_PROVIDER=hybrid`: each new search queries Shopify
 and Browser Use once, sequentially, with cancellation checked between sources.
 Both sources are searched even if the first succeeds. No automatic paid retry occurs.
+
+A search after an edit that only filters reuses the last search's listings instead
+(`reusable()` in `app/runtime/discovery.py`): must-have/preferred toggles, a lower budget,
+removed features, brands, usage or size, newly excluded brands, or a rejected offer with
+unchanged needs. Reuse needs both sources to have succeeded and lasts 25 minutes from the
+search's start, since snapshots older than 30 minutes cannot check out. A new or changed
+category, currency, feature, usage, size or preferred brand, a higher or removed budget, a
+hard budget made preferred, an un-excluded brand, or unchanged needs search again. A reuse
+with no eligible listing falls back to a new search. Reuse is logged as a `search_reuse`
+event and shown as "Rechecked N web listing offers from your last search".
+
 A deterministic workflow cheaply ranks and deduplicates results before inspecting
 up to six candidates total (configurable `screening_budget` in `backend/config/policy.json`).
 It stops once three eligible, distinct products are found: one primary and up to two
@@ -204,8 +228,8 @@ Partial source failures are logged; valid results from the other source can stil
 be used. A failed search with no usable results remains a service failure.
 
 `shopify_catalog`, `browser_use` and `catalogue` remain single-source modes.
-Existing sessions retain their stored provider. Hybrid now invokes Browser Use
-on each search and may consume its configured credits, subject to the existing
+Existing sessions retain their stored provider. Hybrid invokes Browser Use
+on each new search and may consume its configured credits, subject to the existing
 per-run cost cap. No real carts, orders or payments are created. Provider diagnostics
 stay in backend logs; participant UI avoids internal provider/routing labels.
 
