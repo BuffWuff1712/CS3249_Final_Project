@@ -40,7 +40,10 @@ export function MatchedPriorities({ product, brief, fit }: { product: Product; b
   const requested = brief.features?.source === "confirmed" ? brief.features.value.split(",").map(value => value.trim()).filter(Boolean) : [];
   const attributes = new Set(product.attributes.map(normalized));
   // Prefer the backend's per-feature verdicts (tolerant matching and listing checks) over a literal attribute match.
-  const features: FeatureFit[] = fit?.length ? fit : requested.map(value => ({ feature: value, status: attributes.has(normalized(value)) ? "met" : "unknown", quote: "" }));
+  // Backend verdicts per need (tolerant rules and listing checks); kind-less entries are features.
+  const verdict = (kind: NonNullable<FeatureFit["kind"]>) => fit?.find(item => (item.kind || "feature") === kind);
+  const backendFeatures = (fit || []).filter(item => (item.kind || "feature") === "feature");
+  const features: FeatureFit[] = backendFeatures.length ? backendFeatures : requested.map(value => ({ feature: value, status: attributes.has(normalized(value)) ? "met" : "unknown", quote: "" }));
   const unknown = features.filter(item => item.status === "unknown" || item.status === "unstated").map(item => item.feature);
   const budget = brief.budget;
   const amount = Number(budget?.value);
@@ -63,9 +66,11 @@ export function MatchedPriorities({ product, brief, fit }: { product: Product; b
   else if (budgetNote) add(sameCurrency ? "Above your budget" : "Budget match unconfirmed", sameCurrency ? "mismatch" : "unknown", budget.hard);
   const size = brief.size;
   if (size?.source === "confirmed" && size.value.trim()) {
+    const checked = verdict("size");
     const supplied = product.sizes.length > 0;
-    const available = product.sizes.includes(size.value.trim());
-    add(`Size ${size.value}: ${available ? "available" : supplied ? "unavailable" : "availability unknown"}`, available ? "match" : supplied ? "mismatch" : "unknown", true);
+    const state = checked ? (checked.status === "met" ? "match" : checked.status === "absent" ? "mismatch" : "unknown")
+      : product.sizes.includes(size.value.trim()) ? "match" : supplied ? "mismatch" : "unknown";
+    add(`Size ${size.value}: ${state === "match" ? "available" : state === "mismatch" ? "unavailable" : supplied ? "not confirmed" : "availability unknown"}`, state, size.hard, checked?.quote);
   }
   for (const [field, fact] of Object.entries(brief)) {
     if (fact.source !== "confirmed" || !fact.value.trim() || ["budget", "size", "features"].includes(field)) continue;
@@ -81,15 +86,20 @@ export function MatchedPriorities({ product, brief, fit }: { product: Product; b
       if (!validBudget) add(`Currency: ${fact.value}`, normalized(fact.value) === normalized(product.currency) ? "match" : "mismatch", fact.hard);
     } else if (field === "preferred_brands" || field === "excluded_brands") {
       const supplied = !!product.brand?.trim();
+      const checked = field === "preferred_brands" ? verdict("brand") : undefined;
       const included = supplied && values.includes(normalized(product.brand));
       const match = field === "excluded_brands" ? !included : included;
-      add(field === "excluded_brands" ? `Excluded brands: ${!supplied ? "brand unknown" : included ? `${product.brand} is excluded` : "avoided"}` : `Brand: ${supplied ? product.brand : "unknown"}`, !supplied ? "unknown" : match ? "match" : "mismatch", fact.hard);
+      const state = checked ? (checked.status === "met" ? "match" : checked.status === "absent" ? "mismatch" : "unknown") : !supplied ? "unknown" : match ? "match" : "mismatch";
+      add(field === "excluded_brands" ? `Excluded brands: ${!supplied ? "brand unknown" : included ? `${product.brand} is excluded` : "avoided"}` : `Brand: ${supplied ? product.brand : state === "match" ? fact.value : "unknown"}`, state, fact.hard);
     } else if (field === "merchants") {
       const supplied = !!product.merchant?.trim();
-      add(`Seller: ${supplied ? product.merchant : "unknown"}`, !supplied ? "unknown" : values.includes(normalized(product.merchant)) ? "match" : "mismatch", fact.hard);
+      const checked = verdict("merchant");
+      const state = !supplied ? "unknown" : checked ? (checked.status === "met" ? "match" : "mismatch") : values.includes(normalized(product.merchant)) ? "match" : "mismatch";
+      add(`Seller: ${supplied ? product.merchant : "unknown"}`, state, fact.hard);
     } else if (field === "usage") {
-      const listed = attributes.has(normalized(fact.value));
-      add(`For ${fact.value}: ${listed ? "listed" : "suitability unknown"}`, listed ? "match" : "unknown", fact.hard);
+      const checked = verdict("usage");
+      const state = checked ? (checked.status === "met" ? "match" : checked.status === "absent" ? "mismatch" : "unknown") : attributes.has(normalized(fact.value)) ? "match" : "unknown";
+      add(`For ${fact.value}: ${state === "match" ? "listed" : state === "mismatch" ? "listing says otherwise" : "suitability unknown"}`, state, fact.hard, checked?.quote);
     } else add(`${field.replaceAll("_", " ")}: ${fact.value} — not verified`, "unknown", fact.hard);
   }
   const featureLabel = { met: "", absent: ": listing says otherwise", unstated: ": not mentioned in listing", unknown: ": not established" } as const;

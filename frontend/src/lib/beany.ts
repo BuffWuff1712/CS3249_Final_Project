@@ -124,7 +124,7 @@ export type Action = {
   // Backend verdict per requested feature; absent on older saved proposals.
   feature_fit?: FeatureFit[];
 };
-export type FeatureFit = { feature: string; status: "met" | "absent" | "unstated" | "unknown"; quote: string };
+export type FeatureFit = { kind?: "feature" | "size" | "usage" | "brand" | "merchant"; feature: string; status: "met" | "absent" | "unstated" | "unknown"; quote: string };
 export type Session = {
   search_provider: "catalogue" | "browser_use" | "shopify_catalog" | "hybrid";
   search_replay?: string;

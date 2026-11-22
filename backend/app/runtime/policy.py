@@ -36,48 +36,107 @@ def live(s, p):
     return p.source in ("browser_use", "shopify_catalog") and not s.search_replay
 
 
-def has_feature(s, p, term):
-    """Live listings: tolerant rules, then a cached model verdict. Catalogue keeps exact matching."""
+KEY_PREFIX = {"feature": "", "size": "size: ", "usage": "use: "}
+
+
+def needs(s):
+    """(kind, term, cache key) for each need the model may settle in a live listing.
+
+    Preferred needs are checked too, so a listing that clearly meets one is shown as meeting it;
+    only must-have needs ever exclude an offer or add a review rule."""
+    out = []
+    if confirmed(s, "features"):
+        out += [("feature", t, t) for t in terms(value(s, "features"))]
+    for kind, field in (("size", "size"), ("usage", "usage")):
+        term = value(s, field).strip().casefold()
+        if confirmed(s, field) and term:
+            out.append((kind, term, KEY_PREFIX[kind] + term))
+    return out
+
+
+def need_rule(s, p, kind, term):
+    """Rules only: True met, False clearly not, None undecided (a live listing then asks the model)."""
+    from .feature_match import met, listing_text, size_rule
+    if kind == "size":
+        if not p.sizes:
+            return None if live(s, p) else True
+        found = size_rule(term, p.sizes)
+        return found if found is not None or live(s, p) else False
     if live(s, p):
-        from .feature_match import met, listing_text
-        if met(term, listing_text(p)):
-            return True
-        found = s.feature_checks.get(p.id, {}).get(term)
-        return bool(found and found.status == "met")
+        return True if met(term, listing_text(p)) else None
     return term in " ".join(p.attributes).casefold()
+
+
+def status(s, p, kind, term):
+    """met, absent, unstated (the model found no mention) or unknown (nothing settled it)."""
+    found = need_rule(s, p, kind, term)
+    if found is not None:
+        return "met" if found else "absent"
+    verdict = s.feature_checks.get(p.id, {}).get(KEY_PREFIX[kind] + term) if live(s, p) else None
+    return verdict.status if verdict else "unknown"
+
+
+def has_feature(s, p, term):
+    return status(s, p, "feature", term) == "met"
 
 
 def unstated_features(s, p):
     """Required features a live listing neither shows nor contradicts, per the model check."""
-    if not live(s, p):
-        return []
-    checks = s.feature_checks.get(p.id, {})
-    return [t for t in terms(value(s, "features"))
-            if not has_feature(s, p, t) and t in checks and checks[t].status == "unstated"]
-
-
-def feature_fit(s, p):
-    """Per requested feature: met, absent, unstated (model found no mention) or unknown."""
-    from .schemas import FeatureFit
-    if not confirmed(s, "features"):
-        return []
-    checks = s.feature_checks.get(p.id, {}) if live(s, p) else {}
-    out = []
-    for t in terms(value(s, "features")):
-        found = checks.get(t)
-        if has_feature(s, p, t):
-            out.append(FeatureFit(feature=t, status="met", quote=found.quote if found and found.status == "met" else ""))
-        elif found:
-            out.append(FeatureFit(feature=t, status=found.status, quote=found.quote))
-        else:
-            out.append(FeatureFit(feature=t, status="unknown"))
-    return out
+    return [t for t in terms(value(s, "features")) if status(s, p, "feature", t) == "unstated"]
 
 
 def missing_features(s, p):
-    """Features that disqualify: not matched, and for live listings not merely unstated."""
-    unstated = set(unstated_features(s, p))
-    return [t for t in terms(value(s, "features")) if not has_feature(s, p, t) and t not in unstated]
+    """Features that disqualify: contradicted, or never confirmed by rules or the model."""
+    return [t for t in terms(value(s, "features")) if status(s, p, "feature", t) in ("absent", "unknown")]
+
+
+def size_status(s, p):
+    return status(s, p, "size", value(s, "size").strip().casefold()) if confirmed(s, "size") and value(s, "size").strip() else None
+
+
+def usage_met(s, p):
+    return bool(value(s, "usage").strip()) and status(s, p, "usage", value(s, "usage").strip().casefold()) == "met"
+
+
+def brand_match(s, p, field):
+    """True if the offer is one of these brands, False if clearly not, None if its brand is not shown."""
+    from .feature_match import brand_rule
+    found = [brand_rule(t, p) for t in terms(value(s, field))]
+    return True if True in found else None if None in found else False
+
+
+def merchant_match(p, names):
+    from .feature_match import merchant_rule
+    return any(merchant_rule(n, p) for n in names if n.strip())
+
+
+def feature_fit(s, p):
+    """Per requested need: met, absent, unstated (model found no mention) or unknown."""
+    from .schemas import FeatureFit
+    checks = s.feature_checks.get(p.id, {}) if live(s, p) else {}
+    out = []
+    if confirmed(s, "features"):
+        for t in terms(value(s, "features")):
+            st = status(s, p, "feature", t)
+            # A curated catalogue attribute list not naming a feature is no evidence the product lacks it.
+            st = "unknown" if st == "absent" and not live(s, p) else st
+            found = checks.get(t)
+            out.append(FeatureFit(feature=t, status=st, quote=found.quote if found and found.status == st else ""))
+    for kind, field in (("size", "size"), ("usage", "usage")):
+        term = value(s, field).strip()
+        if confirmed(s, field) and term:
+            st = status(s, p, kind, term.casefold())
+            found = checks.get(KEY_PREFIX[kind] + term.casefold())
+            out.append(FeatureFit(kind=kind, feature=term, status=st,
+                                  quote=found.quote if found and found.status == st else ""))
+    if confirmed(s, "preferred_brands"):
+        found = brand_match(s, p, "preferred_brands")
+        out.append(FeatureFit(kind="brand", feature=value(s, "preferred_brands"),
+                              status="met" if found else "unknown" if found is None else "absent"))
+    if confirmed(s, "merchants"):
+        out.append(FeatureFit(kind="merchant", feature=value(s, "merchants"),
+                              status="met" if merchant_match(p, terms(value(s, "merchants"))) else "absent"))
+    return out
 
 
 def confirmed(s, key):
@@ -139,20 +198,16 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
             and p.price > float(value(s, "budget"))
         ):
             continue
-        if confirmed(s, "excluded_brands") and p.brand.casefold() in terms(
-            value(s, "excluded_brands")
-        ):
+        if confirmed(s, "excluded_brands") and brand_match(s, p, "excluded_brands"):
             continue
-        if p.merchant.casefold() in [
-            m.casefold() for m in s.permissions.restricted_merchants
-        ]:
+        if merchant_match(p, s.permissions.restricted_merchants):
             continue
-        if confirmed(s, "size") and p.sizes and value(s, "size") not in p.sizes:
+        if size_status(s, p) == "absent" and s.brief["size"].hard:
             continue
         if (
             confirmed(s, "preferred_brands")
             and s.brief["preferred_brands"].hard
-            and p.brand.casefold() not in terms(value(s, "preferred_brands"))
+            and brand_match(s, p, "preferred_brands") is False
         ):
             continue
         if (
@@ -164,19 +219,15 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
         if (
             confirmed(s, "merchants")
             and s.brief["merchants"].hard
-            and p.merchant.casefold() not in terms(value(s, "merchants"))
+            and not merchant_match(p, terms(value(s, "merchants")))
         ):
             continue
         products.append(p)
 
     def rank(p):
         score = sum(has_feature(s, p, t) for t in terms(value(s, "features")))
-        score += 2 * (p.brand.casefold() in terms(value(s, "preferred_brands")))
-        score += (
-            int(value(s, "usage").casefold() in " ".join(p.attributes).casefold())
-            if value(s, "usage")
-            else 0
-        )
+        score += 2 * bool(confirmed(s, "preferred_brands") and brand_match(s, p, "preferred_brands"))
+        score += int(usage_met(s, p))
         return (-score, p.price, p.id)
 
     ranked = sorted(products, key=rank)
@@ -319,13 +370,9 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
             "currency",
             "The currency differs from your confirmed currency.",
         )
-    if confirmed(s, "excluded_brands") and p.brand.casefold() in terms(
-        value(s, "excluded_brands")
-    ):
+    if confirmed(s, "excluded_brands") and brand_match(s, p, "excluded_brands"):
         rule("brand", "BLOCK", "excluded_brands", "This brand is explicitly excluded.")
-    if p.merchant.casefold() in [
-        m.casefold() for m in s.permissions.restricted_merchants
-    ]:
+    if merchant_match(p, s.permissions.restricted_merchants):
         rule(
             "merchant",
             "BLOCK",
@@ -366,11 +413,13 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
             "category",
             "This product differs from the requested category.",
         )
-    if confirmed(s, "size") and p.sizes and value(s, "size") not in p.sizes:
-        rule("size", "BLOCK", "size", "The requested size is unavailable.")
-    if confirmed(s, "merchants") and p.merchant.casefold() not in terms(
-        value(s, "merchants")
-    ):
+    size = size_status(s, p)
+    if size == "absent":
+        rule("size", "BLOCK" if s.brief["size"].hard else "REVIEW", "size", "The requested size is unavailable.")
+    elif size in ("unstated", "unknown") and (p.sizes or live(s, p)):
+        rule("size_unconfirmed", "REVIEW", "size",
+             f"The listing doesn't confirm size {value(s, 'size')}. Check the size options on the source page.")
+    if confirmed(s, "merchants") and not merchant_match(p, terms(value(s, "merchants"))):
         rule(
             "preferred_merchant",
             "BLOCK" if s.brief["merchants"].hard else "REVIEW",
@@ -386,21 +435,18 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
     if confirmed(s, "features") and s.brief["features"].hard and unstated_features(s, p):
         rule("features_unconfirmed", "REVIEW", "features",
              f"The listing doesn't mention {', '.join(unstated_features(s, p))}. Check the source page yourself.")
-    if (
-        confirmed(s, "preferred_brands")
-        and s.brief["preferred_brands"].hard
-        and p.brand.casefold() not in terms(value(s, "preferred_brands"))
-    ):
-        rule(
-            "required_brand",
-            "BLOCK",
-            "preferred_brands",
-            "This brand does not meet your required brand constraint.",
-        )
+    if confirmed(s, "preferred_brands") and s.brief["preferred_brands"].hard:
+        brand = brand_match(s, p, "preferred_brands")
+        if brand is False:
+            rule("required_brand", "BLOCK", "preferred_brands",
+                 "This brand does not meet your required brand constraint.")
+        elif brand is None:
+            rule("brand_unconfirmed", "REVIEW", "preferred_brands",
+                 "The listing doesn't show its brand. Check it on the source page.")
     if (
         confirmed(s, "usage")
         and s.brief["usage"].hard
-        and value(s, "usage").casefold() not in " ".join(p.attributes).casefold()
+        and not usage_met(s, p)
     ):
         rule(
             "usage",

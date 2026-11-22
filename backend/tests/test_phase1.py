@@ -124,7 +124,7 @@ def test_live_shape_single_product_calls_and_cache(monkeypatch, caplog):
         counts[schema.__name__]+=1
         if schema.__name__=="Interpretation":
             return interpretation("search",[change("category","Desk lamp"),change("budget","200"),change("features","adjustable")],"request")
-        if schema.__name__=="Assessment":return schema(status="match",evidence="Desk lamp")
+        if schema.__name__=="Assessment":return schema(status="match",quote="Desk lamp")
         if schema.__name__=="Review":return schema(findings=[])
         if schema.__name__=="OutcomeExplanation":return schema(explanation="Here are three options to review. Checkout is simulated.")
         pytest.fail(f"Unexpected LLM schema: {schema.__name__}")

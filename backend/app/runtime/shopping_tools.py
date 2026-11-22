@@ -82,10 +82,9 @@ def candidate_key(product):
 
 def candidate_rank(session, product):
     from .relevance import status
-    features = " ".join(product.attributes).casefold()
     fit = sum(policy.has_feature(session, product, t) for t in policy.terms(policy.value(session, "features")))
-    fit += 2 * (product.brand.casefold() in policy.terms(policy.value(session, "preferred_brands")))
-    fit += int(bool(policy.value(session, "usage")) and policy.value(session, "usage").casefold() in features)
+    fit += 2 * bool(policy.confirmed(session, "preferred_brands") and policy.brand_match(session, product, "preferred_brands"))
+    fit += int(policy.usage_met(session, product))
     information = sum(map(bool, [product.description, product.attributes, product.specifications, product.sizes]))
     return (status(session, product) == "mismatch", -fit, -information,
             product.currency, product.price, product.id)

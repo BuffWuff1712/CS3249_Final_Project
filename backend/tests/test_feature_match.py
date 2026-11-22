@@ -21,6 +21,8 @@ SPEAKER = "portable bluetooth speaker 20w driver (30w peak), 480g with carry str
     ("loud volume", SPEAKER),
     ("waterproof", SPEAKER),
     ("durable", "made of durable ripstop nylon"),
+    ("christmas-themed", "boys ugly christmas sweater knit pullover"),
+    ("usb-c charging", "charging case with usb-c port"),
 ])
 def test_paraphrased_features_match(feature, text):
     assert met(feature, text)
@@ -31,6 +33,7 @@ def test_paraphrased_features_match(feature, text):
     ("waterproof", HEADPHONES),
     ("durable", "stylish canvas tote"),
     ("usb-c charging", "classic wired headphones"),
+    ("christmas-themed", "plain navy crewneck sweater that keeps them warm"),
 ])
 def test_absent_features_do_not_match(feature, text):
     assert not met(feature, text)

@@ -119,6 +119,9 @@ test("required size and other constraints show evidence states before preference
   await page.route(`**/shop/sessions/${created.session.id}`, async route => {
     const response = await route.fetch(); const body = await response.json();
     body.current.product.sizes = sizes;
+    // The backend's size verdict follows the listed sizes; the chip shows that verdict.
+    body.current.feature_fit = (body.current.feature_fit || []).map((fit: { kind?: string }) =>
+      fit.kind === "size" ? { ...fit, status: sizes.length ? (sizes.includes("42") ? "met" : "absent") : "unknown" } : fit);
     body.session.brief.merchants = { value: "Another seller", source: "confirmed", hard: true };
     body.session.brief.other = { value: "wide fit", source: "confirmed", hard: true };
     await route.fulfill({ response, json: body });

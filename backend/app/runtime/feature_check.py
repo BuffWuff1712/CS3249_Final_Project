@@ -1,7 +1,8 @@
-"""LLM fallback for required features the matching rules cannot confirm in a live listing.
+"""LLM fallback for shopper needs the matching rules cannot settle in a live listing.
 
-Rules run first (feature_match). Only must-have features they cannot confirm go to the model, in one
-batched call per search. Every verdict needs a quote copied from the listing; an ungrounded verdict
+Rules run first (feature_match). Needs they cannot settle go to the model in one batched call per
+search: requested features, the requested size ("size: ...") and the intended use ("use: ..."),
+whether must-have or preferred. Only must-have needs can exclude an offer. Every verdict needs a quote copied from the listing; an ungrounded verdict
 counts as "unstated". Policy keeps final authority: "absent" excludes, "unstated" keeps the offer
 with a review note, "met" counts as matched. Verdicts are cached per product and feature.
 """
@@ -13,8 +14,12 @@ from .timing import timed, diagnostic
 MAX_LISTINGS = 20
 MAX_TEXT = 2500
 
-INSTRUCTIONS = """You check whether web product listings show features a shopper requires.
-Return exactly one verdict for every listing and every feature named for it, using the feature text as given:
+INSTRUCTIONS = """You check whether web product listings meet needs a shopper stated.
+Return exactly one verdict for every listing and every need named for it, copying the need text as given
+into the feature field. A need starting "size:" asks whether the listing offers that size or an equivalent
+(for a child's age, a size labelled for that age or a matching height); a listed size clearly for someone
+else (an adult size, a baby size) is absent. A need starting "use:" asks whether the listing shows the
+product suits that use. Any other need is a product feature:
 - met: the listing text shows the feature, in any wording (synonyms, specifications or a clear implication,
   for example "multipoint Bluetooth" shows "connects to two devices").
 - absent: the listing text shows the product lacks it or contradicts it (for example "wired" for "wireless").
@@ -36,10 +41,9 @@ class Review(Model):
 
 
 def required(session):
-    from .policy import confirmed, terms, value
-    if not confirmed(session, "features") or not session.brief["features"].hard:
-        return []
-    return terms(value(session, "features"))
+    """Cache keys of the needs the model may settle (see policy.needs)."""
+    from .policy import needs
+    return [key for _kind, _term, key in needs(session)]
 
 
 def verdict(session, product, term):
@@ -50,9 +54,10 @@ def verdict(session, product, term):
 @timed("product.feature_check")
 def ensure(session, ids):
     """Ask the model about required features the rules could not confirm; cache grounded verdicts."""
-    from .feature_match import met, listing_text, words
+    from .feature_match import listing_text, words
+    from .policy import needs, need_rule
     live = ("browser_use", "shopify_catalog")
-    needed = required(session)
+    needed = needs(session)
     if not needed or session.search_replay:
         return
     asks = {}
@@ -60,10 +65,10 @@ def ensure(session, ids):
         p = session.live_products.get(pid)
         if p is None or p.source not in live:
             continue
-        text = listing_text(p)
-        open_terms = [t for t in needed if not met(t, text) and verdict(session, p, t) is None]
+        open_terms = [key for kind, term, key in needed
+                      if need_rule(session, p, kind, term) is None and verdict(session, p, key) is None]
         if open_terms:
-            asks[pid] = (open_terms, text)
+            asks[pid] = (open_terms, listing_text(p))
     if not asks:
         return
     asks = dict(list(asks.items())[:MAX_LISTINGS])

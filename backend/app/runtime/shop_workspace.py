@@ -119,7 +119,9 @@ def friendly_history(s):
             item = dict(original)
             count = len(item["evidence"])
             if item["id"] == "search":
-                item["label"] = f"Found {count} matching offer{'s' if count != 1 else ''}"
+                rechecked = item["label"].startswith("Rechecked")
+                item["label"] = (f"Rechecked {count} offer{'s' if count != 1 else ''} from your last search" if rechecked
+                                 else f"Found {count} matching offer{'s' if count != 1 else ''}")
                 item["evidence"] = [names.get(value, value if " · " in value else "Previously compared offer") for value in item["evidence"]]
             elif item["id"] == "inspection":
                 item["label"] = f"Checked {count} product{'s' if count != 1 else ''} and seller terms"

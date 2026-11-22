@@ -119,10 +119,9 @@ agent: these behavioural instructions are not a hard read-only browser sandbox. 
 constrains accepted results and instructs navigation; it is not a provider-enforced network allowlist.
 
 Results are unverified snapshots saved with the session. Details inspection reads that snapshot,
-not another paid browse. Existing brief filters still apply. When an edit only filters (for example a
-must-have feature made preferred or a lower budget), the next search rechecks the last search's
-listings for up to 25 minutes instead of starting another run; new or changed needs, a higher budget
-or a failed source start a new run. See "Shopify Global Catalog and hybrid discovery" in the README. Fictional fraud classifications are not
+not another paid browse. Existing brief filters still apply. After an edit that keeps the category and
+currency, the next search rechecks the latest search's listings for up to 25 minutes and starts a new
+run only when fewer than three of them fit; a new category or currency always starts a new run. See "Shopify Global Catalog and hybrid discovery" in the README. Fictional fraud classifications are not
 reused; live risk comes from the captured evidence and review agent described below. Live proposals
 always require review; detected instruction injection and existing hard-constraint checks still block.
 Snapshots older than 30 minutes cannot check out.

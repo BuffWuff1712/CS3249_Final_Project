@@ -2,7 +2,7 @@ import json
 import httpx
 import pytest
 from app.runtime import service, llm, browser_search as browser, relevance, policy
-from app.runtime.schemas import Session, Fact, Change, Interpretation, Message, Event
+from app.runtime.schemas import Session, Fact, Change, Interpretation, Message, Event, Product
 from app.runtime.preferences import apply_change, grounded_change
 from app.runtime.search_errors import SearchProviderError, provider_reason, USER_MESSAGE
 from app.runtime.shopping_workflow import ShoppingResult
@@ -95,7 +95,7 @@ def test_relevance_bound_to_snapshot_and_request(monkeypatch,assessment):
     assert p.category=="Desk lamp"  # Never assigned Lighting from request.
     monkeypatch.setenv("BEANY_LLM_MODE","openai")
     from app.runtime import gateway
-    monkeypatch.setattr(gateway,"structured_call",lambda *_:relevance.Assessment(status=assessment,evidence="Adjustable desk lamp"))
+    monkeypatch.setattr(gateway,"structured_call",lambda *_:relevance.Assessment(status=assessment,quote="Adjustable desk lamp"))
     relevance.inspect(s,p)
     assert relevance.status(s,p)==assessment
     assert (p in policy.search(s)) == (assessment!="mismatch")
@@ -111,7 +111,7 @@ def test_unquoted_assessment_cannot_confirm_match(monkeypatch):
     s=Session(search_provider="browser_use")
     from app.runtime import gateway
     monkeypatch.setenv("BEANY_LLM_MODE","openai")
-    monkeypatch.setattr(gateway,"structured_call",lambda *_:relevance.Assessment(status="match",evidence="invented"))
+    monkeypatch.setattr(gateway,"structured_call",lambda *_:relevance.Assessment(status="match",quote="invented"))
     relevance.inspect(s,p)
     assert relevance.status(s,p)=="unknown"
 
@@ -161,3 +161,23 @@ def test_unsure_retains_valid_recovered_family(monkeypatch):
     monkeypatch.setattr(service,"run_shopping",lambda state:calls.append(state.brief.copy()) or ShoppingResult(status="no_match"))
     service.chat(s,"Im unsure")
     assert calls and calls[0]["category"].value=="coffee machine"
+
+
+@pytest.mark.parametrize("quote,expected", [
+    ('"Size": "2Y"', "mismatch"),          # JSON quote marks around a specification
+    ("Size: 2Y", "mismatch"),
+    ("ADJUSTABLE   desk lamp", "mismatch"),  # case and spacing
+    ("Listing states: Adjustable desk lamp", "unknown"),  # added words are not a quote
+])
+def test_relevance_grounds_only_the_quote(monkeypatch, quote, expected):
+    from app.runtime import gateway
+    monkeypatch.setenv("BEANY_LLM_MODE", "openai")
+    s = service.create(search_provider="browser_use")
+    s.brief["category"] = Fact(value="lamp", source="confirmed")
+    p = Product(id="web-1", name="Lamp", category="lamp", brand="", price=20, currency="SGD", merchant="m",
+                merchant_id="m", attributes=[], stock=True, description="Adjustable desk lamp", trust="unverified",
+                source="browser_use", specifications={"Size": "2Y"})
+    monkeypatch.setattr(gateway, "structured_call", lambda *_: relevance.Assessment(
+        status="mismatch", quote=quote, reason="The model's own explanation is never grounded."))
+    relevance.inspect(s, p)
+    assert p.relevance == expected

@@ -96,12 +96,19 @@ def test_cached_verdicts_are_not_asked_again(s, monkeypatch):
     assert seen == []
 
 
-def test_soft_features_and_catalogue_products_skip_the_model(s, monkeypatch):
+def test_preferred_features_are_checked_but_never_exclude(s, monkeypatch):
+    s.brief["features"] = Fact(value="connects to two devices", source="confirmed", hard=False)
+    answer(monkeypatch, [{"product_id": "a", "feature": "connects to two devices", "status": "met", "quote": "multipoint Bluetooth 5.3"},
+                         {"product_id": "b", "feature": "connects to two devices", "status": "absent", "quote": "Wired headphones"}])
+    ensure(s, ["a", "b", "c"])
+    assert {f.feature: f.status for f in policy.feature_fit(s, s.live_products["a"])} == {"connects to two devices": "met"}
+    assert {p.id for p in policy.search(s, limit=None)} == {"a", "b", "c"}
+    assert policy.search(s, limit=None)[0].id == "a"
+
+
+def test_catalogue_products_skip_the_model(s, monkeypatch):
     seen = []
     answer(monkeypatch, [], seen)
-    s.brief["features"] = Fact(value="connects to two devices", source="confirmed", hard=False)
-    ensure(s, ["a", "b", "c"])
-    s.brief["features"] = Fact(value="connects to two devices", source="confirmed", hard=True)
     s.live_products["d"] = make("d", "Black headphones", source="catalogue")
     ensure(s, ["d"])
     assert seen == []

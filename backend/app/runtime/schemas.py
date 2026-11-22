@@ -226,7 +226,8 @@ class Rule(Model):
 
 
 class FeatureFit(Model):
-    """How one requested feature matches this offer, for display; policy rules decide eligibility."""
+    """How one requested need matches this offer, for display; policy rules decide eligibility."""
+    kind: Literal["feature", "size", "usage", "brand", "merchant"] = "feature"
     feature: str
     status: Literal["met", "absent", "unstated", "unknown"]
     quote: str = ""

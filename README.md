@@ -171,17 +171,24 @@ an LLM assessment, not independent verification or checkout authority. It is bou
 the request and listing snapshot; mismatches are blocked and unknown relevance requires
 review. Existing cart receipts are not rewritten. Changed snapshots invalidate approvals.
 
-Features are matched differently for live listings (`app/runtime/feature_match.py`,
-`app/runtime/feature_check.py`). Rules first: a feature counts when the listing's name,
-description, attributes or specifications show the same concept (noise control, comfort,
-portability, durability, water resistance, battery, sound, storage) or most of its words.
-Must-have features the rules cannot confirm go to one batched LLM call per search. Each
-verdict is met, absent or unstated and must quote the listing; an ungrounded or skipped
-verdict counts as unstated. Absent excludes the listing; unstated keeps it with a REVIEW
-note ("The listing doesn't mention …"); if the model is unavailable, an unconfirmed
-must-have still excludes. Provider-inferred features and selling points never confirm a
-feature. Catalogue products keep exact matching against their attributes. The offer card's
-"How this matches your needs" chips show these per-feature verdicts (`feature_fit`).
+Needs are matched tolerantly for live listings (`app/runtime/feature_match.py`,
+`app/runtime/feature_check.py`, `policy.status()`). Rules come first. A feature or use counts
+when the listing's name, description, attributes, specifications or sizes show the same concept
+(noise control, comfort, portability, durability, water resistance, battery, sound, storage) or
+most of its words; hyphenated words compare by their parts. A size matches when written
+differently ("7-8 years" = "7-8 Years", "7T-8T", "7-8 jaar"), when age ranges overlap (months
+convert to years) or when letter sizes agree (M = Medium); a clearly different size does not.
+A brand matches the brand field, or the title when that field is empty (Shopify listings). A seller
+matches its name or the listing's host ("amazon" matches "Amazon US (www.amazon.sg)"); this also
+applies to restricted sellers in settings. Features, size and use the rules cannot settle go to one
+batched LLM call per search, must-have or preferred, so a clearly met preference is shown as met.
+Each verdict is met, absent or unstated and must quote the listing; an ungrounded or skipped verdict
+counts as unstated. Only must-have needs exclude: absent excludes the listing, unstated keeps it
+with a REVIEW note, and if the model is unavailable an unconfirmed must-have feature still
+excludes while an unconfirmed size is kept for review. A required brand the listing doesn't show
+is reviewed, not excluded. Provider-inferred features and selling points never confirm a need.
+Catalogue products keep exact attribute matching for features. The offer card's "How this matches
+your needs" chips show these verdicts (`feature_fit`, one entry per need with its `kind`).
 
 Live merchants on a retailer in `backend/data/sites/live_site_registry.json` show its
 website reputation (amazon.sg good, qoo10.sg mid); other hosts, such as independent
@@ -207,15 +214,15 @@ New sessions default to `BEANY_SEARCH_PROVIDER=hybrid`: each new search queries 
 and Browser Use once, sequentially, with cancellation checked between sources.
 Both sources are searched even if the first succeeds. No automatic paid retry occurs.
 
-A search after an edit that only filters reuses the last search's listings instead
-(`reusable()` in `app/runtime/discovery.py`): must-have/preferred toggles, a lower budget,
-removed features, brands, usage or size, newly excluded brands, or a rejected offer with
-unchanged needs. Reuse needs both sources to have succeeded and lasts 25 minutes from the
-search's start, since snapshots older than 30 minutes cannot check out. A new or changed
-category, currency, feature, usage, size or preferred brand, a higher or removed budget, a
-hard budget made preferred, an un-excluded brand, or unchanged needs search again. A reuse
-with no eligible listing falls back to a new search. Reuse is logged as a `search_reuse`
-event and shown as "Rechecked N web listing offers from your last search".
+After an edit that keeps the product category and currency, the next search first rechecks the
+current batch, the listings from the latest search, against the new needs
+(`reusable()` in `app/runtime/discovery.py`). Earlier batches are never brought back: they were
+fetched for other needs. If at least three listings in the batch are eligible (`REUSE_MINIMUM`, a
+full shortlist) they are used without a new search; otherwise, or when the category or currency changes, the needs are unchanged since the last search or recheck (the user asks
+again) or the batch is older than 25 minutes (snapshots older than 30 minutes cannot check out),
+a new search runs and its listings replace the batch. A batch from a search where one source
+failed is still rechecked. Reuse is logged as a `search_reuse` event and shown as "Rechecked N offers
+from your last search".
 
 A deterministic workflow cheaply ranks and deduplicates results before inspecting
 up to six candidates total (configurable `screening_budget` in `backend/config/policy.json`).
