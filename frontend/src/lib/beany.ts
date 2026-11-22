@@ -90,6 +90,7 @@ export type Product = {
   source?: "catalogue" | "browser_use" | "shopify_catalog";
   // Live listings only: the backend's check that the listing is the requested product family.
   relevance?: "match" | "mismatch" | "unknown";
+  evidence_depth?: "catalog" | "deep" | null;
   source_url?: string;
   observed_at?: string;
   web_evidence?: WebEvidence | null;
