@@ -6,6 +6,7 @@ from .merchant_risk import assess, assess_live, safeguard_block, session_config
 from .risk_agent import snapshot
 from .local_evidence import review_view
 
+from .timing import timed
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = json.loads((ROOT / "config/policy.json").read_text(encoding="utf-8-sig"))
 FIELDS = {
@@ -31,12 +32,60 @@ def terms(text):
     return [x.strip().casefold() for x in text.split(",") if x.strip()]
 
 
+def live(s, p):
+    return p.source in ("browser_use", "shopify_catalog") and not s.search_replay
+
+
+def has_feature(s, p, term):
+    """Live listings: tolerant rules, then a cached model verdict. Catalogue keeps exact matching."""
+    if live(s, p):
+        from .feature_match import met, listing_text
+        if met(term, listing_text(p)):
+            return True
+        found = s.feature_checks.get(p.id, {}).get(term)
+        return bool(found and found.status == "met")
+    return term in " ".join(p.attributes).casefold()
+
+
+def unstated_features(s, p):
+    """Required features a live listing neither shows nor contradicts, per the model check."""
+    if not live(s, p):
+        return []
+    checks = s.feature_checks.get(p.id, {})
+    return [t for t in terms(value(s, "features"))
+            if not has_feature(s, p, t) and t in checks and checks[t].status == "unstated"]
+
+
+def feature_fit(s, p):
+    """Per requested feature: met, absent, unstated (model found no mention) or unknown."""
+    from .schemas import FeatureFit
+    if not confirmed(s, "features"):
+        return []
+    checks = s.feature_checks.get(p.id, {}) if live(s, p) else {}
+    out = []
+    for t in terms(value(s, "features")):
+        found = checks.get(t)
+        if has_feature(s, p, t):
+            out.append(FeatureFit(feature=t, status="met", quote=found.quote if found and found.status == "met" else ""))
+        elif found:
+            out.append(FeatureFit(feature=t, status=found.status, quote=found.quote))
+        else:
+            out.append(FeatureFit(feature=t, status="unknown"))
+    return out
+
+
+def missing_features(s, p):
+    """Features that disqualify: not matched, and for live listings not merely unstated."""
+    unstated = set(unstated_features(s, p))
+    return [t for t in terms(value(s, "features")) if not has_feature(s, p, t) and t not in unstated]
+
+
 def confirmed(s, key):
     return key in s.brief and s.brief[key].source == "confirmed"
 
 
 def catalogue(s):
-    if s.search_provider == "browser_use" and not s.scenario_id:
+    if s.search_provider != "catalogue" and not s.scenario_id:
         return list(s.live_products.values())
     products = [
         Product.model_validate(p)
@@ -73,10 +122,15 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
         ):
             continue
         if (
-            value(s, "category")
+            not (p.source in ("browser_use", "shopify_catalog") and not s.search_replay)
+            and value(s, "category")
             and p.category.casefold() != value(s, "category").casefold()
         ):
             continue
+        if p.source in ("browser_use", "shopify_catalog") and not s.search_replay:
+            from .relevance import status
+            if status(s, p) == "mismatch":
+                continue
         if confirmed(s, "currency") and p.currency != value(s, "currency"):
             continue
         if (
@@ -104,10 +158,7 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
         if (
             confirmed(s, "features")
             and s.brief["features"].hard
-            and any(
-                t not in " ".join(p.attributes).casefold()
-                for t in terms(value(s, "features"))
-            )
+            and missing_features(s, p)
         ):
             continue
         if (
@@ -119,9 +170,7 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
         products.append(p)
 
     def rank(p):
-        score = sum(
-            t in " ".join(p.attributes).casefold() for t in terms(value(s, "features"))
-        )
+        score = sum(has_feature(s, p, t) for t in terms(value(s, "features")))
         score += 2 * (p.brand.casefold() in terms(value(s, "preferred_brands")))
         score += (
             int(value(s, "usage").casefold() in " ".join(p.attributes).casefold())
@@ -136,18 +185,22 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
 
 def fingerprint(a):
     payload = {
-        "product": a.product.model_dump(),
+        "product": a.product.model_dump(exclude={"image_url", "image_alt"}),
         "merchant": a.merchant_details.model_dump() if a.merchant_details else None,
         "risk_config": a.risk.config_hash if a.risk else None,
         "payment": a.payment_method,
         "sharing": a.shares_personal_data,
         "substitute": a.substitute,
     }
+    for key in ("observed_type", "type_evidence", "relevance_binding", "relevance", "provider_ids", "inferred_attributes", "detail_checked", "selling_points", "policy_links", "rating_scope", "list_price", "availability_note", "product_rating_text", "seller_rating_text", "review_excerpts"):
+        if payload["product"].get(key) in ("", "unknown", None, {}, [], False):
+            payload["product"].pop(key, None)
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
 
 
+@timed("policy.evaluate")
 def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
     rules = []
 
@@ -173,7 +226,7 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
                 "merchant",
                 "Merchant terms changed or are missing. Request a new proposal.",
             )
-        if p.source == "browser_use":
+        if p.source in ("browser_use", "shopify_catalog"):
             import re
             from datetime import datetime, timezone
             config = session_config(s)  # Invalid policy configuration still blocks.
@@ -245,6 +298,8 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
             "configuration",
             "Merchant risk data or configuration is invalid. Checkout is blocked until the researcher repairs it.",
         )
+    if p.source == "shopify_catalog" and not p.detail_checked:
+        rule("variant_unresolved", "BLOCK", "variant", "Inspect this seller and variant before simulated checkout.")
     if not p.stock:
         rule(
             "stock", "BLOCK", "availability", "This fictional product is out of stock."
@@ -298,7 +353,13 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
             "substitutions",
             "This is a substitution; approve this specific alternative or refine your request.",
         )
-    if confirmed(s, "category") and p.category != value(s, "category"):
+    if p.source in ("browser_use", "shopify_catalog") and not s.search_replay:
+        from .relevance import status
+        relevance = status(s, p)
+        if relevance != "match":
+            rule("product_relevance", "BLOCK" if relevance == "mismatch" else "REVIEW", "category",
+                 "This listing is not the requested product." if relevance == "mismatch" else "The listing’s fit to your request needs your review.")
+    elif confirmed(s, "category") and p.category != value(s, "category"):
         rule(
             "category",
             "REVIEW",
@@ -319,12 +380,12 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
     if (
         confirmed(s, "features")
         and s.brief["features"].hard
-        and any(
-            t not in " ".join(p.attributes).casefold()
-            for t in terms(value(s, "features"))
-        )
+        and missing_features(s, p)
     ):
         rule("features", "BLOCK", "features", "A required feature is missing.")
+    if confirmed(s, "features") and s.brief["features"].hard and unstated_features(s, p):
+        rule("features_unconfirmed", "REVIEW", "features",
+             f"The listing doesn't mention {', '.join(unstated_features(s, p))}. Check the source page yourself.")
     if (
         confirmed(s, "preferred_brands")
         and s.brief["preferred_brands"].hard
@@ -383,6 +444,7 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
             "All checked constraints and checkout permissions are satisfied.",
         )
     a.rules = rules
+    a.feature_fit = feature_fit(s, p)
     a.decision = (
         "BLOCK"
         if any(r.decision == "BLOCK" for r in rules)

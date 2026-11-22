@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from pathlib import Path
 from .schemas import Interpretation, Change, ClarificationAnswer
 
+from .timing import timed
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -22,6 +23,7 @@ class OpenAIConversation:
         if os.getenv("BEANY_LLM_MODE", "openai") == "mock":
             return mock_interpret(session, text)
         instructions = (ROOT / "config/prompts/dialogue.txt").read_text(encoding="utf-8-sig")
+        from .preferences import task_start
         payload = {
                 "supported_categories": supported_categories(session),
                 "search_vocabulary": search_vocabulary(session),
@@ -29,6 +31,7 @@ class OpenAIConversation:
                 "brief": {k: v.model_dump() for k, v in session.brief.items()},
                 "clarification": {"asked": session.clarification_asked, "answers": session.clarification_answers},
                 "stage": session.stage,
+                "search_requested": session.search_requested,
                 "checkout_ui": checkout_controls(session),
                 "permissions_read_only": session.permissions.model_dump(),
                 "current_proposal": session.proposals[-1].model_dump()
@@ -40,6 +43,7 @@ class OpenAIConversation:
                 # Keep whole recent messages for references/banter; IDs and timestamps
                 # add no conversational meaning. Durable preferences live in brief.
                 "history": [{"role": m.role, "text": m.text} for m in session.messages[-20:]],
+                "current_task_messages": [{"index": i, "text": m.text} for i, m in enumerate(session.messages) if i >= task_start(session) and m.role == "user"][-20:],
                 "latest_message": text,
             }
         result = structured_call(Interpretation, instructions, payload)
@@ -49,7 +53,7 @@ class OpenAIConversation:
             # One corrective call only; Python still validates the second result.
             result = structured_call(Interpretation, instructions, {
                 **payload, "validation_feedback": issues,
-                "repair_instruction": "Regenerate the complete interpretation. Quote literal contiguous text from latest_message, never ellipses or older messages. A provided answer needs a matching non-null preference change unless already in brief. If a fact cannot be grounded, ask for it; do not promise a search without a category.",
+                "repair_instruction": "Regenerate the complete interpretation. Quote literal contiguous text from latest_message, never ellipses. Only for a missing category, you may quote an indexed current_task_messages entry and set evidence_message_index to its index; otherwise leave it null. A provided answer needs a matching non-null preference change unless already in brief. If a fact cannot be grounded, ask for it; do not promise a search without a category.",
             })
         return result
 
@@ -160,10 +164,17 @@ def mock_interpret(session, text):
         brief_fields = {"product_type": "category", "budget": "budget", "features": "features"}
         answers.extend(ClarificationAnswer(field=f, status="unknown", evidence=text) for f in fields
                        if not any(c.field == brief_fields[f] and c.source == "confirmed" for c in changes))
+    # Deterministic examples for offline UI tests only; production uses structured intent.
+    deferred = bool(re.search(r"don't search|do not search|just exploring|figure out what|not sure what|differences between", lower))
+    if deferred and intent != "new_task":
+        intent = "respond"
+        question = "We can explore your needs first. Tell me when you'd like me to search."
     return Interpretation(
         reply=question or "[Mock LLM] I have updated your shopping request.",
         changes=changes,
         intent=intent,
+        search_control="defer" if deferred else "request" if intent in ("search", "new_task", "clarify", "alternative") else "unchanged",
+        new_task_evidence=text if intent == "new_task" else "",
         suggestions=["Show me some options", "Find an alternative", "Cancel this task"],
         clarification_answers=answers,
     )
@@ -173,6 +184,7 @@ class OutcomeExplanation(BaseModel):
     explanation: str
 
 
+@timed("conversation.explain")
 def explain_outcome(session):
     """Optional conversational wording; deterministic facts remain visible in the card."""
     if os.getenv("BEANY_LLM_MODE", "openai") == "mock":
@@ -245,6 +257,7 @@ def explain_outcome(session):
             Keep the response focused on what the user needs to understand and do next.""",
             {
                 "stage": session.stage,
+                "search_requested": session.search_requested,
                 "checkout_ui": checkout_controls(session),
                 "brief": {k: v.model_dump() for k, v in session.brief.items()},
                 "proposal": session.proposals[-1].model_dump()

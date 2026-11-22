@@ -42,7 +42,7 @@ def test_provided_category_without_change_triggers_repair(monkeypatch):
 
 @pytest.mark.parametrize("intent", ["respond", "search", "clarify"])
 def test_unsure_resumes_pending_search_instead_of_only_promising(monkeypatch, intent):
-    s = Session(mode="mock", stage="clarifying", brief={
+    s = Session(mode="mock", stage="clarifying", search_requested=True, brief={
         "category": Fact(value="Running shoes"), "budget": Fact(value="200", hard=True)},
         clarification_asked=["features"], clarification_answers={"product_type": "provided", "budget": "provided"})
     monkeypatch.setattr(service.llm, "interpret", lambda *_: result(intent))

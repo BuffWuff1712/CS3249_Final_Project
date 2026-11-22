@@ -152,5 +152,5 @@ def test_site_reputation_scenario_recommends_every_site_tier():
     s = service.create(search_provider="catalogue")
     s.scenario_id = spec["id"]
     s.brief = {k: Fact.model_validate(v) for k, v in spec["initial_brief"].items()}
-    assert [p.id for p in search(s)] == [f"study-hp-target-{v}" for v in ("site-mid", "site-bad", "site-fake", "trusted")]
+    assert [p.id for p in search(s, limit=4)] == [f"study-hp-target-{v}" for v in ("site-mid", "site-bad", "site-fake", "trusted")]
     assert spec["trigger_product"] == "study-hp-target-site-fake"

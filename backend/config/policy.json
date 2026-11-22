@@ -1,1 +1,6 @@
-{"recommendation_limit":4,"review_unverified_merchants":true,"review_missing_budget":true}
+{
+  "recommendation_limit": 3,
+  "review_unverified_merchants": true,
+  "review_missing_budget": true,
+  "screening_budget": 6
+}

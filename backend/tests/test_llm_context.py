@@ -24,7 +24,9 @@ def test_call_logs_metadata_only_and_sends_schema_once(monkeypatch, caplog, fail
             raise APITimeoutError(request=httpx.Request("POST", "https://private.example"))
         return SimpleNamespace(choices=[SimpleNamespace(
             finish_reason="stop", message=SimpleNamespace(content='{"reply":"private answer"}')
-        )])
+        )], usage=SimpleNamespace(prompt_tokens=120, completion_tokens=40,
+             completion_tokens_details=SimpleNamespace(reasoning_tokens=25),
+             prompt_tokens_details=SimpleNamespace(cached_tokens=60)))
     monkeypatch.setattr(gateway, "make_client", lambda _: SimpleNamespace(
         chat=SimpleNamespace(completions=SimpleNamespace(create=create)),
         close=lambda: closed.append(True),
@@ -43,6 +45,11 @@ def test_call_logs_metadata_only_and_sends_schema_once(monkeypatch, caplog, fail
     for private in ("secret-key", "private.example", "private instructions", "private message", "private answer"):
         assert private not in caplog.text
     assert closed == [True]
+    assert 'event=llm.start' in caplog.text and 'event=llm.end' in caplog.text
+    if not fails:
+        assert '"input_tokens": 120' in caplog.text
+        assert '"reasoning_tokens": 25' in caplog.text
+        assert '"cached_input_tokens": 60' in caplog.text
 
 
 @pytest.mark.parametrize("value", ["nan", "inf", "0", "601", "nope"])

@@ -51,7 +51,7 @@ test("actual progress appears before the result and finishes with readable evide
   await page.evaluate(() => (window as unknown as { releaseProgress: () => void }).releaseProgress());
   await expect(page.getByRole("article", { name: "Current recommendation", exact: true })).toBeVisible();
   const activity = page.getByLabel("Comparison activity", { exact: true });
-  await expect(activity).toContainText("Found 4 matching offers");
+  await expect(activity).toContainText(/Found \d+ matching offers/);
   await activity.locator("summary").click();
   await expect(activity).toContainText("Needs your approval");
   await expect(activity).not.toContainText("Records:");

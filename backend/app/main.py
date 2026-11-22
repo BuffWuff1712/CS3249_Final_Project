@@ -168,7 +168,7 @@ def choose(sid: str, product_id: str):
         product = next((p for p in catalogue(s) if p.id == product_id), None)
         if product is None:
             raise ValueError("Product unavailable")
-        service.propose(s, product)
+        service.propose(s, product, recommendations=list(s.recommendations))
 
     return mutate(sid, select)
 

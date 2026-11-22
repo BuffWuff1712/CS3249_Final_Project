@@ -31,12 +31,21 @@ def adopt(s):
 
 
 def model_key(product):
+    if product.source == "shopify_catalog":
+        # Do not merge distinct variants based on fuzzy names or inferred options.
+        return hashlib.sha256(json.dumps(product.provider_ids, sort_keys=True).encode()).hexdigest()
     identity = [product.name.casefold(), product.brand.casefold(), product.category.casefold(),
                 product.currency, sorted(product.sizes), sorted(product.specifications.items())]
-    if product.source == "browser_use":
+    if product.source in ("browser_use", "shopify_catalog"):
         # No canonical cross-seller model/variant identifier is supplied by the live adapter.
         identity += [product.source_url, product.id]
     return hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
+
+
+def current_candidates(s):
+    from .shopping_tools import recommendation_limit
+    eligible = {p.id: p for p in policy.search(s, limit=None)}
+    return [eligible[p.id] for p in s.recommendations if p.id in eligible][:recommendation_limit()]
 
 
 def preview(s):
@@ -45,11 +54,15 @@ def preview(s):
         return []
     offers = []
     context = s.model_copy(deep=True)
-    records = s.live_merchants if s.search_provider == "browser_use" and not s.scenario_id else merchants()
+    records = s.live_merchants if s.search_provider != "catalogue" and not s.scenario_id else merchants()
     products = policy.catalogue(s)
-    for p in policy.search(s, limit=None)[:MAX_OFFERS]:
+    for p in current_candidates(s)[:MAX_OFFERS]:
+        if p.source != "catalogue" and p.id not in {item.id for item in s.recommendations}:
+            continue
         a = Action(id="", product=p, merchant_details=records[p.merchant_id])
         policy.evaluate(context, a, catalogue_snapshot=products, merchant_snapshot=records)
+        if a.decision == "BLOCK":
+            continue
         offers.append({"product": p.model_dump(), "model_key": model_key(p),
                        "merchant": a.merchant_details.model_dump() if a.merchant_details else None,
                        "risk": a.risk.model_dump() if a.risk else None,
@@ -78,7 +91,12 @@ def view(s):
         except (ValueError, LookupError) as exc:
             selection_error = str(exc)
     # Only explicitly selected participant-facing state is exposed, never experiment labels.
-    return {"session": SessionView.model_validate(s.model_dump()).model_dump(),
+    from .shopping_tools import supported_categories
+    try:
+        categories = supported_categories(s)
+    except (StopIteration, ValueError, OSError):
+        categories = []  # Unavailable legacy/demo metadata must not prevent opening saved state.
+    return {"available_categories": categories, "session": SessionView.model_validate(s.model_dump()).model_dump(),
             "revision": state["revision"], "offers": preview(s),
             "current": current.model_dump() if current else None, "current_error": current_error,
             "current_model_key": model_key(current.product) if current else None,
@@ -130,6 +148,7 @@ def record(s, events_before, proposals_before):
     a = s.proposals[-1]
     activity = []
     searched, inspected = set(), set()
+    reused = any(event.kind == "search_reuse" for event in s.events[events_before:])
     for event in s.events[events_before:]:
         if event.kind == "shopping_tool":
             step = json.loads(event.detail)
@@ -138,7 +157,9 @@ def record(s, events_before, proposals_before):
             if step["action"] == "get_product_details":
                 inspected.add(step["product"]["id"])
     if searched:
-        activity.append({"id": "search", "label": f"Search returned {len(searched)} {'local catalogue' if s.search_provider == 'catalogue' else 'saved listing' if s.search_replay else 'web listing'} offers", "state": "completed", "evidence": sorted(searched)})
+        label = (f"Rechecked {len(searched)} web listing offers from your last search" if reused else
+                 f"Search returned {len(searched)} {'local catalogue' if s.search_provider == 'catalogue' else 'saved listing' if s.search_replay else 'web listing'} offers")
+        activity.append({"id": "search", "label": label, "state": "completed", "evidence": sorted(searched)})
     if inspected:
         activity.append({"id": "inspection", "label": f"Inspected {len(inspected)} product records", "state": "completed", "evidence": sorted(inspected)})
     activity.append({"id": "policy", "label": f"Checked selected offer: {a.decision}", "state": "completed", "evidence": [a.product.id]})
@@ -223,7 +244,7 @@ def different_model(s, models, current):
     if current:
         service.event(s, "alternative", current.id)
     start = len(s.messages)
-    service.propose(s, candidate, recommendations=policy.search(s, limit=None))
+    service.propose(s, candidate, recommendations=current_candidates(s))
     del s.messages[start:]
     action = s.proposals[-1]
     lines = ["A different model to review:" if fresh else f"You have now seen all {len(others) + bool(current)} matching models, so this starts again from the first:",
@@ -305,7 +326,14 @@ def compare(s):
     service.invalidate(s)
     meta(s).pop("browsed", None)
     events, proposals = len(s.events), len(s.proposals)
-    outcome = run_shopping(s)
+    from .search_errors import SearchProviderError, report_failure, USER_MESSAGE
+    try:
+        outcome = run_shopping(s)
+    except SearchProviderError as exc:
+        report_failure(s, exc)
+        s.stage = "ready"
+        service.message(s, USER_MESSAGE)
+        return
     if outcome.status != "proposed":
         s.stage = "no_match" if outcome.status == "no_match" else "ready"
         service.message(s, "No eligible offer was proposed. Your limits were kept. Refine your needs or retry the comparison.")
@@ -319,7 +347,7 @@ def compare(s):
 def propose(s, product_id):
     if not s.recommendations or not policy.value(s, "category"):
         raise ValueError("Compare your current needs before choosing a catalogue offer.")
-    candidates = policy.search(s, limit=None)
+    candidates = current_candidates(s)
     p = next((p for p in candidates if p.id == product_id), None)
     if p is None:
         raise ValueError("That offer is no longer eligible. Compare again.")
@@ -403,11 +431,13 @@ def permissions(s, value):
     clear_selection(s)
     # The offer the user was viewing, possibly one they switched to, is rechecked rather than re-searched.
     current = s.proposals[-1] if s.recommendations and s.proposals and s.proposals[-1].status == "pending" else None
+    saved_candidates = list(s.recommendations)
     service.invalidate(s)
     s.permissions = value
+    s.recommendations = saved_candidates
     s.stage = "ready"
     service.event(s, "permissions", "Permissions explicitly updated through controls")
-    candidates = policy.search(s, limit=None) if current else []
+    candidates = current_candidates(s) if current else []
     product = next((p for p in candidates if p.id == current.product.id), None)
     if product is not None:
         note = f"Permissions saved. I rechecked the offer you were viewing, {product.name} from {product.merchant}, under the new permissions."

@@ -105,13 +105,13 @@ export function MerchantDetails({ action, replay = false }: { action: Action; re
   const m = action.merchant_details,
     r = action.risk;
   if (!m) return null;
-  if (action.product.source === "browser_use") return (
+  if (["browser_use", "shopify_catalog"].includes(action.product.source || "")) return (
     <section className="merchant-details">
       <RiskNotice action={action} />
       <strong>{replay ? "Replayed listing" : "Live listing"} · merchant information unverified</strong>
       <p>Source: <a className="action-link" href={action.product.source_url} target="_blank" rel="noopener noreferrer">{m.name} ↗</a></p>
       <p>Captured: {action.product.observed_at ? new Date(action.product.observed_at).toLocaleString() : "Unknown"}</p>
-      <p>{replay && "Saved study listing replay; no website was visited in this session. "}Prices and availability may change. Seller and policy details below were captured from the listing pages and have not been verified. Demo payment options apply only to Beany’s simulated checkout.</p>
+      <p>{replay && "Saved study listing replay; no website was visited in this session. "}Prices and availability may change. {action.product.source === "shopify_catalog" ? "Descriptions and product attributes may be inferred; seller policies remain unknown unless supplied." : "Seller and policy details below were captured from listing pages and have not been verified."} Demo payment options apply only to Beany’s simulated checkout.</p>
       <LiveEvidence action={action} />
       {r && (
         <details>

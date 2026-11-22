@@ -11,6 +11,11 @@ import tempfile
 from pathlib import Path
 
 OFFLINE = {
+    "SHOPIFY_CLIENT_ID": "",
+    "SHOPIFY_CLIENT_SECRET": "",
+    "SHOPIFY_MARKET_COUNTRY": "SG",
+    "SHOPIFY_TIMEOUT_SECONDS": "30",
+    "SHOPIFY_UCP_PROFILE_URL": "https://shopify.dev/ucp/agent-profiles/examples/2026-08-25/valid-with-capabilities.json",
     "BEANY_LLM_MODE": "mock",
     "BEANY_SEARCH_PROVIDER": "catalogue",
     "BEANY_RISK_DETECTION": "rules",

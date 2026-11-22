@@ -1,5 +1,6 @@
 """Single client/transport boundary. No provider or model fallback."""
 
+from .timing import timed, diagnostic
 import json
 import os
 import logging
@@ -114,9 +115,11 @@ def safe_error(exc):
     return "The gateway returned malformed or incomplete structured output. Rephrase or check model capabilities."
 
 
+@timed("llm.request")
 def structured_call(schema: type[BaseModel], instructions: str, payload, settings=None):
     from .progress import cancellable_call
-    return cancellable_call(lambda: _structured_call(schema, instructions, payload, settings))
+    with timed("llm." + schema.__name__):
+        return cancellable_call(lambda: _structured_call(schema, instructions, payload, settings))
 
 
 def _structured_call(schema, instructions, payload, settings=None):
@@ -137,6 +140,9 @@ def _structured_call(schema, instructions, payload, settings=None):
     logger.info("llm_call_start id=%s stage=%s api=%s mode=%s timeout_s=%s input_chars=%s",
                 request_id, schema.__name__, config.api, config.structured, config.timeout,
                 len(instructions) + len(payload_json))
+    diagnostic("llm.start", call_id=request_id, schema=schema.__name__, transport=config.api,
+               structured_mode=config.structured, timeout_s=config.timeout,
+               instruction_chars=len(instructions), payload_chars=len(payload_json))
     try:
         if config.api == "responses":
             options = (
@@ -181,12 +187,22 @@ def _structured_call(schema, instructions, payload, settings=None):
         if output is None:
             raise ValueError("Missing parsed output or refusal")
         validated = schema.model_validate(output)
+        usage = getattr(result, "usage", None)
+        output_details = getattr(usage, "output_tokens_details", None) or getattr(usage, "completion_tokens_details", None)
+        input_details = getattr(usage, "input_tokens_details", None) or getattr(usage, "prompt_tokens_details", None)
+        diagnostic("llm.usage", call_id=request_id, schema=schema.__name__,
+                   input_tokens=getattr(usage, "input_tokens", getattr(usage, "prompt_tokens", None)),
+                   output_tokens=getattr(usage, "output_tokens", getattr(usage, "completion_tokens", None)),
+                   reasoning_tokens=getattr(output_details, "reasoning_tokens", None),
+                   cached_input_tokens=getattr(input_details, "cached_tokens", None))
         status = "ok"
         return validated
     except (OpenAIError, ValueError, TypeError, IndexError) as exc:
         error_type = type(exc).__name__
         raise LLMError(safe_error(exc)) from exc
     finally:
+        diagnostic("llm.end", call_id=request_id, schema=schema.__name__, status=status,
+                   elapsed_s=round(perf_counter()-started, 3), error_type=error_type)
         logger.info("llm_call_end id=%s stage=%s status=%s elapsed_s=%.3f error_type=%s",
                     request_id, schema.__name__, status, perf_counter() - started, error_type)
         client.close()

@@ -634,13 +634,13 @@ def test_only_legacy_scenarios_see_the_whole_catalogue():
 def test_demo_default_goal_shows_only_the_target(cat):
     s = demo_session(PINNED[cat]["category"], PINNED[cat]["features"], PINNED[cat]["budget"])
     top = [p.id for p in search(s)]
-    assert len(top) == 4 and all(i.startswith(f"study-{cat}-target-") for i in top)
+    assert len(top) == 3 and all(i.startswith(f"study-{cat}-target-") for i in top)
 
 
 @pytest.mark.parametrize("cat,features,budget,c,expected", DEMO_CORRECTIONS)
 def test_demo_correction_ranks_candidate_sellers(cat, features, budget, c, expected):
     s = demo_session(PINNED[cat]["category"], features, budget)
-    assert [p.id for p in search(s)] == [seller_offer(c, v) if v else c for v in expected]
+    assert [p.id for p in search(s)] == [seller_offer(c, v) if v else c for v in expected][:3]
 
 
 def test_demo_hard_feature_correction_matches_soft():

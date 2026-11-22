@@ -1,12 +1,13 @@
 # Data
 
-Everything the backend loads at runtime lives here, along with researcher-only files the runtime never reads. All products, merchants and websites are fictional. Merchant websites use reserved `.test` domains.
+Everything the backend loads at runtime lives here, along with researcher-only files the runtime never reads. All catalogue products, merchants and websites are fictional. Merchant websites use reserved `.test` domains. The one exception is `sites/live_site_registry.json`, which rates the real retailers live search may visit.
 
 | Path | Loaded at runtime | Contents |
 |---|---|---|
 | `products/catalogue.json` | Yes | Products and per-merchant offers (`Product` schema in `app/runtime/schemas.py`) |
 | `merchants/merchants.json` | Yes | Observable merchant records (`Merchant` schema) |
 | `sites/site_registry.json` | Yes | Fictional site registry: reputation tier, label and summary per website domain (`Site` schema). Attached to local merchants by exact host |
+| `sites/live_site_registry.json` | Yes | Reputation of the real retailers in `BROWSER_USE_ALLOWED_DOMAINS` (`Site` schema). Attached to live merchants by host or subdomain. Add an entry when you allow a new retailer |
 | `scenarios/scenarios.json` | Yes | Study scenarios: initial brief, permissions, visible `product_ids`, trigger product |
 | `research/merchant_ground_truth.json` | Researcher reports only | Hidden TRUSTWORTHY / UNCERTAIN / SUSPICIOUS / MALICIOUS label per merchant |
 | `research/risk_offer_manifest.json` | Never | Declared signals, visible cues and ground truth for every study risk offer |
@@ -20,7 +21,7 @@ Never put ground truth into observable records, and never import anything from `
 
 **Original fixtures.** These are products `shoe-*`, `audio-*`, `bag-*` and `offer-*`, and merchants `demo-store` through `concealed`. They back the existing tests and the `risk-a`–`risk-i` scenarios. Leave them unchanged. Their "Fictional ... for simulation only" descriptions are intentional.
 
-**Study dataset.** These are products `study-*` and merchants `study-m-*`, used for the user study. The design is in [`docs/data/2026-10-21-study-dataset-design.md`](../../docs/data/2026-10-21-study-dataset-design.md). Study scenarios must list their products explicitly in `product_ids`. Scenarios without `product_ids` see the whole catalogue, including every study risk offer.
+**Study dataset.** These are products `study-*` and merchants `study-m-*`, used for the user study. Study scenarios must list their products explicitly in `product_ids`. Scenarios without `product_ids` see the whole catalogue, including every study risk offer.
 
 ## Study dataset at a glance
 
@@ -36,7 +37,7 @@ There are three parallel categories, and each has the same structure:
 - **Candidate sellers.** Every candidate is also sold by `neutral` and two or three risk merchants, as `study-{cat}-{n}-{variant}`. These offers copy the candidate's product fields, take the variant price ratios, and pair one of the candidate's reviews with one of two new ones. They never use `lowprice` or `benign` (too few same-brand offers for a stable `low_price` median), `lookalike` (a genuine candidate is not a knockoff) or `concealed`. See [`docs/data/2026-11-01-candidate-sellers-design.md`](../../docs/data/2026-11-01-candidate-sellers-design.md).
 - **Target offers.** `study-{cat}-target-{variant}` are 18 listings of the same target product. Except for `lookalike`, which is a knockoff with its own name and brand, they share name, brand, attributes, specifications, rating and rating count, and differ in merchant, price, description and their 3 product reviews. Any two listings share at most one review.
 - **Merchants.** `study-m-trusted` (established store), `study-m-neutral` (small clean store) and one merchant per risk variant. Each merchant sells the target offer of all three categories.
-- **Websites.** Every study merchant's domain is in `sites/site_registry.json`. Marketplace stores use `https://<platform>/store/<slug>`; independent stores use their own domain. Variants without a website-reputation signal sit on `good` sites. See [`docs/data/2026-10-29-website-reputation-design.md`](../../docs/data/2026-10-29-website-reputation-design.md).
+- **Websites.** Every study merchant's domain is in `sites/site_registry.json`. Marketplace stores use `https://<platform>/store/<slug>`; independent stores use their own domain. Variants without a website-reputation signal sit on `good` sites.
 
 ### Risk variants
 

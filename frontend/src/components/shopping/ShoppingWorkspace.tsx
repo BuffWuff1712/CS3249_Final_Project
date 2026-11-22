@@ -1,4 +1,5 @@
 "use client";
+import { productTitle } from "@/lib/productTitle";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { shopRequest, shopStream, stopShopRequest, ShopRequestError, money, rememberShop, type LiveShopActivity, type OfferPreview, type ShopField, type ShopView } from "@/lib/shopBackend";
 import type { Action, Fact } from "@/lib/beany";
@@ -10,6 +11,7 @@ import { ComparisonActivity, LiveProgress } from "./ComparisonActivity";
 import { PurchaseComposer } from "./PurchaseComposer";
 import { UserCircleIcon, CoinsIcon, ArrowCounterClockwiseIcon } from "./ShoppingIcons";
 import "./shopping.css";
+import { ResizablePanes } from "./ResizablePanes";
 
 const STORAGE_KEY = "beany-shop-backend-session";
 const examples = [
@@ -94,7 +96,7 @@ export function ShoppingWorkspace() {
     activeRequest.current = { sid: before.session.id, id: requestId };
     setStopNotice("");
     const compared = path === "propose" ? before.offers.find(offer => offer.product.id === data.product_id) : undefined;
-    const actionText = compared ? `Compare ${compared.product.name} from ${compared.product.merchant}.` : "";
+    const actionText = compared ? `Compare ${productTitle(compared.product)} from ${compared.product.merchant}.` : "";
     let firstActivityAt: number | undefined;
     setBusy(true); setLiveSteps([]); setError(""); setHistorical(null); setPendingText(submitted || actionText); setRequested(undefined);
     if (submitted) setText("");
@@ -161,9 +163,9 @@ export function ShoppingWorkspace() {
     <a className="cui-skip" href="#shopping-main">Skip to shopping</a>
     <header><a className="brand" href="/">beany.</a><nav aria-label="Shopping navigation"><a href="/cart">Cart ({session?.cart.length || 0})</a><a href="/receipts">Purchase history</a><button disabled={disabled || !session} aria-label="Open settings" onClick={() => window.location.assign("/settings")}>Settings</button><button onClick={() => void load(true)}>Start fresh</button></nav></header>
     <main className="cui-workspace" id="shopping-main"><h1 className="sr-only">Shopping decision assistant</h1>
-      <BackendNeedsSummary brief={session?.brief || {}} busy={disabled} requested={requested} edit={(field: ShopField, fact: Fact | null) => mutate("brief", { field, fact }, "PUT")} />
+      <BackendNeedsSummary live={["browser_use", "shopify_catalog", "hybrid"].includes(session?.search_provider || "") && !session?.search_replay && !session?.scenario_id} categories={view?.available_categories || []} brief={session?.brief || {}} busy={disabled} requested={requested} edit={(field: ShopField, fact: Fact | null) => mutate("brief", { field, fact }, "PUT")} />
       <nav className="cui-mobile-jumps" aria-label="Workspace sections"><a href="#shopping-conversation">Conversation</a><a href="#shopping-decision">Current decision</a></nav>
-      <div className="cui-columns"><section className="cui-conversation" id="shopping-conversation" aria-label="Shopping conversation">
+      <ResizablePanes><section className="cui-conversation" id="shopping-conversation" aria-label="Shopping conversation">
         <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">{busy ? "Working on your request with the configured product source…" : error || latestReply || "Ready to compare products."}</p>
         <div ref={history} className="cui-chat-scroll" role="region" aria-label="Conversation history" tabIndex={0}>
           {storageNotice && <p className="cui-notice cui-notice--review">{storageNotice}</p>}
@@ -176,7 +178,7 @@ export function ShoppingWorkspace() {
               const source = comparison && session.proposals.find(action => action.id === comparison.proposal_id);
               return <Fragment key={`${session.id}-${index}`}>
                 {comparison && <ComparisonActivity activity={comparison.activity} />}
-                <div className={`cui-turn cui-turn--${message.role}`}><span className="cui-avatar" aria-hidden="true">{message.role === "user" ? <UserCircleIcon weight="fill" /> : "b."}</span><div className="cui-turn-body"><span className="sr-only">{message.role === "user" ? "You" : "Beany"}</span>{message.role === "assistant" ? <ShoppingReply text={message.text} /> : <p>{message.text}</p>}{source && <button className="cui-link cui-history-source" onClick={() => inspect(source)}>View evidence for this comparison</button>}</div></div>
+                <div className={`cui-turn cui-turn--${message.role}`}><span className="cui-avatar" aria-hidden="true">{message.role === "user" ? <UserCircleIcon weight="fill" /> : "b."}</span><div className="cui-turn-body"><span className="sr-only">{message.role === "user" ? "You" : "Beany"}</span>{message.role === "assistant" ? <ShoppingReply text={index === 0 && /Shopify|Browser Use/.test(message.text) ? "Hi, I’m Beany! Tell me what you’re shopping for, even if you’re unsure. I’ll help you find and compare options that fit your needs." : message.text} /> : <p>{message.text}</p>}{source && <button className="cui-link cui-history-source" onClick={() => inspect(source)}>View evidence for this comparison</button>}</div></div>
               </Fragment>;
             })}
           </div>
@@ -195,16 +197,15 @@ export function ShoppingWorkspace() {
           {!current && <div className="cui-decision-empty"><h2>Your current match</h2><p>{busy ? "Waiting for the backend's comparison." : session?.stage === "no_match" ? "No eligible offer was proposed. Your constraints were kept." : receipt ? "Your simulated decision is complete." : "Your comparison will appear here."}</p><p className="cui-source">Compare products, inspect seller terms and website reputation, then choose explicitly.</p></div>}
           {view?.current_error && <div className="cui-stale" role="alert"><p>{view.current_error}</p><button disabled={disabled} onClick={() => void mutate("compare")}>Compare current needs</button></div>}
           {current && <BackendCurrentOffer sellerPreferences={<section className="cui-seller-reason" aria-label="Seller preference"><p>Same model &amp; variant:</p><div className="cui-actions">{(["longer returns", "lowest price"] as const).map(preference => <button key={preference} disabled={disabled} aria-pressed={view?.seller_preference === preference} onClick={() => void mutate("seller", { preference })}>{preference === "longer returns" ? <ArrowCounterClockwiseIcon aria-hidden="true" /> : <CoinsIcon aria-hidden="true" />}{preference === "longer returns" ? "Prefer longer returns" : "Prefer lowest price"}</button>)}</div></section>} brief={session?.brief || {}} replay={!!session?.search_replay} action={current} selected={selected} disabled={disabled} selectionInvalid={!!view?.current_error} evidenceId={evidenceId} select={() => void mutate("select", { proposal_id: current.id, fingerprint: current.fingerprint })} seller={() => void mutate("seller")} addCart={() => void mutate("cart", { proposal_id: current.id, fingerprint: current.fingerprint })} alternative={() => void mutate("alternative")} />}
-          {selected && <section ref={selection} className="cui-selection" aria-label="Selected offer"><h2>Your selected offer</h2><p>{view?.selected?.product.name} · {view?.selected && money(view.selected.product)}</p><p>No receipt, order or payment has been created. Review the backend's terms and risk findings before finishing.</p>{view?.selection_error && <p role="alert">{view.selection_error}</p>}<button className="primary" disabled={disabled || !!view?.selection_error} onClick={finish}>Finish decision</button></section>}
-          {receipt && <section className="cui-selection" aria-label="Simulated receipt"><h2>Decision complete</h2><p>{receipt.product.name} · {money(receipt.product)}</p><p>Receipt: {receipt.id}</p><p>No real order or payment was created.</p></section>}
+          {selected && <section ref={selection} className="cui-selection" aria-label="Selected offer"><h2>Your selected offer</h2><p>{view?.selected && productTitle(view.selected.product)} · {view?.selected && money(view.selected.product)}</p><p>No receipt, order or payment has been created. Review the backend's terms and risk findings before finishing.</p>{view?.selection_error && <p role="alert">{view.selection_error}</p>}<button className="primary" disabled={disabled || !!view?.selection_error} onClick={finish}>Finish decision</button></section>}
+          {receipt && <section className="cui-selection" aria-label="Simulated receipt"><h2>Decision complete</h2><p>{productTitle(receipt.product)} · {money(receipt.product)}</p><p>Receipt: {receipt.id}</p><p>No real order or payment was created.</p></section>}
           {current && !!alternativeModels.length && <ProductComparison replay={!!session?.search_replay} current={current} alternatives={alternativeModels} disabled={disabled} choose={id => void mutate("propose", { product_id: id })} />}
           {!!sellers.length && <section className="cui-alternative" aria-label="Sellers of the same model"><SellerComparison offers={currentOffer ? [currentOffer, ...sellers] : sellers} currentId={current?.product.id} disabled={disabled} replay={!!session?.search_replay} choose={id => void mutate("propose", { product_id: id })} /></section>}
           {!!view?.offers.length && <details onToggle={event => setAllOffersOpen(event.currentTarget.open)}><summary>Compare all {view.offers.length} eligible offers</summary>{allOffersOpen && <SellerComparison offers={view.offers} all currentId={current?.product.id} disabled={disabled} replay={!!session?.search_replay} choose={id => void mutate("propose", { product_id: id })} />}</details>}
           </>}
           {session && <details className="cui-oversight"><summary>Shopping activity · {session.stage.replaceAll("_", " ")}</summary><ol>{session.events.filter(event => ["search", "intervention", "approve", "reject", "simulated_checkout", "cancel", "brief_edit", "permissions", "cart_added", "cart_removed", "cart_checkout"].includes(event.kind)).slice(-12).map(event => <li key={event.id}>{({ search: "Compared matching products", intervention: "Requested your review", approve: "You approved this action", reject: "You rejected this action", simulated_checkout: "Created a simulated receipt", cancel: "Shopping task cancelled", brief_edit: "Updated your shopping brief", permissions: "Updated permissions", cart_added: "Saved an item to cart", cart_removed: "Removed an item from cart", cart_checkout: "Checked out a cart item" } as Record<string, string>)[event.kind]}</li>)}</ol></details>}
         </fieldset>
-        <p className="cui-source cui-disclosure">{session ? session.search_replay ? "Saved study listing replay · No websites visited" : session.search_provider === "browser_use" ? "Browser Use live search · Unverified listings" : "Local fictional catalogue · No websites visited" : "Connecting to backend"} · {session?.mode === "mock" ? "Mock LLM: offline test responses" : "Configured backend model conversation"} · No real orders or payments</p>
-      </section></div>
+      </section></ResizablePanes>
     </main>
   </div>;
 }

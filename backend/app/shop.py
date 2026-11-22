@@ -6,6 +6,7 @@ from .runtime.schemas import Model, Fact, Permissions, CartSelection
 from threading import Event, RLock
 from uuid import uuid4
 from .runtime.progress import cancellation, check_cancelled, RequestStopped
+from .runtime.timing import timed, timed_lock
 
 # Independent of the database lock: Stop must work while a model call is pending.
 _runs_lock = RLock()
@@ -41,18 +42,23 @@ class Selection(Mutation):
     fingerprint: str
 
 
+@timed("request.workspace_mutation")
 def mutate(sid, body, work):
-    with storage.lock:
-        s = storage.load(sid)
+    with timed_lock(storage.lock):
+        with timed("storage.load"):
+            s = storage.load(sid)
         state = shop.meta(s)
         if body.revision != state["revision"]:
             raise ValueError("This workspace changed. Refresh its state before trying again.")
-        work(s)
+        with timed("request.process"):
+            work(s)
         shop.meta(s)["revision"] += 1
-        response = shop.view(s)
+        with timed("workspace.render_response"):
+            response = shop.view(s)
         with _runs_lock:
             check_cancelled()
-            storage.save(s)
+            with timed("storage.save"):
+                storage.save(s)
         return response
 
 

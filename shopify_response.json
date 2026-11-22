@@ -1,0 +1,752 @@
+{
+  "content": [],
+  "structuredContent": {
+    "ucp": {
+      "version": "2026-08-25",
+      "capabilities": {
+        "dev.ucp.shopping.catalog.search": [
+          {
+            "version": "2026-08-25",
+            "spec": "https://ucp.dev/2026-08-25/specification/shopping/catalog/",
+            "schema": "https://ucp.dev/2026-08-25/schemas/shopping/catalog_search.json"
+          }
+        ],
+        "dev.ucp.shopping.catalog.lookup": [
+          {
+            "version": "2026-08-25",
+            "spec": "https://ucp.dev/2026-08-25/specification/shopping/catalog/",
+            "schema": "https://ucp.dev/2026-08-25/schemas/shopping/catalog_lookup.json"
+          }
+        ],
+        "dev.shopify.catalog.global": [
+          {
+            "version": "2026-08-25",
+            "spec": "https://shopify.dev/docs/agents/catalog/global-catalog",
+            "schema": "https://shopify.dev/ucp/schemas/2026-08-25/shopify_catalog_global.json",
+            "extends": [
+              "dev.ucp.shopping.catalog.search",
+              "dev.ucp.shopping.catalog.lookup"
+            ],
+            "requires": {
+              "protocol": {
+                "min": "2026-08-25"
+              }
+            }
+          }
+        ]
+      },
+      "status": "success"
+    },
+    "products": [
+      {
+        "id": "gid://shopify/p/3CPQ4RCH1akvewTvbmXHgR",
+        "title": "Sony WH-CH730N Wireless Noise Cancelling Over-Ear Headphones (Black)",
+        "description": {
+          "plain": "<p>The WH-CH730N is a wireless headphone with Digital Noise Cancelling. The lightweight over-ear design is perfect for commuting and everyday music enjoyment. Long battery-life, quick charging and handsfree voice calls, with multipoint, make this headphone a smart choice for both work and pleasure.</p>\r\n<p><strong>Key Features</strong></p>\r\n<p>Bluetooth and Digital Noise Cancelling</p>\r\n<p>Lightweight over-ear design can swivel and fold into a compact shape</p>\r\n<p>Multipoint connectivity and clearer voice calls, using AI</p>\r\n<p>Sony | Sound Connect companion app, 10-band EQ and gaming mode</p>\r\n<p>DSEE music-upscaling helps restore music detail lost during compression</p>\r\n<p>Up to 50 hours battery life, with Noise Cancelling, or up to 75 hours without</p>\r\n<p>USB-C with quick charging (3 mins charge = 60mins of music)</p>\r\n<p>LE Audio (LC3) and Auracast compatible</p>\r\n<p>Supplied 3.5mm cable for wired operation<br><br><strong>What’s in the box?</strong><br>Headphones<br>Headphone cable (1.2m, 3.5mm jack)<br>Reference guide<br></p>"
+        },
+        "handle": "sony-wh-ch730n-wireless-noise-cancelling-over-ear-headphones-black",
+        "media": [
+          {
+            "type": "image",
+            "url": "https://cdn.shopify.com/s/files/1/0024/9803/5810/files/910493-Product-0-I-639226254605606385.jpg",
+            "alt_text": "Sony WH-CH730N Wireless Noise Cancelling Over-Ear Headphones (Black)",
+            "preview": {
+              "url": "https://cdn.shopify.com/s/files/1/0024/9803/5810/files/910493-Product-0-I-639226254605606385.jpg",
+              "width": 2048,
+              "height": 2048
+            },
+            "width": 2048,
+            "height": 2048
+          }
+        ],
+        "options": [
+          {
+            "name": "Color",
+            "values": [
+              {
+                "label": "Beige"
+              },
+              {
+                "label": "Black"
+              },
+              {
+                "label": "Blue"
+              },
+              {
+                "label": "Cream"
+              },
+              {
+                "label": "Pink"
+              },
+              {
+                "label": "White"
+              }
+            ]
+          }
+        ],
+        "metadata": {
+          "unique_selling_points": [
+            "Combines active noise cancellation, multipoint wireless connectivity, and up to 75 hours of battery life in a compact, foldable design."
+          ],
+          "top_features": [
+            "Active noise cancellation for immersive sound in any environment",
+            "Multipoint wireless connectivity for seamless switching between devices",
+            "Lightweight over-ear design with swivel and foldable functionality for portability",
+            "Up to 75 hours battery life with noise cancellation for extended use",
+            "AI-powered voice call clarity and DSEE+ music upscaling for enhanced audio quality"
+          ]
+        },
+        "variants": [
+          {
+            "id": "gid://shopify/ProductVariant/40429121732809",
+            "title": "Sony WH-CH730N Wireless Noise Cancelling Over-Ear Headphones (Black)",
+            "description": {
+              "plain": "<p>The WH-CH730N is a wireless headphone with Digital Noise Cancelling. The lightweight over-ear design is perfect for commuting and everyday music enjoyment. Long battery-life, quick charging and handsfree voice calls, with multipoint, make this headphone a smart choice for both work and pleasure.</p>\r\n<p><strong>Key Features</strong></p>\r\n<p>Bluetooth and Digital Noise Cancelling</p>\r\n<p>Lightweight over-ear design can swivel and fold into a compact shape</p>\r\n<p>Multipoint connectivity and clearer voice calls, using AI</p>\r\n<p>Sony | Sound Connect companion app, 10-band EQ and gaming mode</p>\r\n<p>DSEE music-upscaling helps restore music detail lost during compression</p>\r\n<p>Up to 50 hours battery life, with Noise Cancelling, or up to 75 hours without</p>\r\n<p>USB-C with quick charging (3 mins charge = 60mins of music)</p>\r\n<p>LE Audio (LC3) and Auracast compatible</p>\r\n<p>Supplied 3.5mm cable for wired operation<br><br><strong>What’s in the box?</strong><br>Headphones<br>Headphone cable (1.2m, 3.5mm jack)<br>Reference guide<br></p>"
+            },
+            "handle": "sony-wh-ch730n-wireless-noise-cancelling-over-ear-headphones-black",
+            "url": "https://www.jbhifi.com.au/products/sony-wh-ch730n-wireless-noise-cancelling-over-ear-headphones-black?variant=40429121732809&_gsid=m7ySKe6iac4y&utm_source=shopify&utm_medium=catalog",
+            "seller_product_id": "gid://shopify/Product/7337532162249",
+            "price": {
+              "amount": 14800,
+              "currency": "AUD"
+            },
+            "list_price": {
+              "amount": 19900,
+              "currency": "AUD"
+            },
+            "availability": {
+              "available": true
+            },
+            "options": [
+              {
+                "name": "Color",
+                "label": "Black"
+              }
+            ],
+            "media": [
+              {
+                "type": "image",
+                "url": "https://cdn.shopify.com/s/files/1/0024/9803/5810/files/910493-Product-0-I-639226254605606385.jpg",
+                "alt_text": "Sony WH-CH730N Wireless Noise Cancelling Over-Ear Headphones (Black)",
+                "preview": {
+                  "url": "https://cdn.shopify.com/s/files/1/0024/9803/5810/files/910493-Product-0-I-639226254605606385.jpg",
+                  "width": 2048,
+                  "height": 2048
+                },
+                "width": 2048,
+                "height": 2048
+              }
+            ],
+            "seller": {
+              "id": "gid://shopify/Shop/2498035810",
+              "name": "JB Hi-Fi",
+              "url": "https://www.jbhifi.com.au",
+              "domain": "prod-jbhifi.myshopify.com"
+            },
+            "checkout_url": "https://www.jbhifi.com.au/buy/40429121732809:1?ucp/version=2026-08-25&attribution/utm_source=shopify&attribution/utm_medium=catalog&attribution/click_id_tag=_gsid&attribution/click_id_value=m7ySKe6iac4y&_gsid=m7ySKe6iac4y",
+            "condition": [
+              "new"
+            ],
+            "eligible": {
+              "native_checkout": false
+            },
+            "source": "shopify"
+          }
+        ],
+        "price_range": {
+          "min": {
+            "amount": 14800,
+            "currency": "AUD"
+          },
+          "max": {
+            "amount": 14800,
+            "currency": "AUD"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/p/4nqyvEX8LKh9HdsS21mhEF",
+        "title": "JBL Tune 520BT Wireless on-ear Headphones - Black",
+        "description": {
+          "plain": "<p><strong>JBL Tune 520BT Wireless On-Ear Headphones – Black</strong></p>\n<p>Enjoy powerful sound and all-day comfort with the JBL Tune 520BT Wireless On-Ear Headphones in Black. Featuring JBL Pure Bass Sound, these lightweight headphones deliver deep, rich audio that brings your favorite music, podcasts, and videos to life.</p>\n<p>With Bluetooth wireless connectivity, you can easily pair the Tune 520BT with your smartphone, tablet, or laptop and enjoy hassle-free listening without tangled cables. The comfortable on-ear design and long-lasting battery life make them perfect for daily commutes, work, travel, and entertainment.</p>\n<p>Built-in controls allow you to manage music playback, adjust volume, and answer calls directly from the headphones, while the foldable design makes them easy to carry wherever you go.</p>\n<p><strong>Key Features:</strong></p>\n<ul>\n<li>\n<p>JBL Pure Bass Sound for powerful, immersive audio</p>\n</li>\n<li>\n<p>Bluetooth wireless connectivity for seamless pairing</p>\n</li>\n<li>\n<p>Lightweight and comfortable on-ear design</p>\n</li>\n<li>\n<p>Extended battery life for all-day listening</p>\n</li>\n<li>\n<p>Quick charging capability for added convenience</p>\n</li>\n<li>\n<p>Built-in microphone for hands-free calls</p>\n</li>\n<li>\n<p>Easy-to-use controls on the earcup</p>\n</li>\n<li>\n<p>Foldable design for portability and storage</p>\n</li>\n<li>\n<p>Stylish Blue finish for a vibrant, modern look</p>\n</li>\n</ul>\n<p>Whether you're listening at home, at work, or on the move, the JBL Tune 520BT delivers reliable wireless performance and signature JBL sound in a sleek, comfortable package.</p>"
+        },
+        "handle": "jbl-tune-520bt-wireless-on-ear-headphones-black",
+        "rating": {
+          "value": 4.8,
+          "scale_min": 1,
+          "scale_max": 5,
+          "count": 483
+        },
+        "media": [
+          {
+            "type": "image",
+            "url": "https://cdn.shopify.com/s/files/1/0575/3628/2777/files/61hOoghkbRL._AC_SL1500__1.jpg",
+            "alt_text": "JBL Tune 520BT Wireless on-ear Headphones - Black",
+            "preview": {
+              "url": "https://cdn.shopify.com/s/files/1/0575/3628/2777/files/61hOoghkbRL._AC_SL1500__1.jpg",
+              "width": 1102,
+              "height": 1398
+            },
+            "width": 1102,
+            "height": 1398
+          }
+        ],
+        "options": [
+          {
+            "name": "Color",
+            "values": [
+              {
+                "label": "Black"
+              },
+              {
+                "label": "Blue"
+              },
+              {
+                "label": "Navy"
+              },
+              {
+                "label": "Purple"
+              },
+              {
+                "label": "Red"
+              },
+              {
+                "label": "Sapphire Blue"
+              },
+              {
+                "label": "Spring Lilac"
+              },
+              {
+                "label": "White"
+              }
+            ]
+          }
+        ],
+        "metadata": {
+          "unique_selling_points": [
+            "Combines JBL Pure Bass sound with app-controlled EQ and multi-point Bluetooth connectivity for seamless device switching."
+          ],
+          "top_features": [
+            "JBL Pure Bass sound delivers powerful, studio-quality low frequencies for an immersive listening experience",
+            "Bluetooth 5.3 technology ensures stable wireless streaming and efficient power use",
+            "App customization allows users to adjust EQ and manage settings for personalized audio",
+            "Multi-point Bluetooth connectivity enables effortless switching between devices",
+            "Voice Aware and built-in microphone provide hands-free calls and voice assistant access"
+          ]
+        },
+        "variants": [
+          {
+            "id": "gid://shopify/ProductVariant/47887105589401",
+            "title": "JBL Tune 520BT Wireless on-ear Headphones - Black",
+            "description": {
+              "plain": "<p><strong>JBL Tune 520BT Wireless On-Ear Headphones – Black</strong></p>\n<p>Enjoy powerful sound and all-day comfort with the JBL Tune 520BT Wireless On-Ear Headphones in Black. Featuring JBL Pure Bass Sound, these lightweight headphones deliver deep, rich audio that brings your favorite music, podcasts, and videos to life.</p>\n<p>With Bluetooth wireless connectivity, you can easily pair the Tune 520BT with your smartphone, tablet, or laptop and enjoy hassle-free listening without tangled cables. The comfortable on-ear design and long-lasting battery life make them perfect for daily commutes, work, travel, and entertainment.</p>\n<p>Built-in controls allow you to manage music playback, adjust volume, and answer calls directly from the headphones, while the foldable design makes them easy to carry wherever you go.</p>\n<p><strong>Key Features:</strong></p>\n<ul>\n<li>\n<p>JBL Pure Bass Sound for powerful, immersive audio</p>\n</li>\n<li>\n<p>Bluetooth wireless connectivity for seamless pairing</p>\n</li>\n<li>\n<p>Lightweight and comfortable on-ear design</p>\n</li>\n<li>\n<p>Extended battery life for all-day listening</p>\n</li>\n<li>\n<p>Quick charging capability for added convenience</p>\n</li>\n<li>\n<p>Built-in microphone for hands-free calls</p>\n</li>\n<li>\n<p>Easy-to-use controls on the earcup</p>\n</li>\n<li>\n<p>Foldable design for portability and storage</p>\n</li>\n<li>\n<p>Stylish Blue finish for a vibrant, modern look</p>\n</li>\n</ul>\n<p>Whether you're listening at home, at work, or on the move, the JBL Tune 520BT delivers reliable wireless performance and signature JBL sound in a sleek, comfortable package.</p>"
+            },
+            "handle": "jbl-tune-520bt-wireless-on-ear-headphones-black",
+            "url": "https://www.plug.tech/products/jbl-tune-520bt-wireless-on-ear-headphones-black?_gsid=m7ySKe6iac4y&utm_source=shopify&utm_medium=catalog",
+            "seller_product_id": "gid://shopify/Product/8774014599321",
+            "price": {
+              "amount": 7500,
+              "currency": "SGD"
+            },
+            "list_price": {
+              "amount": 10000,
+              "currency": "SGD"
+            },
+            "availability": {
+              "available": true
+            },
+            "options": [
+              {
+                "name": "Color",
+                "label": "Black"
+              }
+            ],
+            "media": [
+              {
+                "type": "image",
+                "url": "https://cdn.shopify.com/s/files/1/0575/3628/2777/files/61hOoghkbRL._AC_SL1500__1.jpg",
+                "alt_text": "JBL Tune 520BT Wireless on-ear Headphones - Black",
+                "preview": {
+                  "url": "https://cdn.shopify.com/s/files/1/0575/3628/2777/files/61hOoghkbRL._AC_SL1500__1.jpg",
+                  "width": 1102,
+                  "height": 1398
+                },
+                "width": 1102,
+                "height": 1398
+              }
+            ],
+            "seller": {
+              "id": "gid://shopify/Shop/57536282777",
+              "name": "Plug",
+              "url": "https://www.plug.tech",
+              "domain": "plugtechh.myshopify.com",
+              "links": [
+                {
+                  "type": "privacy_policy",
+                  "url": "https://checkout.shopify.com/57536282777/policies/25066766489.html"
+                },
+                {
+                  "type": "terms_of_service",
+                  "url": "https://checkout.shopify.com/57536282777/policies/25066799257.html"
+                },
+                {
+                  "type": "refund_policy",
+                  "url": "https://checkout.shopify.com/57536282777/policies/25066733721.html"
+                }
+              ]
+            },
+            "checkout_url": "https://plugtechh.myshopify.com/buy/47887105589401:1?ucp/version=2026-08-25&attribution/utm_source=shopify&attribution/utm_medium=catalog&channel=headless&attribution/click_id_tag=_gsid&attribution/click_id_value=m7ySKe6iac4y&_gsid=m7ySKe6iac4y",
+            "condition": [
+              "new"
+            ],
+            "eligible": {
+              "native_checkout": false
+            },
+            "source": "shopify"
+          }
+        ],
+        "price_range": {
+          "min": {
+            "amount": 7500,
+            "currency": "SGD"
+          },
+          "max": {
+            "amount": 7500,
+            "currency": "SGD"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/p/632V3E2Ev3fD1t9U4h86Bm",
+        "title": "Studio 2 Wireless On-Ear Headphones Black",
+        "description": {
+          "plain": "Experience studio-quality sound with the Studio 2 Wireless Headphones. These sleek on-ear headphones seamlessly blend innovation and pure audio clarity, bringing your music to life with customizable EQ4 sound modes. Whether you&#39;re diving into your morning playlist or sharing your favorite tracks through LabShare Technology, embrace the freedom of 45+ hours of playtime while the luxurious Cloud Foam™ earcups cradle you in comfort. Stay effortlessly connected with Bluetooth Multipoint technology and crystal-clear calls, while the JLab App transforms every listening moment into something extraordinary."
+        },
+        "handle": "studio-2-wireless-on-ear-headphones-black",
+        "media": [
+          {
+            "type": "image",
+            "url": "https://cdn.shopify.com/s/files/1/0240/9337/files/1_Studio2Wireless_Black.jpg",
+            "alt_text": "Studio 2 Wireless On-Ear Headphones Black",
+            "preview": {
+              "url": "https://cdn.shopify.com/s/files/1/0240/9337/files/1_Studio2Wireless_Black.jpg",
+              "width": 3000,
+              "height": 3000
+            },
+            "width": 3000,
+            "height": 3000
+          }
+        ],
+        "options": [
+          {
+            "name": "Color",
+            "values": [
+              {
+                "label": "Black"
+              },
+              {
+                "label": "Coral"
+              },
+              {
+                "label": "Deep Blue"
+              },
+              {
+                "label": "Mint"
+              }
+            ]
+          }
+        ],
+        "metadata": {
+          "unique_selling_points": [
+            "Bluetooth multipoint and wireless share mode allow two pairs of headphones to connect to the same audio source without a splitter."
+          ],
+          "top_features": [
+            "Bluetooth multipoint connectivity enables two devices to be connected simultaneously for seamless switching",
+            "Wireless share mode lets two pairs of headphones join the same audio source, allowing two people to listen together",
+            "Dual noise-canceling microphones pick up voice while reducing background noise for clear calls",
+            "Customizable EQ3 sound and app-based controls for personalized audio tuning",
+            "Quick charge and long battery life support extended listening sessions"
+          ]
+        },
+        "variants": [
+          {
+            "id": "gid://shopify/ProductVariant/40783329558600",
+            "title": "Studio 2 Wireless On-Ear Headphones Black",
+            "description": {
+              "plain": "Experience studio-quality sound with the Studio 2 Wireless Headphones. These sleek on-ear headphones seamlessly blend innovation and pure audio clarity, bringing your music to life with customizable EQ4 sound modes. Whether you&#39;re diving into your morning playlist or sharing your favorite tracks through LabShare Technology, embrace the freedom of 45+ hours of playtime while the luxurious Cloud Foam™ earcups cradle you in comfort. Stay effortlessly connected with Bluetooth Multipoint technology and crystal-clear calls, while the JLab App transforms every listening moment into something extraordinary."
+            },
+            "handle": "studio-2-wireless-on-ear-headphones-black",
+            "url": "https://www.jlab.com/products/studio-2-wireless-on-ear-headphones-black?variant=40783329558600&_gsid=m7ySKe6iac4y&utm_source=shopify&utm_medium=catalog",
+            "seller_product_id": "gid://shopify/Product/7005647175752",
+            "price": {
+              "amount": 3199,
+              "currency": "USD"
+            },
+            "availability": {
+              "available": true
+            },
+            "options": [
+              {
+                "name": "Color",
+                "label": "Black"
+              }
+            ],
+            "media": [
+              {
+                "type": "image",
+                "url": "https://cdn.shopify.com/s/files/1/0240/9337/files/1_Studio2Wireless_Black.jpg",
+                "alt_text": "Studio 2 Wireless On-Ear Headphones Black",
+                "preview": {
+                  "url": "https://cdn.shopify.com/s/files/1/0240/9337/files/1_Studio2Wireless_Black.jpg",
+                  "width": 3000,
+                  "height": 3000
+                },
+                "width": 3000,
+                "height": 3000
+              }
+            ],
+            "seller": {
+              "id": "gid://shopify/Shop/2409337",
+              "name": "JLab",
+              "url": "https://www.jlab.com",
+              "domain": "jlabgrabbag.myshopify.com",
+              "links": [
+                {
+                  "type": "privacy_policy",
+                  "url": "https://checkout.shopify.com/2409337/policies/1594941.html"
+                },
+                {
+                  "type": "terms_of_service",
+                  "url": "https://checkout.shopify.com/2409337/policies/1594945.html"
+                },
+                {
+                  "type": "refund_policy",
+                  "url": "https://checkout.shopify.com/2409337/policies/1594937.html"
+                },
+                {
+                  "type": "shipping_policy",
+                  "url": "https://checkout.shopify.com/2409337/policies/23307157576.html"
+                }
+              ]
+            },
+            "checkout_url": "https://www.jlab.com/buy/40783329558600:1?ucp/version=2026-08-25&attribution/utm_source=shopify&attribution/utm_medium=catalog&attribution/click_id_tag=_gsid&attribution/click_id_value=m7ySKe6iac4y&_gsid=m7ySKe6iac4y",
+            "rating": {
+              "value": 5.0,
+              "scale_min": 1,
+              "scale_max": 5,
+              "count": 10
+            },
+            "condition": [
+              "new"
+            ],
+            "eligible": {
+              "native_checkout": false
+            },
+            "source": "shopify"
+          }
+        ],
+        "price_range": {
+          "min": {
+            "amount": 3199,
+            "currency": "USD"
+          },
+          "max": {
+            "amount": 3199,
+            "currency": "USD"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/p/6MoGSZ7BSxrM2x1gFrqR6m",
+        "title": "OneOdio Studio Wireless C Bluetooth Headphones",
+        "description": {
+          "plain": "<ul>\n<li data-section-id=\"8152xf\" data-start=\"135\" data-end=\"171\"><strong data-start=\"137\" data-end=\"171\">110 Hours of Wireless Playtime</strong></li>\n<li data-section-id=\"1uakjl6\" data-start=\"172\" data-end=\"210\"><strong data-start=\"174\" data-end=\"210\">Bluetooth 5.2 &amp; Wired Connection</strong></li>\n<li data-section-id=\"ekqr8x\" data-start=\"211\" data-end=\"239\"><strong data-start=\"213\" data-end=\"239\">Hi-Res Audio Certified</strong></li>\n<li data-section-id=\"1c0qvcw\" data-start=\"240\" data-end=\"267\"><strong data-start=\"242\" data-end=\"267\">Powerful 50mm Drivers</strong></li>\n<li data-section-id=\"czy36t\" data-start=\"268\" data-end=\"305\"><strong data-start=\"270\" data-end=\"305\">Clear Vocals, Bass &amp; Percussion</strong></li>\n<li data-section-id=\"1wn9j0n\" data-start=\"306\" data-end=\"341\"><strong data-start=\"308\" data-end=\"341\">Connect Two Bluetooth Devices</strong></li>\n<li data-section-id=\"v3gggw\" data-start=\"342\" data-end=\"373\"><strong data-start=\"344\" data-end=\"373\">Anti-Off Wired Audio Jack</strong></li>\n<li data-section-id=\"8qnvz2\" data-start=\"374\" data-end=\"407\"><strong data-start=\"376\" data-end=\"407\">Easy On-Ear Button Controls</strong></li>\n</ul>"
+        },
+        "handle": "pro-c-wired-wireless-headphones",
+        "media": [
+          {
+            "type": "image",
+            "url": "https://cdn.shopify.com/s/files/1/2317/1601/files/5_c31e91ea-9f6f-4651-b428-ad7ee6d41eda.jpg",
+            "alt_text": "OneOdio Studio Wireless C Bluetooth Headphones",
+            "preview": {
+              "url": "https://cdn.shopify.com/s/files/1/2317/1601/files/5_c31e91ea-9f6f-4651-b428-ad7ee6d41eda.jpg",
+              "width": 1000,
+              "height": 1000
+            },
+            "width": 1000,
+            "height": 1000
+          }
+        ],
+        "options": [
+          {
+            "name": "Color",
+            "values": [
+              {
+                "label": "Black"
+              },
+              {
+                "label": "Red"
+              },
+              {
+                "label": "Rose-Gold"
+              },
+              {
+                "label": "Sky-Blue"
+              },
+              {
+                "label": "Sliver"
+              }
+            ]
+          }
+        ],
+        "metadata": {
+          "unique_selling_points": [
+            "Combines wireless Bluetooth 5.2 with wired connectivity and dual device pairing for versatile, high-quality listening."
+          ],
+          "top_features": [
+            "110 hours wireless playtime enables extended listening without interruption",
+            "Bluetooth 5.2 and wired connection allow seamless switching between wireless and wired audio",
+            "50mm drivers deliver clear vocals and rich bass for immersive sound",
+            "Certified high-resolution audio ensures detailed and accurate audio playback",
+            "Anti-off wired audio jack provides reliable wired connectivity when needed"
+          ]
+        },
+        "variants": [
+          {
+            "id": "gid://shopify/ProductVariant/40011990335688",
+            "title": "OneOdio Studio Wireless C Bluetooth Headphones",
+            "description": {
+              "plain": "<ul>\n<li data-section-id=\"8152xf\" data-start=\"135\" data-end=\"171\"><strong data-start=\"137\" data-end=\"171\">110 Hours of Wireless Playtime</strong></li>\n<li data-section-id=\"1uakjl6\" data-start=\"172\" data-end=\"210\"><strong data-start=\"174\" data-end=\"210\">Bluetooth 5.2 &amp; Wired Connection</strong></li>\n<li data-section-id=\"ekqr8x\" data-start=\"211\" data-end=\"239\"><strong data-start=\"213\" data-end=\"239\">Hi-Res Audio Certified</strong></li>\n<li data-section-id=\"1c0qvcw\" data-start=\"240\" data-end=\"267\"><strong data-start=\"242\" data-end=\"267\">Powerful 50mm Drivers</strong></li>\n<li data-section-id=\"czy36t\" data-start=\"268\" data-end=\"305\"><strong data-start=\"270\" data-end=\"305\">Clear Vocals, Bass &amp; Percussion</strong></li>\n<li data-section-id=\"1wn9j0n\" data-start=\"306\" data-end=\"341\"><strong data-start=\"308\" data-end=\"341\">Connect Two Bluetooth Devices</strong></li>\n<li data-section-id=\"v3gggw\" data-start=\"342\" data-end=\"373\"><strong data-start=\"344\" data-end=\"373\">Anti-Off Wired Audio Jack</strong></li>\n<li data-section-id=\"8qnvz2\" data-start=\"374\" data-end=\"407\"><strong data-start=\"376\" data-end=\"407\">Easy On-Ear Button Controls</strong></li>\n</ul>"
+            },
+            "handle": "pro-c-wired-wireless-headphones",
+            "url": "https://www.oneodio.com/products/pro-c-wired-wireless-headphones?variant=40011990335688&_gsid=m7ySKe6iac4y&utm_source=shopify&utm_medium=catalog",
+            "seller_product_id": "gid://shopify/Product/4468857340044",
+            "price": {
+              "amount": 5400,
+              "currency": "SGD"
+            },
+            "list_price": {
+              "amount": 6000,
+              "currency": "SGD"
+            },
+            "availability": {
+              "available": true
+            },
+            "options": [
+              {
+                "name": "Color",
+                "label": "Black"
+              }
+            ],
+            "media": [
+              {
+                "type": "image",
+                "url": "https://cdn.shopify.com/s/files/1/2317/1601/files/5_c31e91ea-9f6f-4651-b428-ad7ee6d41eda.jpg",
+                "alt_text": "OneOdio Studio Wireless C Bluetooth Headphones",
+                "preview": {
+                  "url": "https://cdn.shopify.com/s/files/1/2317/1601/files/5_c31e91ea-9f6f-4651-b428-ad7ee6d41eda.jpg",
+                  "width": 1000,
+                  "height": 1000
+                },
+                "width": 1000,
+                "height": 1000
+              }
+            ],
+            "seller": {
+              "id": "gid://shopify/Shop/23171601",
+              "name": "OneOdio",
+              "url": "https://www.oneodio.com",
+              "domain": "oneodioheadphones.myshopify.com",
+              "links": [
+                {
+                  "type": "privacy_policy",
+                  "url": "https://checkout.shopify.com/23171601/policies/7470645303.html"
+                },
+                {
+                  "type": "terms_of_service",
+                  "url": "https://checkout.shopify.com/23171601/policies/7470678071.html"
+                },
+                {
+                  "type": "refund_policy",
+                  "url": "https://checkout.shopify.com/23171601/policies/7470612535.html"
+                },
+                {
+                  "type": "shipping_policy",
+                  "url": "https://checkout.shopify.com/23171601/policies/7470710839.html"
+                }
+              ]
+            },
+            "checkout_url": "https://www.oneodio.com/buy/40011990335688:1?ucp/version=2026-08-25&attribution/utm_source=shopify&attribution/utm_medium=catalog&attribution/click_id_tag=_gsid&attribution/click_id_value=m7ySKe6iac4y&_gsid=m7ySKe6iac4y",
+            "rating": {
+              "value": 4.7,
+              "scale_min": 1,
+              "scale_max": 5,
+              "count": 15
+            },
+            "condition": [
+              "new"
+            ],
+            "eligible": {
+              "native_checkout": false
+            },
+            "source": "shopify"
+          }
+        ],
+        "price_range": {
+          "min": {
+            "amount": 5400,
+            "currency": "SGD"
+          },
+          "max": {
+            "amount": 5400,
+            "currency": "SGD"
+          }
+        }
+      },
+      {
+        "id": "gid://shopify/p/2scRyUVGpVwT4Xy9SZkVjr",
+        "title": "JBL Tune 720BT Wireless Over-Ear Headphones",
+        "description": {
+          "plain": "<h3>JBL Tune 720BT: Wireless Over-Ear Headphones with 76-Hour Battery, Same Day Delivery Available in Singapore</h3>\n<p>Enjoy JBL Pure Bass Sound wirelessly with the JBL Tune 720BT, with up to 76 hours of battery life and a lightweight, foldable design for all-day listening. Shop with Metapod, an authorised JBL retailer, and enjoy a 1-year official warranty.</p>\n<h3>Key Features</h3>\n<ul>\n<li>\n<strong>JBL Pure Bass Sound:</strong> over Bluetooth 5.3.</li>\n<li>\n<strong>Up to 76 hours battery:</strong> recharge in 2 hours via USB-C, and 5 minutes adds 3 hours.</li>\n<li>\n<strong>Hands-free calls with Voice Aware:</strong> manage calls from the ear-cup buttons.</li>\n<li>\n<strong>Multi-point connection:</strong> switch between Bluetooth devices without hassle.</li>\n<li>\n<strong>Detachable audio cable:</strong> keep listening even when the battery runs out.</li>\n</ul>\n<h3>Why buy from Metapod</h3>\n<ul>\n<li>Authorised JBL partner with 1-year official warranty.</li>\n<li>Same day delivery for orders before 11am.</li>\n</ul>\n<h3>FAQ</h3>\n<p><strong>Can I customise the sound?</strong><br>Yes. Use the EQ in the JBL Headphones app, with voice prompts in your chosen language.</p>\n<p><strong>Which colours are available?</strong><br>White, Black and Blue.</p>\n<p><strong>Does it come with warranty?</strong><br>Yes, a 1-year official warranty.</p>\n"
+        },
+        "handle": "jbl-tune-720bt-wireless-over-ear-headphones",
+        "rating": {
+          "value": 5.0,
+          "scale_min": 1,
+          "scale_max": 5,
+          "count": 4
+        },
+        "media": [
+          {
+            "type": "image",
+            "url": "https://cdn.shopify.com/s/files/1/0604/7760/4036/files/JBLTune720BTWirelessOver-EarHeadphones_White_3.jpg",
+            "alt_text": "JBL Tune 720BT Wireless Over-Ear Headphones",
+            "preview": {
+              "url": "https://cdn.shopify.com/s/files/1/0604/7760/4036/files/JBLTune720BTWirelessOver-EarHeadphones_White_3.jpg",
+              "width": 1500,
+              "height": 1500
+            },
+            "width": 1500,
+            "height": 1500
+          }
+        ],
+        "options": [
+          {
+            "name": "Color",
+            "values": [
+              {
+                "label": "White"
+              }
+            ]
+          }
+        ],
+        "metadata": {
+          "unique_selling_points": [
+            "Combines JBL Pure Bass sound with up to 76 hours of wireless playtime and multi-point Bluetooth connectivity."
+          ],
+          "top_features": [
+            "JBL Pure Bass sound technology delivers deep, powerful bass for immersive listening",
+            "Bluetooth 5.3 wireless streaming ensures high-quality audio and stable connections",
+            "Up to 76 hours battery life provides extended wireless enjoyment",
+            "Speed charging recharges the battery in just 2 hours for minimal downtime",
+            "Voice Aware and multi-point connections enable hands-free calls and easy device switching"
+          ]
+        },
+        "variants": [
+          {
+            "id": "gid://shopify/ProductVariant/42246172082372",
+            "title": "JBL Tune 720BT Wireless Over-Ear Headphones",
+            "description": {
+              "plain": "<h3>JBL Tune 720BT: Wireless Over-Ear Headphones with 76-Hour Battery, Same Day Delivery Available in Singapore</h3>\n<p>Enjoy JBL Pure Bass Sound wirelessly with the JBL Tune 720BT, with up to 76 hours of battery life and a lightweight, foldable design for all-day listening. Shop with Metapod, an authorised JBL retailer, and enjoy a 1-year official warranty.</p>\n<h3>Key Features</h3>\n<ul>\n<li>\n<strong>JBL Pure Bass Sound:</strong> over Bluetooth 5.3.</li>\n<li>\n<strong>Up to 76 hours battery:</strong> recharge in 2 hours via USB-C, and 5 minutes adds 3 hours.</li>\n<li>\n<strong>Hands-free calls with Voice Aware:</strong> manage calls from the ear-cup buttons.</li>\n<li>\n<strong>Multi-point connection:</strong> switch between Bluetooth devices without hassle.</li>\n<li>\n<strong>Detachable audio cable:</strong> keep listening even when the battery runs out.</li>\n</ul>\n<h3>Why buy from Metapod</h3>\n<ul>\n<li>Authorised JBL partner with 1-year official warranty.</li>\n<li>Same day delivery for orders before 11am.</li>\n</ul>\n<h3>FAQ</h3>\n<p><strong>Can I customise the sound?</strong><br>Yes. Use the EQ in the JBL Headphones app, with voice prompts in your chosen language.</p>\n<p><strong>Which colours are available?</strong><br>White, Black and Blue.</p>\n<p><strong>Does it come with warranty?</strong><br>Yes, a 1-year official warranty.</p>\n"
+            },
+            "handle": "jbl-tune-720bt-wireless-over-ear-headphones",
+            "url": "https://metapod.com/products/jbl-tune-720bt-wireless-over-ear-headphones?variant=42246172082372&_gsid=m7ySKe6iac4y&utm_source=shopify&utm_medium=catalog",
+            "seller_product_id": "gid://shopify/Product/7378484232388",
+            "price": {
+              "amount": 8990,
+              "currency": "SGD"
+            },
+            "list_price": {
+              "amount": 12700,
+              "currency": "SGD"
+            },
+            "availability": {
+              "available": true
+            },
+            "options": [
+              {
+                "name": "Color",
+                "label": "White"
+              }
+            ],
+            "media": [
+              {
+                "type": "image",
+                "url": "https://cdn.shopify.com/s/files/1/0604/7760/4036/files/JBLTune720BTWirelessOver-EarHeadphones_White_3.jpg",
+                "alt_text": "JBL Tune 720BT Wireless Over-Ear Headphones",
+                "preview": {
+                  "url": "https://cdn.shopify.com/s/files/1/0604/7760/4036/files/JBLTune720BTWirelessOver-EarHeadphones_White_3.jpg",
+                  "width": 1500,
+                  "height": 1500
+                },
+                "width": 1500,
+                "height": 1500
+              }
+            ],
+            "seller": {
+              "id": "gid://shopify/Shop/60477604036",
+              "name": "METAPOD SG",
+              "url": "https://metapod.com",
+              "domain": "metapod-com.myshopify.com",
+              "links": [
+                {
+                  "type": "terms_of_service",
+                  "url": "https://checkout.shopify.com/60477604036/policies/25442681028.html"
+                },
+                {
+                  "type": "refund_policy",
+                  "url": "https://checkout.shopify.com/60477604036/policies/25442615492.html"
+                },
+                {
+                  "type": "shipping_policy",
+                  "url": "https://checkout.shopify.com/60477604036/policies/25442713796.html"
+                }
+              ]
+            },
+            "checkout_url": "https://metapod.com/buy/42246172082372:1?ucp/version=2026-08-25&attribution/utm_source=shopify&attribution/utm_medium=catalog&attribution/click_id_tag=_gsid&attribution/click_id_value=m7ySKe6iac4y&_gsid=m7ySKe6iac4y",
+            "rating": {
+              "value": 5.0,
+              "scale_min": 1,
+              "scale_max": 5,
+              "count": 4
+            },
+            "condition": [
+              "new"
+            ],
+            "eligible": {
+              "native_checkout": false
+            },
+            "source": "shopify"
+          }
+        ],
+        "price_range": {
+          "min": {
+            "amount": 8990,
+            "currency": "SGD"
+          },
+          "max": {
+            "amount": 8990,
+            "currency": "SGD"
+          }
+        }
+      }
+    ],
+    "messages": [],
+    "pagination": {
+      "has_next_page": true,
+      "total_count": 801,
+      "cursor": "eyJvZmZzZXQiOjUsInRvdGFsX2NvdW50Ijo4MDEsInJldHVybmVkIjo1fQ"
+    }
+  },
+  "isError": false
+}

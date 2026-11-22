@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from typing import Literal
 from uuid import uuid4
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
 
 
 def uid():
@@ -168,7 +168,31 @@ class LiveRiskReview(Model):
 
 
 class Product(Model):
-    source: Literal["catalogue", "browser_use"] = "catalogue"
+    image_url: str = ""
+    image_alt: str = ""
+
+    @field_validator("image_url", mode="before")
+    @classmethod
+    def safe_image(cls, value):
+        from .product_images import image_url
+        return image_url(value)
+
+    provider_ids: dict[str, str] = Field(default_factory=dict)
+    inferred_attributes: list[str] = Field(default_factory=list)
+    selling_points: list[str] = Field(default_factory=list)
+    availability_note: str = ""
+    product_rating_text: str = ""
+    seller_rating_text: str = ""
+    review_excerpts: list[str] = Field(default_factory=list)
+    policy_links: dict[str, str] = Field(default_factory=dict)
+    rating_scope: Literal["", "product", "variant"] = ""
+    list_price: float | None = Field(default=None, gt=0, allow_inf_nan=False)
+    detail_checked: bool = False
+    observed_type: str = ""
+    type_evidence: str = ""
+    relevance: Literal["match", "mismatch", "unknown"] = "unknown"
+    relevance_binding: str = ""
+    source: Literal["catalogue", "browser_use", "shopify_catalog"] = "catalogue"
     source_url: str = ""
     observed_at: str = ""
     # A dict with local-only keys validates as LocalEvidence; anything else stays WebEvidence.
@@ -201,6 +225,13 @@ class Rule(Model):
     intervention: bool
 
 
+class FeatureFit(Model):
+    """How one requested feature matches this offer, for display; policy rules decide eligibility."""
+    feature: str
+    status: Literal["met", "absent", "unstated", "unknown"]
+    quote: str = ""
+
+
 class Action(Model):
     id: str = Field(default_factory=uid)
     product: Product
@@ -213,6 +244,7 @@ class Action(Model):
     status: Literal["pending", "approved", "rejected", "superseded"] = "pending"
     rules: list[Rule] = Field(default_factory=list)
     decision: Literal["ALLOW", "REVIEW", "BLOCK"] = "REVIEW"
+    feature_fit: list[FeatureFit] = Field(default_factory=list)
 
 
 class Event(Model):
@@ -258,8 +290,23 @@ class CartCheckout(Model):
     items: list[CartSelection] = Field(min_length=1, max_length=100)
 
 
+class FeatureVerdict(Model):
+    """Model check of one required feature in one live listing; the quote is copied from the listing."""
+    status: Literal["met", "absent", "unstated"]
+    quote: str = ""
+
+
+class LiveFetch(Model):
+    """The last completed live search: the needs it was run for and every listing it returned."""
+    provider: str
+    brief: dict[str, Fact]
+    product_ids: list[str]
+    rejected: int = 0
+    at: str = Field(default_factory=now)
+
+
 class Session(Model):
-    search_provider: Literal["catalogue", "browser_use"] = "catalogue"
+    search_provider: Literal["catalogue", "browser_use", "shopify_catalog", "hybrid"] = "catalogue"
     # Who finds risk signals in local products; fixed per session like the search provider.
     risk_detection: Literal["rules", "ai"] = "rules"
     live_products: dict[str, Product] = Field(default_factory=dict)
@@ -283,6 +330,8 @@ class Session(Model):
     rejected_merchants: list[str] = Field(default_factory=list)
     rejected_products: list[str] = Field(default_factory=list)
     clarification_count: int = 0
+    search_requested: bool = False
+    task_start_message: int | None = None
     clarification_asked: list[str] = Field(default_factory=list)
     clarification_answers: dict[str, str] = Field(default_factory=dict)
     intervention_count: int = 0
@@ -290,9 +339,14 @@ class Session(Model):
     cart: list[CartItem] = Field(default_factory=list)
     # Fixture file replayed instead of Browser Use for this session; empty for live search.
     search_replay: str = ""
+    live_fetch: LiveFetch | None = None
+    # product id -> required feature -> model verdict (feature_check.py).
+    feature_checks: dict[str, dict[str, FeatureVerdict]] = Field(default_factory=dict)
 
 
 class Change(Model):
+    operation: Literal["set", "add", "remove"] = "set"
+    evidence_message_index: int | None = None
     field: Literal[
         "category",
         "usage",
@@ -318,6 +372,8 @@ class ClarificationAnswer(Model):
 
 
 class Interpretation(Model):
+    search_control: Literal["unchanged", "request", "defer"] = "unchanged"
+    new_task_evidence: str = ""
     reply: str = Field(
         min_length=1,
         description="Complete user-facing message, including one question when intent is clarify.",
@@ -345,3 +401,5 @@ class Edit(Model):
 class SessionView(Session):
     # Internal profile/config snapshots are persisted but never returned to participants.
     experiment: dict = Field(default_factory=dict, exclude=True)
+    live_fetch: LiveFetch | None = Field(default=None, exclude=True)
+    feature_checks: dict[str, dict[str, FeatureVerdict]] = Field(default_factory=dict, exclude=True)

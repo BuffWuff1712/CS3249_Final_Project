@@ -6,6 +6,7 @@ export type OfferPreview = {
 };
 export type ShopActivity = { id: string; label: string; state: "completed" | "unavailable"; evidence: string[] };
 export type ShopView = {
+  available_categories?: string[];
   cart_review: { action: Action; error: string }[];
   session: Session; revision: number; offers: OfferPreview[]; current: Action | null;
   current_model_key: string | null; current_error: string; selected: Action | null; selection_error: string;
@@ -22,7 +23,7 @@ export async function shopRequest(path = "", method = "GET", body?: unknown, sig
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new ShopRequestError(typeof data.detail === "string" ? data.detail : "The workspace request failed. Reload its state before trying again.", response.status);
-  if (!data.session?.id || !["catalogue", "browser_use"].includes(data.session.search_provider) || !Array.isArray(data.offers)) throw new Error("The backend returned an invalid shopping workspace.");
+  if (!data.session?.id || !["catalogue", "browser_use", "shopify_catalog", "hybrid"].includes(data.session.search_provider) || !Array.isArray(data.offers)) throw new Error("The backend returned an invalid shopping workspace.");
   return data as ShopView;
 }
 export const shopFields = ["category", "usage", "budget", "currency", "features", "size", "preferred_brands", "excluded_brands", "merchants", "other"] as const;
