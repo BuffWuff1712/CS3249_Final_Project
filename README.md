@@ -121,7 +121,7 @@ Live endpoint probes and synthetic shopping turns were exercised against the sel
 
 ## Merchant-risk extension
 
-Live product discovery searches Shopify Global Catalog first in default hybrid mode and falls back to Browser Use Cloud V4 only when Shopify returns no eligible offer that meets every must-have feature. Browser-only and fictional catalogue modes remain selectable.
+Live product discovery queries both Shopify Global Catalog and Browser Use Cloud V4 in default hybrid mode and compares their eligible results. Browser-only and fictional catalogue modes remain selectable.
 See [Browser Use setup and switching guide](docs/browser-use-search.md). Catalogue/research records
 remain fictional; Browser Use listings are clearly labelled unverified web snapshots. All checkout
 and receipts remain simulated. Live search was checked manually against amazon.sg.
@@ -174,7 +174,7 @@ review. Existing cart receipts are not rewritten. Changed snapshots invalidate a
 Features are matched differently for live listings (`app/runtime/feature_match.py`,
 `app/runtime/feature_check.py`). Rules first: a feature counts when the listing's name,
 description, attributes or specifications show the same concept (noise control, comfort,
-portability, durability, water resistance, battery, sound, storage) or more than half of its words.
+portability, durability, water resistance, battery, sound, storage) or most of its words.
 Must-have features the rules cannot confirm go to one batched LLM call per search. Each
 verdict is met, absent or unstated and must quote the listing; an ungrounded or skipped
 verdict counts as unstated. Absent excludes the listing; unstated keeps it with a REVIEW
@@ -184,9 +184,8 @@ feature. Catalogue products keep exact matching against their attributes. The of
 "How this matches your needs" chips show these per-feature verdicts (`feature_fit`).
 
 Live merchants on a retailer in `backend/data/sites/live_site_registry.json` show its
-website reputation (amazon.sg good, qoo10.sg mid). Every Shopify Catalog store is rated
-good ("Shopify store", `shopify_site()` in `app/runtime/sites.py`) because orders go through
-Shopify's hosted checkout. Other hosts show Unknown.
+website reputation (amazon.sg good, qoo10.sg mid); other hosts, such as independent
+Shopify stores, show Unknown.
 
 If Browser Use fails, chat displays a saved search-unavailable response instead of no
 matches. Read the backend terminal (`uvicorn.error`) for `Search failure`: reason code,
@@ -205,17 +204,13 @@ passing tests do not establish live reliability.
 ### Shopify Global Catalog and hybrid discovery
 
 New sessions default to `BEANY_SEARCH_PROVIDER=hybrid`: each new search queries Shopify
-first. Browser Use runs once, afterwards, only when Shopify fails or returns no eligible
-offer that meets every must-have feature (an offer whose listing never mentions one is kept
-for review but does not stop the search); cancellation is checked between sources. Required features the rules cannot confirm
-go through the LLM feature check before that decision, so a paraphrased Shopify match does
-not trigger the minutes-long Browser Use call. No automatic paid retry occurs. Each offer
-carries `evidence_depth` (`catalog` for Shopify, `deep` for Browser Use), shown as a badge.
+and Browser Use once, sequentially, with cancellation checked between sources.
+Both sources are searched even if the first succeeds. No automatic paid retry occurs.
 
 A search after an edit that only filters reuses the last search's listings instead
 (`reusable()` in `app/runtime/discovery.py`): must-have/preferred toggles, a lower budget,
 removed features, brands, usage or size, newly excluded brands, or a rejected offer with
-unchanged needs. Reuse needs every source that ran to have succeeded and lasts 25 minutes from the
+unchanged needs. Reuse needs both sources to have succeeded and lasts 25 minutes from the
 search's start, since snapshots older than 30 minutes cannot check out. A new or changed
 category, currency, feature, usage, size or preferred brand, a higher or removed budget, a
 hard budget made preferred, an un-excluded brand, or unchanged needs search again. A reuse
@@ -234,7 +229,7 @@ be used. A failed search with no usable results remains a service failure.
 
 `shopify_catalog`, `browser_use` and `catalogue` remain single-source modes.
 Existing sessions retain their stored provider. Hybrid invokes Browser Use
-when Shopify gives no fitting offer and may then consume its configured credits, subject to the existing
+on each new search and may consume its configured credits, subject to the existing
 per-run cost cap. No real carts, orders or payments are created. Provider diagnostics
 stay in backend logs; participant UI avoids internal provider/routing labels.
 

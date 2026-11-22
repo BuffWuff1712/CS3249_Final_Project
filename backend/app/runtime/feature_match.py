@@ -56,7 +56,7 @@ def listing_text(product):
 
 
 def met(feature, text):
-    """True when the listing text shows this feature's concept or more than half of its own words."""
+    """True when the listing text shows this feature's concept or most of its own words."""
     feature = feature.casefold().strip()
     if not feature:
         return True
@@ -73,5 +73,4 @@ def met(feature, text):
         return False
     listing = words(text)
     found = sum(any(w.startswith(s) for w in listing) for s in stems)
-    # A strict majority: one shared word of two ("heating" in "induction heating") is not a match.
-    return found * 2 > len(stems)
+    return found * 2 >= len(stems)

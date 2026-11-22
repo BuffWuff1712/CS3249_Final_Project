@@ -345,15 +345,14 @@ def chat(s, text):
     if result.intent in ("search", "alternative") and "category" in s.brief:
         s.search_requested = False
         invalidate(s)
-        from .search_errors import SearchProviderError, report_failure, USER_MESSAGE, ACTIONS
+        from .search_errors import SearchProviderError, report_failure, USER_MESSAGE
         try:
             outcome = run_shopping(s)
         except SearchProviderError as exc:
             report_failure(s, exc)
             s.stage = "ready"
             s.suggestions = []
-            action = ACTIONS.get(exc.reason, ACTIONS["unknown"])
-            message(s, USER_MESSAGE + " " + action)
+            message(s, USER_MESSAGE)
             return s
         event(s, "shopping_result", outcome.model_dump_json())
         if outcome.status != "proposed":

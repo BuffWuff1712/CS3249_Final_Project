@@ -46,16 +46,3 @@ def test_browser_listing_merchant_carries_reputation(monkeypatch):
     [pid] = browser_search.discover(s, "")
     merchant = s.live_merchants[s.live_products[pid].merchant_id]
     assert merchant.site.domain == "amazon.sg" and merchant.site.tier == "good"
-
-
-def test_shopify_stores_are_rated_good():
-    site = sites.shopify_site("https://www.jetvance.com/products/x")
-    assert (site.domain, site.tier, site.label) == ("www.jetvance.com", "good", "Shopify store")
-    assert sites.shopify_site("") is None
-
-
-def test_shopify_listing_merchant_carries_good_reputation():
-    from app.runtime.shopify_catalog import normalize
-    from tests.test_shopify_catalog import row
-    _, merchant = normalize(row())[0]
-    assert merchant.site.tier == "good" and merchant.site.label == "Shopify store"

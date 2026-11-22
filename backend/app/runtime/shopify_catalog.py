@@ -9,7 +9,7 @@ import time
 from threading import Lock
 from urllib.parse import urlparse
 import httpx
-from .sites import live_site_for, shopify_site
+from .sites import live_site_for
 from .schemas import Product, Merchant, Event, WebEvidence, now
 from .search_errors import SearchProviderError
 from .progress import cancellable_call, check_cancelled
@@ -243,7 +243,7 @@ def normalize(row):
             img,alt=select_image(variant,row)
             p=Product(image_url=img,image_alt=alt,id=pid,name=product_title(row["title"], variant.get("title")),
                 category=category,brand="",price=amount/100,currency=price["currency"],merchant=seller["name"],merchant_id=mid,
-                source="shopify_catalog",evidence_depth="catalog",source_url=url,observed_at=now(),stock=available,trust="unverified",
+                source="shopify_catalog",source_url=url,observed_at=now(),stock=available,trust="unverified",
                 attributes=[],sizes=sizes,description=text,inferred_attributes=inferred,
                 selling_points=summaries(metadata.get("unique_selling_points")),
                 policy_links=seller_policy_links(seller), list_price=original_price,
@@ -253,7 +253,7 @@ def normalize(row):
             m=Merchant(id=mid,name=seller["name"],website=site,description="Seller identity and policies need review.",
                 payment_methods=["Demo Visa","Demo Wallet"],return_policy="Unknown; check the merchant.",
                 contact="",review_count=0,verified_business=False,requested_information=[],
-                site=live_site_for(site) or shopify_site(site))
+                site=live_site_for(site))
             products.append((p,m))
         except (ValueError,TypeError,KeyError,AttributeError):
             continue

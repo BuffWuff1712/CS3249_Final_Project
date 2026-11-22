@@ -86,7 +86,7 @@ converted either, so the agent does not judge website reputation. For local prod
 mode. Replayed listings have no registry entry and never carry a website-reputation signal. Live
 listings from a retailer in `data/sites/live_site_registry.json` (matched by host or subdomain, e.g.
 `www.amazon.sg`) carry that site's tier: amazon.sg is `good`, qoo10.sg is `mid` and adds
-`site_reputation_mid`. Shopify Catalog stores are all rated `good` ("Shopify store"); other hosts have none. A local record knows when a
+`site_reputation_mid`. Other hosts, such as independent Shopify stores, have none. A local record knows when a
 detail is absent, so a missing contact or verification becomes explicit text; live listings keep
 "blank means not visible", and blank fields are never evidence. The agent may quote a review only
 when it reports concrete seller conduct, and its reason then starts with "Buyer report:".

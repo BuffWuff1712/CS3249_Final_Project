@@ -193,7 +193,6 @@ class Product(Model):
     relevance: Literal["match", "mismatch", "unknown"] = "unknown"
     relevance_binding: str = ""
     source: Literal["catalogue", "browser_use", "shopify_catalog"] = "catalogue"
-    evidence_depth: Literal["catalog", "deep"] | None = None
     source_url: str = ""
     observed_at: str = ""
     # A dict with local-only keys validates as LocalEvidence; anything else stays WebEvidence.

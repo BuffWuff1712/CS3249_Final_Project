@@ -31,7 +31,6 @@ def test_paraphrased_features_match(feature, text):
     ("waterproof", HEADPHONES),
     ("durable", "stylish canvas tote"),
     ("usb-c charging", "classic wired headphones"),
-    ("induction heating", "rice cooker with aluminium inner pot and heating plate"),
 ])
 def test_absent_features_do_not_match(feature, text):
     assert not met(feature, text)

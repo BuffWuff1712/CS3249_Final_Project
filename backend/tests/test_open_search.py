@@ -4,7 +4,7 @@ import pytest
 from app.runtime import service, llm, browser_search as browser, relevance, policy
 from app.runtime.schemas import Session, Fact, Change, Interpretation, Message, Event
 from app.runtime.preferences import apply_change, grounded_change
-from app.runtime.search_errors import SearchProviderError, provider_reason, USER_MESSAGE, ACTIONS
+from app.runtime.search_errors import SearchProviderError, provider_reason, USER_MESSAGE
 from app.runtime.shopping_workflow import ShoppingResult
 from test_browser_search import listing, RUN
 
@@ -79,7 +79,7 @@ def test_failure_is_one_saved_response_not_no_match(monkeypatch,caplog):
     def fail(*_): raise SearchProviderError("credits",402,RUN)
     monkeypatch.setattr(service,"run_shopping",fail)
     service.chat(s,"Find a lamp")
-    assert s.messages[-1].text==USER_MESSAGE + " " + ACTIONS["credits"] and len(s.messages)==2
+    assert s.messages[-1].text==USER_MESSAGE and len(s.messages)==2
     assert s.brief["category"].value=="lamp" and s.stage=="ready" and not s.proposals
     assert s.events[-1].kind in ("search_failure","assistant_message")
     assert "top up" in caplog.text and "Find a lamp" not in caplog.text
@@ -135,7 +135,7 @@ def test_stream_provider_failure_commits_chat_and_unavailable_progress(monkeypat
     view=next(e["view"] for e in events if e["type"]=="result")
     assert view["revision"]==1 and view["current"] is None
     saved=storage.load(s.id)
-    assert saved.messages[-1].text==USER_MESSAGE + " " + ACTIONS["credits"] and saved.brief["category"].value=="Desk lamp"
+    assert saved.messages[-1].text==USER_MESSAGE and saved.brief["category"].value=="Desk lamp"
 
 
 @pytest.mark.parametrize("mode,reason",[("failed","failed_run"),("invalid","invalid_output"),("network","unavailable"),("timeout","timeout")])

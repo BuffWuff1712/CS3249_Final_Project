@@ -55,13 +55,9 @@ def test_un_excluding_a_brand_needs_a_new_search():
 DESC = "travel backpack, padded straps, durable ripstop, laptop compartment and pockets"
 
 
-class Calls(list):
-    fake = None
-
-
 @pytest.fixture
 def providers(monkeypatch):
-    calls = Calls()
+    calls = []
     def fake(source, prices):
         def run(session, query=""):
             calls.append(source)
@@ -79,10 +75,8 @@ def providers(monkeypatch):
                 ids.append(pid)
             return ids
         return run
-    # Shopify finds nothing by default, so every hybrid search also reaches Browser Use.
-    monkeypatch.setattr(shopify_catalog, "discover", fake("shopify_catalog", []))
-    monkeypatch.setattr(browser_search, "discover", fake("browser_use", [30, 45, 70, 75]))
-    calls.fake = fake
+    monkeypatch.setattr(shopify_catalog, "discover", fake("shopify_catalog", [30, 70]))
+    monkeypatch.setattr(browser_search, "discover", fake("browser_use", [45, 75]))
     return calls
 
 
@@ -156,54 +150,16 @@ def test_old_results_expire(providers):
 
 def test_partial_search_is_never_reused(providers, monkeypatch):
     from app.runtime.search_errors import SearchProviderError
-    def down(session, query=""):
-        providers.append("shopify_catalog")
-        raise SearchProviderError("unavailable", provider="shopify_catalog")
-    monkeypatch.setattr(shopify_catalog, "discover", down)
+    def timeout(session, query=""):
+        providers.append("browser_use")
+        raise SearchProviderError("timeout")
+    monkeypatch.setattr(browser_search, "discover", timeout)
     s = session()
-    assert discovery.discover(s)
+    discovery.discover(s)
     assert s.live_fetch is None
     s.brief["budget"] = F("60", hard=True)
     discovery.discover(s)
     assert len(providers) == 4
-
-
-def test_eligible_shopify_offers_skip_browser_use_and_are_reused(providers, monkeypatch):
-    monkeypatch.setattr(shopify_catalog, "discover", providers.fake("shopify_catalog", [30, 70]))
-    s = session()
-    first = discovery.discover(s)
-    assert list(providers) == ["shopify_catalog"] and len(first) == 2
-    s.brief["budget"] = F("50", hard=True)
-    assert [s.live_products[i].price for i in discovery.discover(s)] == [30]
-    assert list(providers) == ["shopify_catalog"]
-
-
-def test_required_features_are_checked_before_skipping_browser_use(providers, monkeypatch):
-    from app.runtime import feature_check
-    from app.runtime.feature_check import Review, Verdict
-    monkeypatch.setenv("BEANY_LLM_MODE", "openai")
-    monkeypatch.setattr(shopify_catalog, "discover", providers.fake("shopify_catalog", [30]))
-    def fake(schema, instructions, payload):
-        return Review(verdicts=[Verdict(product_id=x["product_id"], feature=f, status="met", quote="laptop compartment")
-                                for x in payload["listings"] for f in x["features"]])
-    monkeypatch.setattr("app.runtime.gateway.structured_call", fake)
-    s = session(features=F("fits a 15 inch laptop", hard=True))
-    assert discovery.discover(s) == ["shopify_catalog-1-0"]
-    assert list(providers) == ["shopify_catalog"]
-
-
-def test_offers_that_never_mention_a_required_feature_do_not_skip_browser_use(providers, monkeypatch):
-    from app.runtime.feature_check import Review, Verdict
-    monkeypatch.setenv("BEANY_LLM_MODE", "openai")
-    monkeypatch.setattr(shopify_catalog, "discover", providers.fake("shopify_catalog", [30]))
-    def fake(schema, instructions, payload):
-        return Review(verdicts=[Verdict(product_id=x["product_id"], feature=f, status="unstated")
-                                for x in payload["listings"] for f in x["features"]])
-    monkeypatch.setattr("app.runtime.gateway.structured_call", fake)
-    s = session(features=F("fits a 15 inch laptop", hard=True))
-    found = discovery.discover(s)
-    assert list(providers) == ["shopify_catalog", "browser_use"]
-    assert "shopify_catalog-1-0" in found and len(found) == 5  # Unconfirmed offers stay, flagged for review.
 
 
 def test_live_fetch_is_not_shown_to_participants(providers):

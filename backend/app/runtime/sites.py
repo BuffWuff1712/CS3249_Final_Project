@@ -37,16 +37,6 @@ def live_site_for(url, sites=None):
     return None
 
 
-def shopify_site(url):
-    """Every Shopify Catalog store is rated good: it sells through Shopify's hosted checkout."""
-    host = (urlparse(url).hostname or "").lower()
-    if not host:
-        return None
-    return Site(domain=host, name=host, kind="independent", tier="good", label="Shopify store",
-                summary="Independent store selling through Shopify, whose hosted checkout and "
-                        "payment processing handle the order.")
-
-
 def site_for(url, sites=None):
     parsed = urlparse(url)
     if parsed.port is not None:
