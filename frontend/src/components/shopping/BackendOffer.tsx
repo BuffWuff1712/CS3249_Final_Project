@@ -11,6 +11,14 @@ import { BatteryHighIcon } from "@phosphor-icons/react/dist/csr/BatteryHigh";
 import { PackageIcon } from "@phosphor-icons/react/dist/csr/Package";
 import { RatingStars, RiskBadge, SiteBadge, PolicyBadge, MatchedPriorities, uniqueConcerns, concernTitle, blockingReasons } from "./ShoppingReadability";
 
+export function EvidenceDepthBadge({ depth }: { depth?: "catalog" | "deep" | null }) {
+  if (!depth) return null;
+  const isDeep = depth === "deep";
+  const label = isDeep ? "Deep-checked" : "Catalog data";
+  const title = isDeep ? "On-page seller signals scraped (payment, urgency, badges)" : "Basic verified-merchant catalog data";
+  return <span title={title} style={{ marginLeft: "0.5em", padding: "0.1em 0.5em", fontSize: "0.75em", fontWeight: 600, borderRadius: "0.75em", border: "1px solid currentColor", background: isDeep ? "#e8f5e9" : "#eef3fb", color: isDeep ? "#1b5e20" : "#1e4482", verticalAlign: "middle" }}>{label}</span>;
+}
+
 export function readableRule(explanation: string) {
   const labels: Record<string, string> = { government_id: "government ID", date_of_birth: "date of birth", social_media_account: "social media account" };
   return explanation.replace(/government_id|date_of_birth|social_media_account/g, key => labels[key]);
@@ -60,7 +68,7 @@ function ListingSummary({ product }: { product: Product }) {
 
 export function BackendProductEvidence({ product, merchant, replay = false }: { product: Product; merchant: Merchant | null; replay?: boolean }) {
   return <section className="cui-source-record" aria-label={`Product evidence for ${productTitle(product)}`} tabIndex={-1}>
-    <h3>{productTitle(product)}</h3><p className="cui-source">{product.brand} · {product.category} · {money(product)} · {product.merchant}</p>
+    <h3>{productTitle(product)}<EvidenceDepthBadge depth={product.evidence_depth} /></h3><p className="cui-source">{product.brand} · {product.category} · {money(product)} · {product.merchant}</p>
     <p className="cui-listing-description">{product.description || "Description not supplied."}</p>
     <ListingSummary product={product} /><PolicyLinks product={product} />
     <dl className="cui-spec-grid">{Object.entries(product.specifications).map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value || "Unknown; not supplied"}</dd></div>)}</dl>
@@ -77,7 +85,7 @@ export function BackendProductEvidence({ product, merchant, replay = false }: { 
 
 export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, selected, disabled, selectionInvalid = false, select, seller, addCart, alternative, replay = false, evidenceId }: { sellerPreferences?: ReactNode; action: Action; brief?: Record<string, Fact>; selected: boolean; disabled: boolean; selectionInvalid?: boolean; select: () => void; addCart: () => void; alternative: () => void; seller: () => void; replay?: boolean; evidenceId?: number }) {
   return <article className="cui-recommendation" aria-label="Current recommendation">
-    <h2 className="cui-panel-title">Your current match</h2><div className="cui-product-heading"><h3>{productTitle(action.product)}</h3><div><strong>{money(action.product)}</strong><span>{action.product.merchant}</span></div></div>
+    <h2 className="cui-panel-title">Your current match</h2><div className="cui-product-heading"><h3>{productTitle(action.product)}<EvidenceDepthBadge depth={action.product.evidence_depth} /></h3><div><strong>{money(action.product)}</strong><span>{action.product.merchant}</span></div></div>
     <ProductImage key={action.product.id + (action.product.image_url || "")} product={action.product} />
     {productTitle(action.product) !== action.product.name && <details className="cui-full-title"><summary>Full listing title</summary><p>{action.product.name}</p></details>}
     <MatchedPriorities product={action.product} brief={brief} fit={action.feature_fit} />

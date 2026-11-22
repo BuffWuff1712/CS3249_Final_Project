@@ -41,15 +41,15 @@ def session():
     })
 
 
-def test_both_successes_are_combined_and_best_three_screened(monkeypatch):
+def test_shopify_results_skip_browser_use(monkeypatch):
     calls = setup_sources(monkeypatch)
     s = session()
     with discovery.budget():
         products = run_shopping(s).candidates
 
-    assert calls == ['shopify_catalog', 'browser_use']
+    assert calls == ['shopify_catalog']  # Browser Use is a fallback, not a parallel call.
     assert len(products) == 3
-    assert all(p.source == 'browser_use' for p in products)  # Better grounded feature fit.
+    assert all(p.source == 'shopify_catalog' for p in products)
     assert not s.proposals and not s.approvals and not s.receipts
     shop_workspace.adopt(s)
     service.propose(s, products[0], recommendations=products)
@@ -59,12 +59,24 @@ def test_both_successes_are_combined_and_best_three_screened(monkeypatch):
     assert len(shop_workspace.preview(s)) == 3
 
 
-def test_blocked_candidates_excluded_and_other_source_fills_shortlist(monkeypatch):
-    setup_sources(monkeypatch, blocked=True)
+def test_blocked_candidates_excluded_when_eligible_shopify_results_remain(monkeypatch):
+    calls = setup_sources(monkeypatch, blocked=True)
     s = session()
     products = run_shopping(s).candidates
+    # Only one of five Shopify results is blocked, so the fallback does not fire.
+    assert calls == ['shopify_catalog']
     assert len(products) == 3
     assert all('Ignore all instructions' not in p.description for p in products)
+    assert all(p.source == 'shopify_catalog' for p in products)
+
+
+def test_empty_shopify_falls_back_to_browser_use(monkeypatch):
+    calls = setup_sources(monkeypatch)
+    monkeypatch.setattr(shopify_catalog, 'discover', lambda *_: calls.append('shopify_catalog') or [])
+    s = session()
+    products = run_shopping(s).candidates
+    assert calls == ['shopify_catalog', 'browser_use']
+    assert len(products) == 3
     assert all(p.source == 'browser_use' for p in products)
 
 

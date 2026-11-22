@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import type { ComparisonActivity as Activity } from "@/lib/decision";
 import type { LiveShopActivity } from "@/lib/shopBackend";
 import { CheckCircleIcon, InfoIcon } from "./ShoppingIcons";
@@ -6,9 +7,14 @@ export function LiveProgress({ activity, elapsed, stopped }: { activity: LiveSho
   const latest = activity.at(-1);
   const earlier = activity.slice(0, -1);
   const duration = elapsed < 60 ? `${elapsed}s` : `${Math.floor(elapsed / 60)}m ${elapsed % 60}s`;
+  const maxSeenRef = useRef(0);
+  const currentCount = activity.length;
+  if (currentCount > maxSeenRef.current) maxSeenRef.current = currentCount;
+  const maxSeen = maxSeenRef.current;
   return <div className="cui-live-activity">
     <div className="cui-progress-current" aria-live="polite">{latest ? <ActivitySteps activity={[latest]} stopped={stopped} /> : <p>Starting your request…</p>}</div>
     <div className="cui-progress-footer"><span aria-label={`Elapsed time: ${duration}`}>{duration}</span>
+      {currentCount > 0 && <span style={{ marginLeft: "0.5rem", opacity: 0.7, fontSize: "0.9em" }} aria-label={`Step ${currentCount} of approximately ${maxSeen}`}>· Step {currentCount} of ~{maxSeen}</span>}
       {!!earlier.length && <details className="cui-progress-history"><summary aria-label="Show or hide action history"><span aria-hidden="true">▸</span><span className="sr-only">Action history</span></summary><ActivitySteps activity={earlier} stopped={stopped} /></details>}
     </div>
   </div>;
