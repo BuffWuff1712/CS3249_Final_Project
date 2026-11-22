@@ -184,8 +184,9 @@ feature. Catalogue products keep exact matching against their attributes. The of
 "How this matches your needs" chips show these per-feature verdicts (`feature_fit`).
 
 Live merchants on a retailer in `backend/data/sites/live_site_registry.json` show its
-website reputation (amazon.sg good, qoo10.sg mid); other hosts, such as independent
-Shopify stores, show Unknown.
+website reputation (amazon.sg good, qoo10.sg mid). Every Shopify Catalog store is rated
+good ("Shopify store", `shopify_site()` in `app/runtime/sites.py`) because orders go through
+Shopify's hosted checkout. Other hosts show Unknown.
 
 If Browser Use fails, chat displays a saved search-unavailable response instead of no
 matches. Read the backend terminal (`uvicorn.error`) for `Search failure`: reason code,

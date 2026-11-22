@@ -7,7 +7,7 @@ Everything the backend loads at runtime lives here, along with researcher-only f
 | `products/catalogue.json` | Yes | Products and per-merchant offers (`Product` schema in `app/runtime/schemas.py`) |
 | `merchants/merchants.json` | Yes | Observable merchant records (`Merchant` schema) |
 | `sites/site_registry.json` | Yes | Fictional site registry: reputation tier, label and summary per website domain (`Site` schema). Attached to local merchants by exact host |
-| `sites/live_site_registry.json` | Yes | Reputation of the real retailers in `BROWSER_USE_ALLOWED_DOMAINS` (`Site` schema). Attached to live merchants by host or subdomain. Add an entry when you allow a new retailer |
+| `sites/live_site_registry.json` | Yes | Reputation of the real retailers in `BROWSER_USE_ALLOWED_DOMAINS` (`Site` schema). Attached to live merchants by host or subdomain. Add an entry when you allow a new retailer. Shopify Catalog stores are not listed; `shopify_site()` rates them all good |
 | `scenarios/scenarios.json` | Yes | Study scenarios: initial brief, permissions, visible `product_ids`, trigger product |
 | `research/merchant_ground_truth.json` | Researcher reports only | Hidden TRUSTWORTHY / UNCERTAIN / SUSPICIOUS / MALICIOUS label per merchant |
 | `research/risk_offer_manifest.json` | Never | Declared signals, visible cues and ground truth for every study risk offer |

@@ -9,7 +9,7 @@ import time
 from threading import Lock
 from urllib.parse import urlparse
 import httpx
-from .sites import live_site_for
+from .sites import live_site_for, shopify_site
 from .schemas import Product, Merchant, Event, WebEvidence, now
 from .search_errors import SearchProviderError
 from .progress import cancellable_call, check_cancelled
@@ -253,7 +253,7 @@ def normalize(row):
             m=Merchant(id=mid,name=seller["name"],website=site,description="Seller identity and policies need review.",
                 payment_methods=["Demo Visa","Demo Wallet"],return_policy="Unknown; check the merchant.",
                 contact="",review_count=0,verified_business=False,requested_information=[],
-                site=live_site_for(site))
+                site=live_site_for(site) or shopify_site(site))
             products.append((p,m))
         except (ValueError,TypeError,KeyError,AttributeError):
             continue
