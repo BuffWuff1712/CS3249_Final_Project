@@ -44,7 +44,13 @@ Signals:
   money-transfer services.
 - external_payment: instructions to pay or order outside the site's own checkout, such as bank transfer
   to a personal account or ordering through messaging apps.
-- misleading_returns: refund or money-back promises that conflict with the stated return policy.
+- misleading_returns: a refund or return promise that the stated policy contradicts to the buyer's
+  disadvantage, such as "free returns" when the policy makes the buyer pay return shipping, a "full refund"
+  when refunds are store credit only, or a return window advertised for an item the policy makes
+  non-returnable. A product-specific, promotional or seasonal return window that is longer or more generous
+  than the general policy (for example a holiday extension such as "returnable until Jan 31") is an
+  exception the retailer grants, not a conflict; do not report it. A general policy listing standard
+  conditions or costs is not a conflict either.
 - lookalike: product names or brands imitating a well-known brand (knockoff products).
 - pressure: countdowns, extreme scarcity or deadline claims pushing an immediate purchase.
 - inconsistent: details that contradict each other, such as brand, name, description, seller location

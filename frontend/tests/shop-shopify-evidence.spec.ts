@@ -17,6 +17,8 @@ test("Shopify evidence is visible without inventing reviews or confirming inferr
       privacy_policy: "javascript:alert(1)",
     },
   });
+  // The fabricated product replaces the one the backend checked, so its feature verdicts no longer apply.
+  view.current.feature_fit = [{ feature: "wireless", status: "unknown", quote: "" }];
   await page.route("**/shop/sessions**", route => route.fulfill({ json: view }));
   await page.goto("/");
   const offer = page.getByRole("article", { name: "Current recommendation", exact: true });

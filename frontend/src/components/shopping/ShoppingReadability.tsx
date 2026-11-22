@@ -1,5 +1,5 @@
 "use client";
-import type { Action, Fact, MerchantRisk, Product, Site } from "@/lib/beany";
+import type { Action, Fact, FeatureFit, MerchantRisk, Product, Site } from "@/lib/beany";
 import { StarIcon } from "@phosphor-icons/react/dist/csr/Star";
 import { WarningCircleIcon } from "@phosphor-icons/react/dist/csr/WarningCircle";
 import { GlobeIcon } from "@phosphor-icons/react/dist/csr/Globe";
@@ -36,10 +36,12 @@ export function PolicyBadge({ decision, compact = false }: { decision: string; c
 function normalized(text: string) {
   return text.toLowerCase().replace(/[-_]/g, " ").replace(/\banc\b|noise cancellation|noise canceling/g, "noise cancelling").replace(/\s+/g, " ").trim();
 }
-export function MatchedPriorities({ product, brief }: { product: Product; brief: Record<string, Fact> }) {
+export function MatchedPriorities({ product, brief, fit }: { product: Product; brief: Record<string, Fact>; fit?: FeatureFit[] }) {
   const requested = brief.features?.source === "confirmed" ? brief.features.value.split(",").map(value => value.trim()).filter(Boolean) : [];
   const attributes = new Set(product.attributes.map(normalized));
-  const unknown = requested.filter(value => !attributes.has(normalized(value)));
+  // Prefer the backend's per-feature verdicts (tolerant matching and listing checks) over a literal attribute match.
+  const features: FeatureFit[] = fit?.length ? fit : requested.map(value => ({ feature: value, status: attributes.has(normalized(value)) ? "met" : "unknown", quote: "" }));
+  const unknown = features.filter(item => item.status === "unknown" || item.status === "unstated").map(item => item.feature);
   const budget = brief.budget;
   const amount = Number(budget?.value);
   // Match the needs strip's SGD default, while making the assumption explicit.
@@ -54,9 +56,9 @@ export function MatchedPriorities({ product, brief }: { product: Product; brief:
   const budgetNote = validBudget && !sameCurrency
     ? `Budget match unconfirmed: offer is priced in ${product.currency}; your ${budgetKind} is ${budgetLabel}. No currency conversion is performed.`
     : validBudget && product.price > amount ? `Above your ${budgetLabel} ${budgetKind}${currencyAssumed ? " (currency assumed)" : ""}.` : "";
-  type Match = { label: string; state: "match" | "unknown" | "mismatch"; required: boolean };
+  type Match = { label: string; state: "match" | "unknown" | "mismatch"; required: boolean; evidence?: string };
   const chips: Match[] = [];
-  const add = (label: string, state: Match["state"], required: boolean) => chips.push({ label, state, required });
+  const add = (label: string, state: Match["state"], required: boolean, evidence = "") => chips.push({ label, state, required, evidence });
   if (budgetMatch) add(budgetMatch, "match", budget.hard);
   else if (budgetNote) add(sameCurrency ? "Above your budget" : "Budget match unconfirmed", sameCurrency ? "mismatch" : "unknown", budget.hard);
   const size = brief.size;
@@ -69,7 +71,12 @@ export function MatchedPriorities({ product, brief }: { product: Product; brief:
     if (fact.source !== "confirmed" || !fact.value.trim() || ["budget", "size", "features"].includes(field)) continue;
     if (!fact.hard && field !== "usage" && field !== "preferred_brands") continue;
     const values = fact.value.split(",").map(normalized).filter(Boolean);
-    if (field === "category") add(`Category: ${fact.value}`, normalized(fact.value) === normalized(product.category) ? "match" : "mismatch", fact.hard);
+    if (field === "category") {
+      // A live listing's category is the type read from its page, so the backend's family check decides.
+      const live = product.source === "browser_use" || product.source === "shopify_catalog";
+      const state = !live ? (normalized(fact.value) === normalized(product.category) ? "match" : "mismatch") : product.relevance === "match" ? "match" : product.relevance === "mismatch" ? "mismatch" : "unknown";
+      add(state === "unknown" ? `Category: ${fact.value} — not confirmed` : `Category: ${fact.value}`, state, fact.hard);
+    }
     else if (field === "currency") {
       if (!validBudget) add(`Currency: ${fact.value}`, normalized(fact.value) === normalized(product.currency) ? "match" : "mismatch", fact.hard);
     } else if (field === "preferred_brands" || field === "excluded_brands") {
@@ -85,12 +92,14 @@ export function MatchedPriorities({ product, brief }: { product: Product; brief:
       add(`For ${fact.value}: ${listed ? "listed" : "suitability unknown"}`, listed ? "match" : "unknown", fact.hard);
     } else add(`${field.replaceAll("_", " ")}: ${fact.value} — not verified`, "unknown", fact.hard);
   }
-  for (const value of [...new Set(requested)]) add(attributes.has(normalized(value)) ? value : `${value}: not established`, attributes.has(normalized(value)) ? "match" : "unknown", brief.features.hard);
+  const featureLabel = { met: "", absent: ": listing says otherwise", unstated: ": not mentioned in listing", unknown: ": not established" } as const;
+  for (const item of features.filter((item, index) => features.findIndex(other => other.feature === item.feature) === index))
+    add(`${item.feature}${featureLabel[item.status]}`, item.status === "met" ? "match" : item.status === "absent" ? "mismatch" : "unknown", brief.features.hard, item.quote);
   chips.sort((a, b) => Number(b.required) - Number(a.required));
   if (!chips.length && !budgetNote) return null;
   return <section className="cui-matched-priorities" aria-label="Priority matches"><h4>How this matches your needs</h4><ul>{chips.map((chip, index) => {
     const Icon = chip.state === "match" ? CheckCircleIcon : chip.state === "mismatch" ? ProhibitIcon : InfoIcon;
-    return <li key={index} className={`cui-constraint-${chip.state}`} title={chip.required ? "Required constraint" : "Preference"} aria-label={`${chip.required ? "Required" : "Preferred"}: ${chip.label}`}><Icon weight={chip.state === "match" ? "fill" : "regular"} aria-hidden="true" />{chip.label}</li>;
+    return <li key={index} className={`cui-constraint-${chip.state}`} title={`${chip.required ? "Required constraint" : "Preference"}${chip.evidence ? ` — listing: “${chip.evidence}”` : ""}`} aria-label={`${chip.required ? "Required" : "Preferred"}: ${chip.label}`}><Icon weight={chip.state === "match" ? "fill" : "regular"} aria-hidden="true" />{chip.label}</li>;
   })}</ul>{budgetNote && <p className="cui-source">{budgetNote}</p>}{unknown.length > 0 && <p className="cui-source">Not established from listed features: {unknown.join(", ")}. Missing evidence does not mean a feature is absent.</p>}</section>;
 
 }

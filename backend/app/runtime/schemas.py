@@ -225,6 +225,13 @@ class Rule(Model):
     intervention: bool
 
 
+class FeatureFit(Model):
+    """How one requested feature matches this offer, for display; policy rules decide eligibility."""
+    feature: str
+    status: Literal["met", "absent", "unstated", "unknown"]
+    quote: str = ""
+
+
 class Action(Model):
     id: str = Field(default_factory=uid)
     product: Product
@@ -237,6 +244,7 @@ class Action(Model):
     status: Literal["pending", "approved", "rejected", "superseded"] = "pending"
     rules: list[Rule] = Field(default_factory=list)
     decision: Literal["ALLOW", "REVIEW", "BLOCK"] = "REVIEW"
+    feature_fit: list[FeatureFit] = Field(default_factory=list)
 
 
 class Event(Model):
@@ -282,6 +290,21 @@ class CartCheckout(Model):
     items: list[CartSelection] = Field(min_length=1, max_length=100)
 
 
+class FeatureVerdict(Model):
+    """Model check of one required feature in one live listing; the quote is copied from the listing."""
+    status: Literal["met", "absent", "unstated"]
+    quote: str = ""
+
+
+class LiveFetch(Model):
+    """The last completed live search: the needs it was run for and every listing it returned."""
+    provider: str
+    brief: dict[str, Fact]
+    product_ids: list[str]
+    rejected: int = 0
+    at: str = Field(default_factory=now)
+
+
 class Session(Model):
     search_provider: Literal["catalogue", "browser_use", "shopify_catalog", "hybrid"] = "catalogue"
     # Who finds risk signals in local products; fixed per session like the search provider.
@@ -316,6 +339,9 @@ class Session(Model):
     cart: list[CartItem] = Field(default_factory=list)
     # Fixture file replayed instead of Browser Use for this session; empty for live search.
     search_replay: str = ""
+    live_fetch: LiveFetch | None = None
+    # product id -> required feature -> model verdict (feature_check.py).
+    feature_checks: dict[str, dict[str, FeatureVerdict]] = Field(default_factory=dict)
 
 
 class Change(Model):
@@ -375,3 +401,5 @@ class Edit(Model):
 class SessionView(Session):
     # Internal profile/config snapshots are persisted but never returned to participants.
     experiment: dict = Field(default_factory=dict, exclude=True)
+    live_fetch: LiveFetch | None = Field(default=None, exclude=True)
+    feature_checks: dict[str, dict[str, FeatureVerdict]] = Field(default_factory=dict, exclude=True)

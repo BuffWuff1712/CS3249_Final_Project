@@ -1,0 +1,18 @@
+[
+ {
+  "domain": "amazon.sg",
+  "name": "Amazon Singapore",
+  "kind": "marketplace",
+  "tier": "good",
+  "label": "Large established marketplace",
+  "summary": "Large established marketplace; orders go through Amazon's own checkout and return process, including items from international and third-party sellers."
+ },
+ {
+  "domain": "qoo10.sg",
+  "name": "Qoo10 Singapore",
+  "kind": "marketplace",
+  "tier": "mid",
+  "label": "Open third-party marketplace",
+  "summary": "Large open marketplace where most listings come from independent sellers; product quality, shipping times and return handling vary by seller."
+ }
+]

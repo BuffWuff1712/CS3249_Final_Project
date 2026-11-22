@@ -80,7 +80,7 @@ export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, sel
     <h2 className="cui-panel-title">Your current match</h2><div className="cui-product-heading"><h3>{productTitle(action.product)}</h3><div><strong>{money(action.product)}</strong><span>{action.product.merchant}</span></div></div>
     <ProductImage key={action.product.id + (action.product.image_url || "")} product={action.product} />
     {productTitle(action.product) !== action.product.name && <details className="cui-full-title"><summary>Full listing title</summary><p>{action.product.name}</p></details>}
-    <MatchedPriorities product={action.product} brief={brief} />
+    <MatchedPriorities product={action.product} brief={brief} fit={action.feature_fit} />
     <ListingSummary product={action.product} />
     <ul className="cui-product-points">
       {(action.product.attributes.length > 0 || !action.product.inferred_attributes?.length) && <li className="cui-icon-fact"><ListBulletsIcon aria-hidden="true" /><span><strong>Listed features:</strong> {action.product.attributes.join(", ") || "Not supplied"}</span></li>}

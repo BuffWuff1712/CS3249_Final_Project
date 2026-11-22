@@ -32,6 +32,54 @@ def terms(text):
     return [x.strip().casefold() for x in text.split(",") if x.strip()]
 
 
+def live(s, p):
+    return p.source in ("browser_use", "shopify_catalog") and not s.search_replay
+
+
+def has_feature(s, p, term):
+    """Live listings: tolerant rules, then a cached model verdict. Catalogue keeps exact matching."""
+    if live(s, p):
+        from .feature_match import met, listing_text
+        if met(term, listing_text(p)):
+            return True
+        found = s.feature_checks.get(p.id, {}).get(term)
+        return bool(found and found.status == "met")
+    return term in " ".join(p.attributes).casefold()
+
+
+def unstated_features(s, p):
+    """Required features a live listing neither shows nor contradicts, per the model check."""
+    if not live(s, p):
+        return []
+    checks = s.feature_checks.get(p.id, {})
+    return [t for t in terms(value(s, "features"))
+            if not has_feature(s, p, t) and t in checks and checks[t].status == "unstated"]
+
+
+def feature_fit(s, p):
+    """Per requested feature: met, absent, unstated (model found no mention) or unknown."""
+    from .schemas import FeatureFit
+    if not confirmed(s, "features"):
+        return []
+    checks = s.feature_checks.get(p.id, {}) if live(s, p) else {}
+    out = []
+    for t in terms(value(s, "features")):
+        found = checks.get(t)
+        if has_feature(s, p, t):
+            out.append(FeatureFit(feature=t, status="met", quote=found.quote if found and found.status == "met" else ""))
+        elif found:
+            out.append(FeatureFit(feature=t, status=found.status, quote=found.quote))
+        else:
+            out.append(FeatureFit(feature=t, status="unknown"))
+    return out
+
+
+def missing_features(s, p):
+    """Features that disqualify: not matched, and for live listings not merely unstated."""
+    unstated = set(unstated_features(s, p))
+    return [t for t in terms(value(s, "features")) if not has_feature(s, p, t) and t not in unstated]
+
+
 def confirmed(s, key):
     return key in s.brief and s.brief[key].source == "confirmed"
 
@@ -110,10 +158,7 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
         if (
             confirmed(s, "features")
             and s.brief["features"].hard
-            and any(
-                t not in " ".join(p.attributes).casefold()
-                for t in terms(value(s, "features"))
-            )
+            and missing_features(s, p)
         ):
             continue
         if (
@@ -125,9 +170,7 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
         products.append(p)
 
     def rank(p):
-        score = sum(
-            t in " ".join(p.attributes).casefold() for t in terms(value(s, "features"))
-        )
+        score = sum(has_feature(s, p, t) for t in terms(value(s, "features")))
         score += 2 * (p.brand.casefold() in terms(value(s, "preferred_brands")))
         score += (
             int(value(s, "usage").casefold() in " ".join(p.attributes).casefold())
@@ -337,12 +380,12 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
     if (
         confirmed(s, "features")
         and s.brief["features"].hard
-        and any(
-            t not in " ".join(p.attributes).casefold()
-            for t in terms(value(s, "features"))
-        )
+        and missing_features(s, p)
     ):
         rule("features", "BLOCK", "features", "A required feature is missing.")
+    if confirmed(s, "features") and s.brief["features"].hard and unstated_features(s, p):
+        rule("features_unconfirmed", "REVIEW", "features",
+             f"The listing doesn't mention {', '.join(unstated_features(s, p))}. Check the source page yourself.")
     if (
         confirmed(s, "preferred_brands")
         and s.brief["preferred_brands"].hard
@@ -401,6 +444,7 @@ def evaluate(s, a, *, catalogue_snapshot=None, merchant_snapshot=None):
             "All checked constraints and checkout permissions are satisfied.",
         )
     a.rules = rules
+    a.feature_fit = feature_fit(s, p)
     a.decision = (
         "BLOCK"
         if any(r.decision == "BLOCK" for r in rules)

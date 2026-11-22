@@ -148,6 +148,7 @@ def record(s, events_before, proposals_before):
     a = s.proposals[-1]
     activity = []
     searched, inspected = set(), set()
+    reused = any(event.kind == "search_reuse" for event in s.events[events_before:])
     for event in s.events[events_before:]:
         if event.kind == "shopping_tool":
             step = json.loads(event.detail)
@@ -156,7 +157,9 @@ def record(s, events_before, proposals_before):
             if step["action"] == "get_product_details":
                 inspected.add(step["product"]["id"])
     if searched:
-        activity.append({"id": "search", "label": f"Search returned {len(searched)} {'local catalogue' if s.search_provider == 'catalogue' else 'saved listing' if s.search_replay else 'web listing'} offers", "state": "completed", "evidence": sorted(searched)})
+        label = (f"Rechecked {len(searched)} web listing offers from your last search" if reused else
+                 f"Search returned {len(searched)} {'local catalogue' if s.search_provider == 'catalogue' else 'saved listing' if s.search_replay else 'web listing'} offers")
+        activity.append({"id": "search", "label": label, "state": "completed", "evidence": sorted(searched)})
     if inspected:
         activity.append({"id": "inspection", "label": f"Inspected {len(inspected)} product records", "state": "completed", "evidence": sorted(inspected)})
     activity.append({"id": "policy", "label": f"Checked selected offer: {a.decision}", "state": "completed", "evidence": [a.product.id]})

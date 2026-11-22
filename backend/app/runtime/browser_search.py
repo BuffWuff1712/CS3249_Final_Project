@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 from uuid import UUID
 import httpx
 from pydantic import field_validator, model_validator
+from .sites import live_site_for
 from .schemas import Model, Field, Product, Merchant, Event, WebEvidence, LocalEvidence, now
 from .gateway import LLMError
 from .search_errors import SearchProviderError, provider_reason
@@ -356,7 +357,8 @@ def discover(session, query):
         m = Merchant(id=mid, name=f"{seller} ({host})" if seller else host, website="https://" + host,
                      description="Live listing source. Merchant policies and identity have not been verified.",
                      payment_methods=["Demo Visa", "Demo Wallet"], return_policy="Unknown; check the source listing.",
-                     contact="", review_count=0, verified_business=False, requested_information=[])
+                     contact="", review_count=0, verified_business=False, requested_information=[],
+                     site=live_site_for("https://" + host))
         session.live_products[pid] = p
         session.live_merchants[mid] = m
         ids.append(pid)

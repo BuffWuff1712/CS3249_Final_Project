@@ -9,6 +9,7 @@ import time
 from threading import Lock
 from urllib.parse import urlparse
 import httpx
+from .sites import live_site_for
 from .schemas import Product, Merchant, Event, WebEvidence, now
 from .search_errors import SearchProviderError
 from .progress import cancellable_call, check_cancelled
@@ -251,7 +252,8 @@ def normalize(row):
                 web_evidence=WebEvidence(return_policy_url=seller_policy_links(seller).get("refund_policy", "")))
             m=Merchant(id=mid,name=seller["name"],website=site,description="Seller identity and policies need review.",
                 payment_methods=["Demo Visa","Demo Wallet"],return_policy="Unknown; check the merchant.",
-                contact="",review_count=0,verified_business=False,requested_information=[])
+                contact="",review_count=0,verified_business=False,requested_information=[],
+                site=live_site_for(site))
             products.append((p,m))
         except (ValueError,TypeError,KeyError,AttributeError):
             continue

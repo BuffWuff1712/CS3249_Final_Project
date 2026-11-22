@@ -88,6 +88,8 @@ export type Product = {
   image_url?: string;
   image_alt?: string;
   source?: "catalogue" | "browser_use" | "shopify_catalog";
+  // Live listings only: the backend's check that the listing is the requested product family.
+  relevance?: "match" | "mismatch" | "unknown";
   source_url?: string;
   observed_at?: string;
   web_evidence?: WebEvidence | null;
@@ -119,7 +121,10 @@ export type Action = {
   rules: { rule_id: string; decision: string; explanation: string }[];
   payment_method: string;
   shares_personal_data: boolean;
+  // Backend verdict per requested feature; absent on older saved proposals.
+  feature_fit?: FeatureFit[];
 };
+export type FeatureFit = { feature: string; status: "met" | "absent" | "unstated" | "unknown"; quote: string };
 export type Session = {
   search_provider: "catalogue" | "browser_use" | "shopify_catalog" | "hybrid";
   search_replay?: string;
