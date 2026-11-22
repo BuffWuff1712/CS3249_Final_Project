@@ -1,86 +1,235 @@
-# Beany — Conversational Shopping User Interface
+# Beany: a conversational shopping agent you stay in control of
 
-Beany is a Conversational User Interface designed for agentic shopping and commerce built with Next.js and FastAPI.
+**CS3249 Final Project · Group 2** · Bhavina Sathish Kumar, Goel Arnav, Low Bing Heng, Yuan Weitu
 
-An LLM model interprets conversations; Python controls permissions, product search, policy decisions and simulated checkout. Every product and merchant is fictional. No payment or real shopping service is connected.
+## Core task
 
-## Current CUI demo
+Beany is a conversational user interface (CUI) for agentic shopping. A shopper describes what they want in plain English, even vaguely ("I need headphones for my commute"). Beany then:
 
-Open **http://localhost:3000/shop** for the PRD v2 experience: headphones and running shoes, a compact editable needs summary, personalised comparative reasoning, optional source evidence, priority correction, exact-product seller changes, visible payment cautions and explicit offer selection. You can finish without opening evidence or entering checkout. All records are fictional.
+1. **Clarifies purchase intent.** It asks one concise question about anything still missing (product type, budget, must-have features) and keeps an editable needs summary that the user can correct at any time.
+2. **Finds and compares products.** It searches live product sources, checks each listing against the user's stated needs, and presents one recommended match plus up to two alternatives, explaining how each one fits.
+3. **Surfaces merchant risk.** It checks each seller for scam signals (unusual or off-site payment, missing business details, lookalike branding, misleading returns, prompt injection on the page) and labels every offer ALLOW, REVIEW or BLOCK, with the quoted evidence.
+4. **Leaves the decision to the user.** Nothing is bought until the user explicitly selects an offer. Checkout is **simulated**: no real payment, order or personal data is ever involved.
 
-This route runs entirely in the frontend with a bounded deterministic interpreter and the versioned `beany-cui-v3.0` fixtures in `frontend/src/lib/shoppingFixtures.ts`. No backend or API credentials are required. Run `npm install`, `npm run build` and `npm run start` from `frontend`, then open `/shop`; for development use `npm run dev`. It is a working interaction prototype, not open-ended LLM conversation or live web research.
+The interface has two panes: the conversation on the left, and the current match, needs summary and evidence on the right.
 
-Needs, the last request and any selected offer are stored in this browser. Refresh rechecks the offer against the current fixture and needs. Editing needs clears selection; `Start fresh` clears only this CUI decision. Storage failures are visible. Unsupported categories and USD requests ask for clarification, and budgets never silently increase.
+## For graders: how to try Beany
 
-The `/` route remains the classic backend-connected simulation described below. Its SQLite sessions, research exports, cart and receipts are independent of `/shop`.
+| Option | What you need | What you get |
+|---|---|---|
+| **A. Hosted version (recommended)** | A browser | The full system as submitted, running on Google Cloud Run with the real LLM. **Link: [HOSTED_URL, add before submission]** |
+| **B. Local, no keys (offline)** | Python 3.11+, Node 20.9+ | The full interface and backend, with recorded product listings and a keyword-based stand-in for the LLM. Good for checking setup, the UI, risk flags and the selection flow. Conversation quality is limited. |
+| **C. Local, with the real LLM** | Option B plus an OpenAI-compatible API key | The full conversational behaviour. Uses the recorded listings, or live search if you also add a Browser Use key. |
 
-Blocked seller offers use a prominent red flag with the affected seller/price, evidence, consequence and an action to select the recommended alternative. Missing information remains a separate caution; colour never substitutes for the reason or next action.
+No accounts or personal data are needed for any option. All test data ships in this repository (`backend/data/`).
 
-## Requirements
+### Option A: using the hosted version
 
-Python 3.11+, Node.js 20.9+ (Node 22 recommended), npm. Run one backend worker for local studies.
+- Open the link above. If nobody has used it for a while, the first page load can take 10–20 seconds while Google Cloud Run starts the service.
+- The hosted version uses **[recorded listings / live web search: confirm before submission]**. With live web search, one search can take 1–5 minutes; the progress panel shows what Beany is doing while you wait.
+- Sessions are kept only while the service is running and may be cleared when it restarts. This is expected: everything is a demo, and checkout is simulated.
+- If the link is unavailable, please contact us ([TEAM_EMAIL]) and we will restart it or arrange a short online session.
 
-## Windows (PowerShell)
+### Option B: run locally with no API keys
+
+macOS / Linux:
+
+```sh
+# Terminal 1: backend
+cd backend
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+cp .env.example .env
+# Then edit backend/.env and set these four lines:
+#   BEANY_LLM_MODE=mock
+#   BEANY_SEARCH_PROVIDER=browser_use
+#   BROWSER_USE_REPLAY=data/replay/study_listings.json
+#   BEANY_RISK_DETECTION=rules
+.venv/bin/python -m uvicorn app.main:app --port 8000
+
+# Terminal 2: frontend
+cd frontend
+npm install
+npm run dev
+```
+
+Windows (PowerShell):
 
 ```powershell
 cd backend
 py -3 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 Copy-Item .env.example .env
-# Edit .env locally; do not paste your key into chat or frontend files.
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
-```
+# Edit backend\.env as above, then:
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --port 8000
 
-If your existing virtual environment was created with uv and has no pip, use `uv pip install --python .venv/Scripts/python.exe -r requirements.txt` instead.
-
-In another terminal:
-
-```powershell
+# In a second terminal:
 cd frontend
 npm install
 npm run dev
 ```
 
-## macOS / Linux
+Open **http://localhost:3000**. Backend API docs are at http://localhost:8000/docs.
+
+The recorded listings (`backend/data/replay/study_listings.json`) cover **headphones, backpacks and running shoes**, with a deliberate mix of trustworthy and risky sellers. In mock mode, include the product, budget and feature in one message, for example:
+
+- `I want wireless headphones under 300 SGD with noise cancelling`
+- `I need a lightweight backpack under 80 SGD`
+- `Running shoes under 150 SGD, size 42, with cushioning`
+
+Leave out a detail (for example `I need a backpack under 80 SGD`) to see Beany ask a clarifying question first. Then inspect the current match, open the seller evidence, use **Find another seller** or **Find another product**, and select an offer to finish the simulated decision. Some replayed sellers trigger REVIEW or BLOCK so that you can see the risk flags.
+
+### Option C: run locally with the real LLM
+
+Follow Option B, but in `backend/.env` set `BEANY_LLM_MODE=openai` and fill in:
+
+```
+OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1   # or any OpenAI-compatible endpoint
+OPENAI_API_KEY=<your key>
+OPENAI_MODEL=qwen3.6:35b                                  # the model we used
+OPENAI_API_MODE=responses
+OPENAI_STRUCTURED_MODE=schema
+```
+
+DeepSeek also works: `OPENAI_BASE_URL=https://api.deepseek.com/v1`, `OPENAI_API_MODE=chat`, `OPENAI_STRUCTURED_MODE=json` and a model listed by `python -m app.check_gateway`. Run `python -m app.check_gateway --generate` from `backend/` to test the connection.
+
+For **live web search** instead of recorded listings, leave `BROWSER_USE_REPLAY` empty, set `BEANY_SEARCH_PROVIDER=hybrid` and add a `BROWSER_USE_API_KEY` plus `BROWSER_USE_ALLOWED_DOMAINS` (for example `amazon.sg,qoo10.sg`). Shopify Global Catalog needs no key. Live search is paid per run (capped by `BROWSER_USE_MAX_COST_USD`) and takes 1–4 minutes per search.
+
+After changing `.env`, restart the backend and click **Start fresh** in the interface, because each session keeps the search provider it started with.
+
+## Deploying to Google Cloud Run (how the hosted version runs)
+
+The hosted version runs as two Cloud Run services built from this repository: `beany-backend` (FastAPI) and `beany-frontend` (Next.js). The browser calls the backend directly, so the frontend needs the backend's URL at build time, and the backend needs the frontend's URL for CORS. API keys are stored in Google Secret Manager, never in the repository.
+
+**Prerequisites:** a Google Cloud project with billing enabled (light use stays within Cloud Run's free tier; set a budget alert anyway), and the [gcloud CLI](https://cloud.google.com/sdk/docs/install).
+
+**1. Set up the project (once).**
 
 ```sh
-cd backend
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-cp .env.example .env
-# Edit .env before launching.
-.venv/bin/python -m uvicorn app.main:app --reload --port 8000
-# Separate terminal:
-cd frontend
-npm install
-npm run dev
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com
+
+# Store keys as secrets (paste the key, then press Ctrl-D)
+gcloud secrets create openai-api-key --data-file=-
+gcloud secrets create browser-use-api-key --data-file=-      # only for live web search
+
+# Let Cloud Run read the secrets
+PROJECT_NUMBER=$(gcloud projects describe $(gcloud config get-value project) --format='value(projectNumber)')
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
 ```
 
-Open http://localhost:3000. Backend API docs: http://localhost:8000/docs.
+**2. Deploy the backend.** Run from the repository root:
 
-## NUS SoCLaaS configuration
+```sh
+gcloud run deploy beany-backend --source backend --region asia-southeast1 \
+  --allow-unauthenticated --timeout 3600 --max-instances 1 --memory 1Gi \
+  --set-secrets OPENAI_API_KEY=openai-api-key:latest \
+  --set-env-vars "BEANY_LLM_MODE=openai,OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1,OPENAI_MODEL=qwen3.6:35b,OPENAI_API_MODE=responses,OPENAI_STRUCTURED_MODE=schema,OPENAI_TIMEOUT_SECONDS=200,BEANY_DB=/tmp/beany.sqlite3,BEANY_SEARCH_PROVIDER=browser_use,BROWSER_USE_REPLAY=data/replay/study_listings.json"
+```
 
-Configure `backend/.env` using `backend/.env.example`. Obtain your NUS SoCLaaS API credentials through your course/project access; keep them on the backend. Set `OPENAI_API_KEY`, `OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1`, and an available `OPENAI_MODEL`. The project owner's selected model is `qwen3.6:35b`. No model or provider is hardcoded in application logic.
+This uses the recorded listings. For **live web search**, add `BROWSER_USE_API_KEY=browser-use-api-key:latest` to `--set-secrets` (comma-separated), and replace the `--set-env-vars` value with the version below. It starts with `^@^` because the domain list contains commas, so the variables are separated by `@` instead:
 
-Responses is the default API mode; Chat Completions is an explicit compatible adapter. The selected NUS model passed endpoint probes, but full-schema responses require explicit JSON instructions plus Pydantic validation; accepting a schema parameter does not prove constrained decoding. See [configuration guide](docs/configuration-guide.md) for exact settings, empirical compatibility results, model listing and connectivity commands.
+```sh
+  --set-env-vars "^@^BEANY_LLM_MODE=openai@OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1@OPENAI_MODEL=qwen3.6:35b@OPENAI_API_MODE=responses@OPENAI_STRUCTURED_MODE=schema@OPENAI_TIMEOUT_SECONDS=200@BEANY_DB=/tmp/beany.sqlite3@BEANY_SEARCH_PROVIDER=hybrid@BROWSER_USE_ALLOWED_DOMAINS=amazon.sg,qoo10.sg@BROWSER_USE_TIMEOUT_SECONDS=600@BROWSER_USE_MAX_COST_USD=1"
+```
 
-Any OpenAI-compatible HTTPS endpoint works through the same settings. For DeepSeek, use `OPENAI_BASE_URL=https://api.deepseek.com/v1`, `OPENAI_API_MODE=chat`, `OPENAI_STRUCTURED_MODE=json`, a blank `OPENAI_REASONING_EFFORT`, and a model listed by `python -m app.check_gateway` (`deepseek-flash` was used for testing). `backend/.env.example` shows both setups. Run `python -m app.check_gateway --generate` from `backend/` before starting the app; it consumes a small amount of credit.
+Why these settings:
+- `--timeout 3600` lets a long live search (several minutes) finish. The progress stream also sends a heartbeat every 5 seconds, so the connection never looks idle.
+- `--max-instances 1` keeps every session on one instance, because sessions are stored in a single SQLite file.
+- `BEANY_DB=/tmp/...` puts the database on the container's temporary disk. It is cleared on restart, which is acceptable for a demo.
+- Scaling to zero when idle keeps the cost at or near $0. Add `--min-instances 1` to avoid cold starts, which costs a small amount to keep one instance running.
 
-For offline testing set `BEANY_LLM_MODE=mock`. This mode is visibly labelled and is not a substitute for real conversational evaluation. Missing credentials never silently activate it. The API key must never appear in frontend variables or Git. Only recent conversation and observable catalogue/merchant/risk data are sent to the configured model; hidden ground truth is never included.
+Then check that the backend can reach the model:
 
-## Using Beany
+```sh
+BACKEND_URL=$(gcloud run services describe beany-backend --region asia-southeast1 --format='value(status.url)')
+curl "$BACKEND_URL/health"
+```
 
-Start with a prompt or free text. Vague requests can trigger a clarification; specific requests search immediately. The brief records confirmed, suggested and unspecified values. Edit/remove preferences directly. Currency accepts SGD/USD; category accepts Running shoes, Headphones, Backpacks; list fields use commas. A hard budget is never bypassed by approval.
+**3. Deploy the frontend with the backend's URL.** Next.js reads `.env.production` at build time:
 
-Permissions in the classic interface are changed explicitly through their own form. Missing budgets and unverified fictional merchants require review by default. Even ALLOW proposals wait for explicit checkout; adding an item to the cart is not approval.
+```sh
+echo "NEXT_PUBLIC_API_URL=$BACKEND_URL" > frontend/.env.production
+gcloud run deploy beany-frontend --source frontend --region asia-southeast1 \
+  --allow-unauthenticated --memory 1Gi
+```
 
-Any classic brief/permission edit supersedes pending proposals. Ask for options again to search with the new state. Approvals bind to a proposal ID and a hash of its complete product/payment/data-sharing details. Reject, request an alternative, refine through chat, or cancel. Receipts and state survive refresh/restart. A fresh classic session retains prior server sessions; export study logs before any explicit deletion.
+**4. Allow the frontend to call the backend (CORS).**
+
+```sh
+FRONTEND_URL=$(gcloud run services describe beany-frontend --region asia-southeast1 --format='value(status.url)')
+gcloud run services update beany-backend --region asia-southeast1 --update-env-vars FRONTEND_ORIGIN=$FRONTEND_URL
+```
+
+Open `$FRONTEND_URL`. This is the hosted link to put at the top of this README.
+
+**Updating after a code change:** rerun step 2 (backend) or step 3 (frontend). A redeploy restarts the service and clears sessions, so avoid redeploying while graders are testing.
+
+**Logs:** `gcloud run services logs read beany-backend --region asia-southeast1` shows the backend's timing and diagnostic lines (see "Diagnosing slow shopping requests" below).
+
+## Models, APIs and services
+
+| Service | Used for | Key needed |
+|---|---|---|
+| OpenAI-compatible LLM. We used **NUS SoCLaaS with `qwen3.6:35b`**; DeepSeek was also tested. | Interpreting each turn (intent and preference extraction), grounded feature checks, merchant-risk review and explanations | Yes (not for mock mode) |
+| **Shopify Global Catalog** via the Model Context Protocol (MCP), read-only | Structured live product discovery | No (anonymous) |
+| **Browser Use Cloud** | A browser agent that reads listings, seller and return-policy pages on allowlisted retailers | Yes (not for replay mode) |
+| SQLite (local file) | Sessions, conversations, cart and simulated receipts | No |
+
+Stack: **Next.js 15 / React 19** frontend, **FastAPI / Pydantic** backend, Python 3.11+.
+
+## How to use Beany
+
+- Start with a request in your own words. Vague requests trigger one clarifying question; specific ones search straight away. Saying "not sure" or "no preference" lets Beany continue without that constraint.
+- The **needs summary** shows each value as confirmed, suggested or unspecified. Edit or remove values directly, or say what changed in chat ("actually, comfort matters more than noise cancelling").
+- Each offer card shows **How this matches your needs** (each feature is met, absent or not stated in the listing), price, product and seller evidence, website reputation, and any risk flag.
+- Ask questions about the results ("why this one?", "what's the return policy?"). Beany answers from the captured evidence only.
+- Off-topic chat gets a brief natural reply and a gentle offer to return to shopping. A failed search is reported as unavailable, never as "no matches".
+- Nothing is bought without your explicit selection, and checkout is always simulated. Blocked offers cannot be selected.
+
+## Where the main code is
+
+| Component | Location |
+|---|---|
+| Conversation prompt (Beany's voice, intents, extraction rules) | `backend/config/prompts/dialogue.txt` |
+| LLM interpretation and structured-output gateway | `backend/app/runtime/llm.py`, `backend/app/runtime/gateway.py` |
+| Turn handling and orchestration | `backend/app/runtime/service.py`, `backend/app/shop.py` (API for the two-pane UI), `backend/app/main.py` |
+| Preference grounding and clarification | `backend/app/runtime/preferences.py`, `backend/app/runtime/clarification.py` |
+| Search workflow, shortlist and ranking | `backend/app/runtime/shopping_workflow.py`, `backend/app/runtime/shopping_tools.py`, `backend/app/runtime/discovery.py` |
+| Product sources | `backend/app/runtime/shopify_catalog.py` (MCP), `backend/app/runtime/browser_search.py` (Browser Use and replay) |
+| Feature verification | `backend/app/runtime/feature_match.py`, `backend/app/runtime/feature_check.py` |
+| Merchant-risk review and scoring | `backend/app/runtime/risk_agent.py`, `backend/app/runtime/merchant_risk.py`, `backend/config/merchant_risk_rules.json`, `backend/app/runtime/sites.py` |
+| Policy, approvals and simulated checkout | `backend/app/runtime/policy.py`, `backend/config/policy.json`, `backend/app/runtime/cart.py` |
+| Frontend (two-pane workspace) | `frontend/src/components/shopping/ShoppingWorkspace.tsx` and the rest of `frontend/src/components/shopping/`; API client `frontend/src/lib/shopBackend.ts` |
+| Test data | `backend/data/` (replay listings, fictional catalogue, merchants, scenarios, site reputation registries) |
+| Tests | `backend/tests/` (pytest), `frontend/tests/` (Playwright) |
+
+## What is new: technical challenges and our solutions
+
+The central design idea is that **the LLM interprets the conversation, while deterministic Python code controls search, permissions, policy decisions and checkout**. A prompt is a request, not a guarantee, so every rule that must hold is enforced in code around the model. Each item below is marked in the code with a comment starting with `INNOVATION` (search the repository for `INNOVATION:`).
+
+1. **Quote-grounded preference extraction.** *Challenge:* LLMs invent or misattribute preferences, so the agent ends up shopping for something the user never asked for. *Solution:* a preference is saved as confirmed only if the model quotes the user's own words, and Python checks that the quote exists before it touches the brief. Ungrounded extractions are sent back to the model once as validation feedback. Assumptions can only be saved as "suggested". → `preferences.py` (`grounded_change`), `clarification.py` (`extraction_issues`)
+
+2. **Conversation is evidence, not permission.** *Challenge:* a chat agent tends to search as soon as a brief looks complete, or to treat "not sure" as an answer to a question it never asked. *Solution:* Python tracks which of product type, budget and features were asked and answered. A search runs only when the user requested one and the asked fields are resolved. → `clarification.py` (`clarify_before_search`)
+
+3. **Two-stage feature verification for live listings.** *Challenge:* retailers describe the same feature in many different ways, and an LLM can claim a feature the listing never mentions. *Solution:* deterministic concept and word-stem rules confirm most features cheaply. Must-have features the rules cannot confirm go to one batched LLM check, whose verdict (met, absent or unstated) must quote the listing. An absent feature excludes the listing, an unstated one keeps it with a review note, and the check fails closed if the model is unavailable. → `feature_match.py` (`met`), `feature_check.py` (`ensure`)
+
+4. **Grounded merchant-risk review of untrusted web content.** *Challenge:* listing pages may contain scams or prompt-injection text aimed at shopping agents. *Solution:* the LLM reviewer may only report findings it can quote verbatim from the captured page, and text addressed to AI assistants is itself a finding. Fixed weights, not the model, turn findings into ALLOW, REVIEW or BLOCK. External payment requests and injection always block, and live listings never fall below REVIEW. → `risk_agent.py` (`grounded`), `merchant_risk.py`, `config/merchant_risk_rules.json`
+
+5. **Approval bound to exactly what the user saw.** *Challenge:* a listing, price or brief can change between recommendation and checkout. *Solution:* each proposal is hashed over its product, merchant, risk rules, payment and data-sharing details, and checkout compares that hash, so any change invalidates earlier approval. → `policy.py` (`fingerprint`), `cart.py`
+
+6. **Bounded hybrid shortlist and search reuse.** *Challenge:* live browsing is slow and paid, and comparing every listing is not feasible. *Solution:* results from Shopify (MCP) and Browser Use are ranked, deduplicated and inspected up to a fixed budget (6), stopping at three distinct eligible products. Brief edits that can only narrow the results recheck the listings already found instead of running a new search. → `shopping_tools.py` (`screen_candidates`), `discovery.py` (`reusable`)
+
+7. **Two-pane, inspectable interface.** The conversation scrolls on the left, while the current match, the editable needs summary, per-feature fit, seller evidence and risk flags stay visible on the right. This makes the agent's interpretation and reasoning inspectable and correctable at any point. → `frontend/src/components/shopping/`
 
 ## Tests
 
-```powershell
+```sh
 cd backend
-.\.venv\Scripts\python.exe -m pytest -q
+.venv/bin/python -m pytest -q          # 1,084 tests, offline: no paid calls
 cd ../frontend
 npm run typecheck
 npm run build
@@ -88,36 +237,36 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-On macOS/Linux use `.venv/bin/python`. Playwright starts isolated servers at 3100/8100 with an explicit mock LLM and test SQLite file. It exercises desktop and mobile layouts, approval/receipt persistence, cancellation, hard blocking and exports.
+Pytest never reads your `backend/.env`. `backend/tests/conftest.py` forces mock mode, blank keys and a temporary database, so the test suite cannot trigger paid model or Browser Use calls.
 
-Pytest never uses your `backend/.env`: `backend/tests/conftest.py` pins mock mode, catalogue search, blank API keys and a temporary database before the app is imported, so a live configuration cannot trigger paid model or Browser Use calls from the test suite.
+## Study tools (optional)
 
-Your original learning modules (`workflow.py`, `review.py`, `checkout.py`, `shopping_service.py`, etc.) remain intact as optional exercises. The integrated `app.main` does **not** import LangGraph. `legacy_main.py` preserves the earlier scripted API for regression tests only. To run LangGraph exercises/tests, install `requirements-legacy.txt`; those tests skip when LangGraph is absent. Do not expose the legacy app as the participant backend.
-
-## Study sessions
-
-Open http://localhost:3000/research and enter the backend researcher key. Start a fresh scenario participant, open the participant interface, and trigger a predefined condition if applicable. Triggering a condition proposes a fixture product; it does not script the conversation. Refresh study results and export anonymous CSV.
-
-## Editing and architecture
-
-- Conversation instructions: `backend/config/prompts/dialogue.txt`
-- Policy thresholds: `backend/config/policy.json`; rule logic: `backend/app/runtime/policy.py`
-- Products: `backend/data/products/catalogue.json`
-- Merchants: `backend/data/merchants/merchants.json`; website reputation registries in `backend/app/runtime/sites.py`: `backend/data/sites/site_registry.json` (fictional local sites, exact host) and `backend/data/sites/live_site_registry.json` (live retailers, host or subdomain)
-- Scenarios: `backend/data/scenarios/scenarios.json`
-- UI: `frontend/src/app/page.tsx`, `frontend/src/components/Brief.tsx`, `frontend/src/app/globals.css`
-- Backend state/orchestration: `backend/app/runtime/`
-- Browser Use task and captured evidence fields: `backend/app/runtime/browser_search.py`, `backend/app/runtime/schemas.py` (`WebEvidence`)
-- Live-listing risk review prompt and grounding: `backend/app/runtime/risk_agent.py`; weights and levels: `backend/config/merchant_risk_rules.json`
-- Replay fixture: `backend/data/replay/study_listings.json`, rebuilt by `python -m scripts.build_replay_fixture`
+Open http://localhost:3000/research and enter `BEANY_RESEARCH_KEY` from `backend/.env` to start scenario sessions and export anonymous CSV logs. This is not needed to try the core task.
 
 ## Limits
 
-This is a local, single-worker study application, not an internet deployment. Session UUIDs act as local access tokens; there is no participant account authentication. The researcher key protects study controls, not a production research-data security perimeter. SQLite stores raw conversation and model interpretations locally; anonymous CSV deliberately omits that free text. Researchers must manage consent, retention and local database access. Do not use real personal/payment data.
+- This is a local, single-worker research prototype, not a production deployment. There are no user accounts; session IDs act as local access tokens.
+- LLM extraction is probabilistic. Quote grounding prevents invented preferences but cannot prove semantic correctness, which is why the needs summary is editable.
+- Mock mode uses keyword matching and does not represent the real conversation quality. Use the hosted version or Option C for that.
+- Live search covers only the allowlisted retailers and Shopify's catalogue, and compares a bounded shortlist rather than every listing. Risk signals are indicators, not proof of fraud or safety.
+- All checkout and receipts are simulated. Do not enter real personal or payment data.
 
-LLM extraction remains probabilistic. Confirmed changes need a supporting quote and pass deterministic field validation; quote matching cannot prove semantic correctness. The editable brief and receipts make interpretation inspectable. Unknown free-text requirements require review. Catalogue search uses deterministic keyword/brand matching, not semantic retrieval; live listings use tolerant feature matching with an LLM check (see "Open-ended live product search"). USD requests may have no matches because the seeded catalogue uses SGD. Prices use fixed catalogue decimals; no real financial processing occurs.
+---
 
-Live endpoint probes and synthetic shopping turns were exercised against the selected NUS model. Broader conversational quality still requires human-reviewed evaluations. Automated tests validate deterministic behaviour and gateway contracts. LangGraph, RAG and real checkout are absent from the integrated runtime. MCP is used only for read-only Shopify Global Catalog discovery; website automation uses read-only Browser Use.
+# Technical reference
+
+The sections below document configuration and behaviour in more detail. For every setting, see [docs/configuration-guide.md](docs/configuration-guide.md) and [docs/browser-use-search.md](docs/browser-use-search.md).
+
+Editable configuration:
+
+- Conversation instructions: `backend/config/prompts/dialogue.txt`
+- Policy thresholds: `backend/config/policy.json`; rule logic: `backend/app/runtime/policy.py`
+- Fictional products and merchants: `backend/data/products/catalogue.json`, `backend/data/merchants/merchants.json`
+- Website reputation registries: `backend/data/sites/site_registry.json` (fictional sites) and `backend/data/sites/live_site_registry.json` (live retailers)
+- Scenarios: `backend/data/scenarios/scenarios.json`
+- Replay fixture: `backend/data/replay/study_listings.json`, rebuilt by `python -m scripts.build_replay_fixture`
+
+The older learning modules (`workflow.py`, `review.py`, `checkout.py`, `shopping_service.py`, `legacy_main.py`) are kept only as exercises and regression references. The integrated app (`app.main`) does not import LangGraph, and `legacy_main.py` must not be used as the participant backend.
 
 ## Merchant-risk extension
 
