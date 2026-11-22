@@ -326,7 +326,9 @@ def discover(session, query):
         run_id, output = replay_task(session.search_replay, brief, query)
         hosts = replay_hosts(session.search_replay)
     else:
-        run_id, output = run_task(brief, query)
+        from .progress import step
+        with step("Checking seller trust signals on non-Shopify retailers (this can take up to 2 minutes)..."):
+            run_id, output = run_task(brief, query)
         hosts = domains()
     ids = []
     captured = now()
@@ -349,7 +351,7 @@ def discover(session, query):
                     product_rating_text=row.product_rating, seller_rating_text=row.seller_rating or evidence.seller.rating,
                     rating=rating, rating_count=rating_count, review_excerpts=row.review_excerpts,
                     policy_links={"refund_policy": evidence.return_policy_url} if evidence.return_policy_url else {},
-                    source="browser_use", source_url=row.url, observed_at=captured,
+                    source="browser_use", evidence_depth="deep", source_url=row.url, observed_at=captured,
                     web_evidence=evidence)
         # Demo payment fields describe Beany's simulation, not real retailer acceptance.
         # Observed seller and policy details live on the product snapshot, so this record stays stable.

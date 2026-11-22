@@ -242,7 +242,7 @@ def normalize(row):
             img,alt=select_image(variant,row)
             p=Product(image_url=img,image_alt=alt,id=pid,name=product_title(row["title"], variant.get("title")),
                 category=category,brand="",price=amount/100,currency=price["currency"],merchant=seller["name"],merchant_id=mid,
-                source="shopify_catalog",source_url=url,observed_at=now(),stock=available,trust="unverified",
+                source="shopify_catalog",evidence_depth="catalog",source_url=url,observed_at=now(),stock=available,trust="unverified",
                 attributes=[],sizes=sizes,description=text,inferred_attributes=inferred,
                 selling_points=summaries(metadata.get("unique_selling_points")),
                 policy_links=seller_policy_links(seller), list_price=original_price,

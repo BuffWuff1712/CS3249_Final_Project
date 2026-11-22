@@ -88,6 +88,7 @@ export type Product = {
   image_url?: string;
   image_alt?: string;
   source?: "catalogue" | "browser_use" | "shopify_catalog";
+  evidence_depth?: "catalog" | "deep" | null;
   source_url?: string;
   observed_at?: string;
   web_evidence?: WebEvidence | null;
