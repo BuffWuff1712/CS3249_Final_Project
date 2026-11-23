@@ -42,10 +42,27 @@ def model_key(product):
     return hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
 
 
-def current_candidates(s):
+def shortlist(s):
+    """The screened shortlist (at most recommendation_limit models) that is still eligible."""
     from .shopping_tools import recommendation_limit
     eligible = {p.id: p for p in policy.search(s, limit=None)}
     return [eligible[p.id] for p in s.recommendations if p.id in eligible][:recommendation_limit()]
+
+
+def current_candidates(s):
+    """The shortlist plus every other eligible catalogue seller of a shortlisted model.
+
+    Screening keeps one seller per model, so without this a catalogue model sold by several
+    merchants could never be compared across sellers. Live listings stay limited to the
+    shortlist: only screened listings have a relevance check and risk review."""
+    from .shopping_tools import recommendation_limit
+    shortlisted = shortlist(s)
+    keys = {model_key(p) for p in s.recommendations[:recommendation_limit()] if p.source == "catalogue"}
+    if not keys:
+        return shortlisted
+    ids = {p.id for p in shortlisted}
+    return shortlisted + [p for p in policy.search(s, limit=None)
+                          if p.source == "catalogue" and p.id not in ids and model_key(p) in keys]
 
 
 def preview(s):
@@ -246,7 +263,7 @@ def different_model(s, models, current):
     if current:
         service.event(s, "alternative", current.id)
     start = len(s.messages)
-    service.propose(s, candidate, recommendations=current_candidates(s))
+    service.propose(s, candidate, recommendations=shortlist(s))
     del s.messages[start:]
     action = s.proposals[-1]
     lines = ["A different model to review:" if fresh else f"You have now seen all {len(others) + bool(current)} matching models, so this starts again from the first:",
@@ -362,7 +379,8 @@ def propose(s, product_id):
     clear_selection(s)
     events, proposals = len(s.events), len(s.proposals)
     start = len(s.messages)
-    service.propose(s, p, recommendations=candidates)
+    # Keep the screened shortlist; another seller of a shortlisted model stays reachable through it.
+    service.propose(s, p, recommendations=shortlist(s))
     merge_reply(s, start)
     record(s, events, proposals)
 
@@ -462,7 +480,9 @@ def permissions(s, value):
     events, proposals = len(s.events), len(s.proposals)
     start = len(s.messages)
     service.message(s, note)
-    service.propose(s, product, recommendations=candidates)
+    kept = shortlist(s)
+    # A seller that replaced a now-restricted one keeps its model in the shortlist.
+    service.propose(s, product, recommendations=kept if product.id in {p.id for p in kept} else kept + [product])
     merge_reply(s, start)
     s.messages[-1].text += " Cart items retain their original needs and use current permissions at checkout."
     record(s, events, proposals)

@@ -204,7 +204,10 @@ def stream_mutation(sid, body, work):
             publish({"type": "result", "view": result})
         except RequestStopped as exc:
             publish({"type": "error", "message": str(exc)})
-        except (ValueError, LookupError, LLMError) as exc:
+        except (ValueError, LookupError) as exc:
+            # A refused action raises before the session is saved: the state is unchanged.
+            publish({"type": "error", "message": str(exc), "rejected": True})
+        except LLMError as exc:
             publish({"type": "error", "message": str(exc)})
         except Exception:
             logging.getLogger(__name__).exception("Shopping stream failed")

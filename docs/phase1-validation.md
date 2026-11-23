@@ -101,5 +101,7 @@ partial-failure behavior before selecting a batch size. Phase 1 still assesses s
 latency can remain substantial. Hybrid discovery still queries both configured providers once.
 The shortlist is the best within the bounded screened set, not the global best across all inventory.
 Trade-off ranking uses grounded feature matches and information completeness; cross-provider model
-identity is not always known, so some near-duplicates can remain. Seller browsing is now limited to
-the screened shortlist rather than exposing unscreened inventory.
+identity is not always known, so some near-duplicates can remain. Model browsing is limited to the
+screened shortlist rather than exposing unscreened inventory. For catalogue products, seller browsing
+also lists the other eligible sellers of each shortlisted model; live listings stay limited to the
+screened shortlist.

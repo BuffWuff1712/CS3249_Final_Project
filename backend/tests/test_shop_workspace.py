@@ -170,7 +170,8 @@ def test_history_is_backend_activity_not_fixed_frontend_counts():
     assert row["message_index"] == len(view["session"]["messages"]) - 1
     activity = {step["id"]: step for step in row["activity"]}
     assert len(activity["search"]["evidence"]) >= len(view["offers"])
-    assert len(activity["inspection"]["evidence"]) >= len(view["offers"])
+    # Every model shown was inspected; extra catalogue sellers of those models are not re-inspected.
+    assert len(activity["inspection"]["evidence"]) >= len({offer["model_key"] for offer in view["offers"]})
     assert all(step["state"] == "completed" for step in activity.values())
     explained = change(view, "messages", {"text": "Explain this offer"})
     assert explained["history"] == view["history"]
@@ -215,7 +216,11 @@ def test_ai_preview_uses_cached_review_or_honest_rules_fallback_without_model_ca
     offers = restored.json()["offers"]
     selected = next(offer for offer in offers if offer["product"]["id"] == view["current"]["product"]["id"])
     assert selected["risk"]["basis"] == "ai"
-    assert all(offer["risk"]["basis"] == "ai" for offer in offers if offer["risk"])
+    # Screened offers use their cached AI review; other catalogue sellers of the same models are
+    # labelled as a rules fallback rather than presented as AI-reviewed.
+    screened = {p["id"] for p in restored.json()["session"]["recommendations"]}
+    assert all(offer["risk"]["basis"] == "ai" for offer in offers if offer["risk"] and offer["product"]["id"] in screened)
+    assert all(offer["risk"]["basis"] in ("ai", "rules_fallback") for offer in offers if offer["risk"])
     assert storage.load(sid).model_dump_json() == before
 
 
@@ -381,6 +386,25 @@ def test_another_seller_walks_every_seller_before_repeating():
     assert "seen all" in view["session"]["messages"][-1]["text"]
 
 
+def test_catalogue_sellers_of_shortlisted_models_can_be_compared():
+    # Screening keeps one seller per model; the other catalogue sellers of those models must
+    # still be listed and reachable, without adding models beyond the shortlist.
+    view = searched()
+    screened = {p["id"] for p in view["session"]["recommendations"]}
+    keys = {o["model_key"] for o in view["offers"] if o["product"]["id"] in screened}
+    assert 1 <= len(keys) <= 3 and {o["model_key"] for o in view["offers"]} == keys
+    multi = [k for k in keys if sum(o["model_key"] == k for o in view["offers"]) > 1]
+    assert multi
+    key = multi[0]
+    if view["current_model_key"] != key:
+        first = next(o for o in view["offers"] if o["model_key"] == key and o["product"]["id"] in screened)
+        view = change(view, "propose", {"product_id": first["product"]["id"]})
+    view = change(view, "seller")
+    assert view["current_model_key"] == key
+    assert view["current"]["product"]["id"] not in screened
+    assert {o["model_key"] for o in view["offers"]} == keys
+
+
 def test_another_product_keeps_other_sellers_available():
     view = searched()
     merchant = view["current"]["product"]["merchant_id"]
@@ -454,3 +478,17 @@ def test_return_preference_uses_listing_terms_before_merchant_terms(monkeypatch)
     monkeypatch.setattr(shop, "propose", capture)
     shop.another_seller(session, "longer returns")
     assert chosen == [candidates[-1]["product"]["id"]]
+
+
+def test_live_listings_keep_seller_comparison_to_the_screened_shortlist(monkeypatch):
+    # Extra sellers are a catalogue-only feature: an unscreened live listing of the same
+    # model must never appear, even when its model key matches a shortlisted one.
+    view = searched()
+    session = storage.load(view["session"]["id"])
+    live = [p.model_copy(update={"source": "browser_use"}) for p in session.recommendations]
+    twin = live[0].model_copy(update={"id": "live-unscreened-twin"})
+    monkeypatch.setattr(policy, "search", lambda *_a, **_k: live + [twin])
+    monkeypatch.setattr(shop, "model_key", lambda p: "same-model")
+    session.recommendations = live
+    assert [p.id for p in shop.current_candidates(session)] == [p.id for p in shop.shortlist(session)]
+    assert "live-unscreened-twin" not in {p.id for p in shop.current_candidates(session)}

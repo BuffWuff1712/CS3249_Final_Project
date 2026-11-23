@@ -36,6 +36,7 @@ function waitForPresentation(ms: number, signal: AbortSignal) {
 
 export function ShoppingWorkspace() {
   const [view, setView] = useState<ShopView | null>(null), [text, setText] = useState(""), [busy, setBusy] = useState(true);
+  const [notice, setNotice] = useState("");
   const [error, setError] = useState(""), [storageNotice, setStorageNotice] = useState(""), [uncertain, setUncertain] = useState(false);
   const [pendingText, setPendingText] = useState(""), [requested, setRequested] = useState<{ field: ShopField }>();
   const [liveSteps, setLiveSteps] = useState<LiveShopActivity[]>([]);
@@ -104,7 +105,7 @@ export function ShoppingWorkspace() {
     const compared = path === "propose" ? before.offers.find(offer => offer.product.id === data.product_id) : undefined;
     const actionText = compared ? `Compare ${productTitle(compared.product)} from ${compared.product.merchant}.` : "";
     let firstActivityAt: number | undefined;
-    setBusy(true); setLiveSteps([]); setError(""); setHistorical(null); setPendingText(submitted || actionText); setRequested(undefined);
+    setBusy(true); setLiveSteps([]); setError(""); setNotice(""); setHistorical(null); setPendingText(submitted || actionText); setRequested(undefined);
     if (submitted) setText("");
     try {
       const body = { ...data, revision: before.revision, request_id: requestId };
@@ -121,8 +122,17 @@ export function ShoppingWorkspace() {
       keep(next); setUncertain(false); return true;
     } catch (error) {
       if (id === generation.current && !abort.signal.aborted) {
-        setError(error instanceof Error ? error.message : "The request failed. Reload the workspace state before trying again.");
-        setUncertain(true); if (submitted) setText(current => current || submitted);
+        if (submitted) setText(current => current || submitted);
+        if (error instanceof ShopRequestError && (error.status === 409 || error.status === 404)) {
+          // The backend refused the action without changing anything: explain it and keep the
+          // controls usable, refreshing to the server's current revision.
+          setNotice(error.message);
+          try { const fresh = await shopRequest(`/${before.session.id}`, "GET", undefined, abort.signal); if (id === generation.current) keep(fresh); }
+          catch { setError("The workspace state could not be refreshed. Reload it before trying again."); setUncertain(true); }
+        } else {
+          setError(error instanceof Error ? error.message : "The request failed. Reload the workspace state before trying again.");
+          setUncertain(true);
+        }
       }
       return false;
     } finally { if (id === generation.current) { activeRequest.current = null; setBusy(false); setPendingText(""); } }
@@ -189,6 +199,7 @@ export function ShoppingWorkspace() {
         <div ref={history} className="cui-chat-scroll" role="region" aria-label="Conversation history" tabIndex={0}>
           {storageNotice && <p className="cui-notice cui-notice--review">{storageNotice}</p>}
           {stopNotice && <p role="status" className="cui-notice">{stopNotice}</p>}
+          {notice && !error && <div role="status" className="cui-input-error cui-action-notice"><p>{notice}</p><p>Nothing was changed. You can keep going.</p><button onClick={() => setNotice("")}>Dismiss</button></div>}
           {error && <div role="alert" className="cui-input-error"><p>{error}</p><p>Your last confirmed server state is shown. Selection and checkout are paused until it is reloaded.</p><button disabled={busy} onClick={() => void load()}>Reload workspace</button></div>}
           <div className="cui-conversation-history">
             {session?.messages.slice(-60).map((message, offset) => {

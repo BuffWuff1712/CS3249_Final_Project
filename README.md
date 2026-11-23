@@ -271,7 +271,7 @@ Each item below is marked in the code with a comment starting with `INNOVATION:`
 
 ```sh
 cd backend
-.venv/bin/python -m pytest -q          # 1,122 tests, offline: no paid calls
+.venv/bin/python -m pytest -q          # 1,124 tests, offline: no paid calls
 cd ../frontend
 npm run typecheck
 npm run build
@@ -541,7 +541,9 @@ Each candidate still uses its own relevance assessment and risk review, with exi
 snapshot-bound caches. A final snapshot check prevents returning changed offers.
 There are no routine ShoppingStep LLM calls. The explanation model and explicit
 approval/simulated-checkout paths remain intact. Workspace comparisons are limited
-to the saved shortlist; they cannot introduce unscreened alternatives.
+to the models in the saved shortlist; they cannot introduce unscreened models. In catalogue mode,
+every other eligible seller of a shortlisted model can also be compared (screening keeps one seller
+per model); live listings stay limited to the screened shortlist.
 
 Offline verification and measurement are described in `docs/phase1-validation.md`.
 To collect live evidence yourself, run the same request in a fresh session and retain

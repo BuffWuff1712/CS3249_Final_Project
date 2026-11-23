@@ -68,7 +68,8 @@ export async function shopStream(path: string, body: unknown, signal: AbortSigna
   function read(line: string) {
     if (!line.trim()) return;
     const event = JSON.parse(line);
-    if (event.type === "error") throw new Error(event.message || "The request could not finish.");
+    // A refused action (409) left the server state unchanged; other errors leave it uncertain.
+    if (event.type === "error") throw event.rejected ? new ShopRequestError(event.message || "That action is not available.", 409) : new Error(event.message || "The request could not finish.");
     if (event.type === "activity") {
       const activity = event.activity;
       if (typeof activity?.id !== "string" || typeof activity.label !== "string" || !["running", "completed", "unavailable"].includes(activity.state) || !Array.isArray(activity.evidence)) throw new Error("Invalid progress update. Reload the workspace.");
