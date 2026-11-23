@@ -23,6 +23,11 @@ service-account*.json
 
 AGENTS.md
 
+# Local Claude Code skills — not for the repo.
+.agents/
+.claude/skills/
+skills-lock.json
+
 # Local session databases, journals, and backups.
 *.db
 *.db-*
