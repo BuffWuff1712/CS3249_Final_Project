@@ -241,3 +241,20 @@ test("selected offer stays above the left composer and finishes a simulated deci
   await expect(page.getByRole("region", { name: "Simulated receipt", exact: true })).toBeVisible();
   await expect(dock).toHaveCount(0);
 });
+
+test("More needs is a keyboard-accessible plus beside the needs heading", async ({ page, request }) => {
+  await openOffer(page, request, () => {});
+  const needs = page.getByRole("region", { name: "Purchase needs", exact: true });
+  const plus = needs.getByRole("button", { name: "More needs", exact: true });
+  await expect(plus).toHaveText("+");
+  const heading = needs.getByRole("heading", { name: "Your purchase intent" });
+  const [buttonBox, headingBox] = await Promise.all([plus.boundingBox(), heading.boundingBox()]);
+  expect(buttonBox!.x).toBeGreaterThan(headingBox!.x);
+  expect(buttonBox!.y).toBeLessThanOrEqual(headingBox!.y);
+  await plus.focus();
+  await page.keyboard.press("Enter");
+  await expect(plus).toHaveAttribute("aria-expanded", "true");
+  await expect(needs.getByLabel("Additional need", { exact: true })).toBeVisible();
+  await needs.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(plus).toHaveAttribute("aria-expanded", "false");
+});

@@ -73,7 +73,11 @@ export function BackendNeedsSummary({ brief, busy, edit, requested, live = false
     </fieldset></form>;
   }
   return <section ref={root} className="cui-needs cui-needs--individual" aria-label="Purchase needs">
-    <h2 aria-label="Your purchase intent">Your needs</h2>
+    <div className="cui-needs-heading"><h2 aria-label="Your purchase intent">Your needs</h2>
+    <div className="cui-more-needs"><button className="cui-add-need" aria-label="More needs" title="More needs" disabled={busy} aria-expanded={!!field && extraFields.includes(field as typeof extraFields[number])} onClick={() => field && !primaryFields.includes(field) ? close() : open("size")}><span aria-hidden="true">+</span></button>
+      {field && !primaryFields.includes(field) && <div className="cui-extra-editor"><label>Additional need<select aria-label="Additional need" disabled={busy} value={field} onChange={event => open(event.target.value as ShopField)}>{extraFields.map(key => <option key={key} value={key}>{key.replaceAll("_", " ")}</option>)}</select></label>{editor()}</div>}
+    </div>
+    </div>
     <dl className="cui-intent-grid">{primaryFields.map(key => <div key={key} className="cui-need-anchor">
       <dt className="sr-only">{labels[key]}</dt><dd><button className={`cui-need-chip ${!brief[key] ? "cui-need-chip--empty" : ""}`} disabled={busy} aria-expanded={field === key} aria-controls={field === key ? "cui-need-editor" : undefined} onClick={() => field === key ? close() : open(key)} aria-label={`Edit ${labels[key].toLowerCase()}: ${brief[key]?.value || "not set"}`}>
         {key === "category" ? brief.category?.value === "Running shoes" ? <SneakerIcon aria-hidden="true" /> : brief.category?.value === "Backpacks" ? <BackpackIcon aria-hidden="true" /> : brief.category?.value === "Headphones" ? <HeadphonesIcon aria-hidden="true" /> : <SlidersHorizontalIcon aria-hidden="true" /> : key === "usage" ? <TrainIcon aria-hidden="true" /> : key === "budget" ? <CoinsIcon aria-hidden="true" /> : <SlidersHorizontalIcon aria-hidden="true" />}
@@ -81,8 +85,6 @@ export function BackendNeedsSummary({ brief, busy, edit, requested, live = false
       </button>{field === key && editor()}</dd><small className="cui-fact-status">{brief[key] && brief[key].source !== "confirmed" ? "Assumption · editable" : ""}</small>
     </div>)}</dl>
     <p className="cui-source cui-currency">{brief.currency ? `Currency: ${brief.currency.value} (${brief.currency.source}).` : "Prices show their currency; no conversion is performed."}{!brief.budget && " No budget is confirmed."}</p>
-    <div className="cui-more-needs"><button className="cui-link-button" disabled={busy} aria-expanded={!!field && extraFields.includes(field as typeof extraFields[number])} onClick={() => field && !primaryFields.includes(field) ? close() : open("size")}>More needs</button>
-      {field && !primaryFields.includes(field) && <div className="cui-extra-editor"><label>Additional need<select disabled={busy} value={field} onChange={event => open(event.target.value as ShopField)}>{extraFields.map(key => <option key={key} value={key}>{key.replaceAll("_", " ")}</option>)}</select></label>{editor()}</div>}
-    </div>
+
   </section>;
 }
