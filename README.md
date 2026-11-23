@@ -1,4 +1,4 @@
-# Beany: a conversational shopping agent you stay in control of
+# Beany: a conversational shopping agent
 
 **CS3249 Final Project · Group 2** · Bhavina Sathish Kumar, Goel Arnav, Low Bing Heng, Yuan Weitu
 
