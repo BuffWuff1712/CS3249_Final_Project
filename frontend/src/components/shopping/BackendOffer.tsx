@@ -1,7 +1,7 @@
 "use client";
 import { productTitle } from "@/lib/productTitle";
 import { ProductImage } from "./ProductImage";
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import type { Action, Fact, Merchant, MerchantRisk, Product } from "@/lib/beany";
 import { MerchantDetails } from "@/components/MerchantDetails";
 import { money } from "@/lib/shopBackend";
@@ -127,14 +127,24 @@ export function BackendCurrentOffer({ sellerPreferences, sellerPreference, actio
   const verdictTone: "block" | "warn" | "caution" | "safe" = action.decision === "BLOCK" ? "block" : dangerCount > 0 ? "warn" : concerns.length > 0 ? "caution" : "safe";
   const verdictMessage = verdictTone === "block" ? "Blocked under your shopping rules. See reasons below." : verdictTone === "warn" ? `${dangerCount} concern${dangerCount === 1 ? "" : "s"} worth checking before you buy.` : verdictTone === "caution" ? `${concerns.length} thing${concerns.length === 1 ? "" : "s"} to review on this listing.` : "No red flags detected. Open details if you want to dig in.";
   const verdictIcon = verdictTone === "safe" ? <CheckCircleIcon weight="fill" aria-hidden="true" /> : verdictTone === "block" || verdictTone === "warn" ? <WarningCircleIcon weight="fill" aria-hidden="true" /> : <InfoIcon weight="fill" aria-hidden="true" />;
+  const riskRef = useRef<HTMLDetailsElement>(null);
+  const jumpToConcerns = () => {
+    const details = riskRef.current;
+    if (!details) return;
+    details.open = true;
+    details.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    details.querySelector<HTMLElement>("summary")?.focus({ preventScroll: true });
+  };
+  const hasReviewTarget = verdictTone !== "safe";
   return <article className="cui-recommendation" aria-label="Current recommendation">
     <aside className={`cui-verdict-strip cui-verdict-strip--${verdictTone}`} role="status" aria-live="polite">
       {verdictIcon}<p><strong>{verdictTone === "safe" ? "Looks OK." : verdictTone === "block" ? "Blocked." : verdictTone === "warn" ? "Needs attention." : "Heads up."}</strong> {verdictMessage}</p>
+      {hasReviewTarget && <button type="button" className="cui-verdict-jump" onClick={jumpToConcerns} aria-label="Jump to seller and policy checks">Review ↓</button>}
     </aside>
     {header}
     {sellerPreference && <p className="cui-seller-pref-chip" aria-label={`Seller chosen for ${sellerPreference}`}>Seller chosen for: <strong>{sellerPreference}</strong></p>}
 
-    <details className="cui-offer-section cui-risk-disclosure" open={concerns.length > 0 || action.decision === "BLOCK"}><summary>{concerns.length > 0 || action.decision === "BLOCK" ? `Seller & policy checks (${concerns.length || "see reasons"})` : "Seller & policy checks"}</summary>
+    <details ref={riskRef} className="cui-offer-section cui-risk-disclosure" open={concerns.length > 0 || action.decision === "BLOCK"}><summary>{concerns.length > 0 || action.decision === "BLOCK" ? `Seller & policy checks (${concerns.length || "see reasons"})` : "Seller & policy checks"}</summary>
       <BackendRisk merchant={action.merchant_details} risk={action.risk} decision={action.decision} rules={action.rules} />
     </details>
 
@@ -162,8 +172,10 @@ export function BackendCurrentOffer({ sellerPreferences, sellerPreference, actio
         {selected ? <p className="cui-selected-label"><CheckCircleIcon weight="fill" aria-hidden="true" />Offer selected; no receipt created yet</p> : <button className="primary cui-select" disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={select}><CheckCircleIcon aria-hidden="true" />Select this offer</button>}
         <button disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={addCart}><ShoppingCartIcon aria-hidden="true" />Add to cart</button>
       </div>
-      <div className="cui-offer-explore"><div className="cui-actions"><button disabled={disabled} onClick={alternative}><PackageIcon aria-hidden="true" />Find another product</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div></div>
-      {sellerPreferences}
+      <div className="cui-offer-explore">
+        {sellerPreferences}
+        <div className="cui-actions"><button disabled={disabled} onClick={alternative}><PackageIcon aria-hidden="true" />Find another product</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div>
+      </div>
     </section>
 
     <details className="cui-offer-section"><summary>Reviews &amp; terms</summary>
