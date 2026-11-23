@@ -63,7 +63,7 @@ export function MatchedPriorities({ product, brief, fit }: { product: Product; b
   type Match = { label: string; state: "match" | "unknown" | "mismatch"; required: boolean; evidence?: string };
   const chips: Match[] = [];
   const add = (label: string, state: Match["state"], required: boolean, evidence = "") => chips.push({ label, state, required, evidence });
-  if (budgetMatch) add(budgetMatch, "match", budget.hard);
+  if (budgetMatch) add(budgetMatch, "match", budget.hard, `Listed price: ${product.currency}${new Intl.NumberFormat("en-SG", { maximumFractionDigits: 2 }).format(product.price)}`);
   else if (budgetNote) add(sameCurrency ? "Above your budget" : "Budget match unconfirmed", sameCurrency ? "mismatch" : "unknown", budget.hard);
   const size = brief.size;
   if (size?.source === "confirmed" && size.value.trim()) {
@@ -104,13 +104,17 @@ export function MatchedPriorities({ product, brief, fit }: { product: Product; b
     } else add(`${field.replaceAll("_", " ")}: ${fact.value} — not verified`, "unknown", fact.hard);
   }
   const featureLabel = { met: "", absent: ": listing says otherwise", unstated: ": not mentioned in listing", unknown: ": not established" } as const;
-  for (const item of features.filter((item, index) => features.findIndex(other => other.feature === item.feature) === index))
-    add(`${item.feature}${featureLabel[item.status]}`, item.status === "met" ? "match" : item.status === "absent" ? "mismatch" : "unknown", brief.features.hard, item.quote);
+  for (const item of features.filter((item, index) => features.findIndex(other => other.feature === item.feature) === index)) {
+    const listedAttribute = product.attributes.find(value => normalized(value) === normalized(item.feature));
+    const evidence = item.quote?.trim() || (item.status === "met" ? listedAttribute : "");
+    add(`${item.feature}${featureLabel[item.status]}`, item.status === "met" ? "match" : item.status === "absent" ? "mismatch" : "unknown", brief.features?.hard ?? false,
+      evidence ? `Listing: “${evidence}”` : "Supporting listing evidence not supplied.");
+  }
   chips.sort((a, b) => Number(b.required) - Number(a.required));
   if (!chips.length && !budgetNote) return null;
-  return <section className="cui-matched-priorities" aria-label="Priority matches"><h4>How this matches your needs</h4><ul>{chips.map((chip, index) => {
+  return <section className="cui-matched-priorities" aria-label="Priority matches"><h4>Why this fits</h4><ul>{chips.map((chip, index) => {
     const Icon = chip.state === "match" ? CheckCircleIcon : chip.state === "mismatch" ? ProhibitIcon : InfoIcon;
-    return <li key={index} className={`cui-constraint-${chip.state}`} title={`${chip.required ? "Required constraint" : "Preference"}${chip.evidence ? ` — listing: “${chip.evidence}”` : ""}`} aria-label={`${chip.required ? "Required" : "Preferred"}: ${chip.label}`}><Icon weight={chip.state === "match" ? "fill" : "regular"} aria-hidden="true" />{chip.label}</li>;
+    return <li key={index} className={`cui-constraint-${chip.state}`} title={`${chip.required ? "Required constraint" : "Preference"}${chip.evidence ? ` — listing: “${chip.evidence}”` : ""}`} aria-label={`${chip.required ? "Required" : "Preferred"}: ${chip.label}`}><Icon weight={chip.state === "match" ? "fill" : "regular"} aria-hidden="true" /><span className="cui-match-copy"><span>{chip.label}</span>{chip.evidence && <small className="cui-match-evidence">{chip.evidence}</small>}</span></li>;
   })}</ul>{budgetNote && <p className="cui-source">{budgetNote}</p>}{unknown.length > 0 && <p className="cui-source">Not established from listed features: {unknown.join(", ")}. Missing evidence does not mean a feature is absent.</p>}</section>;
 
 }

@@ -1052,9 +1052,6 @@
 .cui-seller-pref-chip { display: inline-flex; align-items: center; gap: 6px; margin: -4px 0 12px; padding: 4px 10px; font-size: 12px; color: var(--blue-ink); background: var(--blue-tint); border: 1px solid #cfd8ce; border-radius: 999px; }
 .cui-seller-pref-chip strong { font-weight: 600; }
 
-.cui-recommendation > .cui-offer-anchor { position: sticky; top: 0; z-index: 20; background: var(--surface); box-shadow: 0 1px 0 var(--line); }
-@media (max-width: 760px) { .cui-recommendation > .cui-offer-anchor { position: static; box-shadow: none; } }
-
 .cui-cart-link { position: relative; display: inline-flex; align-items: center; gap: 6px; }
 .cui-cart-link--filled { font-weight: 600; color: var(--blue); }
 .cui-cart-count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; font-size: 11px; font-weight: 700; color: #fff; background: var(--blue); border-radius: 10px; line-height: 1; }
@@ -1119,4 +1116,65 @@
 @media (max-width: 480px) {
   .cui-recommendation-navigation { flex-wrap: wrap; }
   .cui-recommendation-navigation > span { order: -1; flex-basis: 100%; }
+}
+
+/* Recommendation disclosures stay legible and informative when closed. */
+.cui-shell .cui-recommendation .cui-offer-section > summary {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  min-height: 52px;
+  padding: 12px 10px;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+  border-radius: 8px;
+}
+.cui-recommendation .cui-offer-section > summary > span { min-width: 0; }
+.cui-section-preview {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.cui-shell .cui-recommendation .cui-offer-section > summary:hover { background: var(--surface-2); }
+.cui-shell .cui-recommendation .cui-offer-section > summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.cui-recommendation .cui-offer-section > summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  margin: 0 4px 4px 8px;
+}
+.cui-recommendation .cui-offer-section[open] > summary::after { content: ""; transform: rotate(225deg); margin-bottom: -4px; }
+.cui-shell .cui-recommendation .cui-risk-disclosure--block > summary,
+.cui-shell .cui-recommendation .cui-risk-disclosure--warn > summary { color: var(--cui-danger-text); }
+.cui-shell .cui-recommendation .cui-risk-disclosure--caution > summary { color: #805200; }
+.cui-fit-overview { margin: 20px 0; }
+.cui-fit-overview .cui-matched-priorities h4 { font-family: var(--sans); font-size: 16px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0 0 12px; }
+.cui-fit-overview .cui-matched-priorities ul { display: grid; gap: 8px; }
+.cui-fit-overview .cui-matched-priorities li { border: 0; border-radius: 0; background: transparent; padding: 0; font-size: 13px; line-height: 1.5; }
+.cui-fit-overview .cui-matched-priorities li { align-items: flex-start; }
+.cui-fit-overview .cui-matched-priorities li > svg { margin-top: 3px; flex-shrink: 0; }
+.cui-match-copy { min-width: 0; overflow-wrap: anywhere; }
+.cui-match-evidence { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.cui-recommendation .cui-seller-pref-chip { padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--muted); }
+.cui-recommendation .cui-assessment-info { background: transparent; border: 0; border-left: 2px solid var(--line); border-radius: 0; }
+.cui-recommendation .cui-verdict-strip--safe,
+.cui-recommendation .cui-verdict-strip--unknown { background: var(--surface-2); color: var(--ink-2); border-color: var(--line); }
+.cui-recommendation > .cui-offer-actions { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.cui-action-help { margin: 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
+.cui-recommendation .cui-cart-secondary { background: transparent; color: var(--ink); }
+@media (prefers-reduced-motion: reduce) {
+  .cui-recommendation .cui-offer-section > summary::after { transition: none; }
 }

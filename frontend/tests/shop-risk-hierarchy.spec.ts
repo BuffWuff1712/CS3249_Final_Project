@@ -316,3 +316,55 @@ test("recommendation buttons replace the complete offer without selecting it", a
   await expect(next).toBeDisabled();
   await navigation.screenshot({ path: testInfo.outputPath("recommendation-navigation.png") });
 });
+
+test("collapsed seller checks preserve the concern preview and keyboard access", async ({ page, request }) => {
+  const current = await openOffer(page, request, action => { action.risk = assessment([concrete[1]]); });
+  const disclosure = current.locator('.cui-risk-disclosure');
+  const heading = disclosure.locator('summary').first();
+  await heading.click();
+  await expect(disclosure).not.toHaveAttribute('open', '');
+  await expect(heading).toContainText('Conflicting return terms');
+  await expect(current.getByRole('region', { name: 'How this fits your needs', exact: true })).toBeVisible();
+  await expect(current.getByRole('button', { name: 'Change your needs', exact: true })).toBeVisible();
+  const style = await heading.evaluate(element => ({ transform: getComputedStyle(element).textTransform, size: parseFloat(getComputedStyle(element).fontSize) }));
+  expect(style.transform).toBe('none');
+  expect(style.size).toBeGreaterThanOrEqual(15);
+  await heading.focus();
+  await page.keyboard.press('Enter');
+  await expect(disclosure).toHaveAttribute('open', '');
+});
+
+test("missing seller assessments never receive a reassuring verdict", async ({ page, request }) => {
+  const current = await openOffer(page, request, action => { action.risk = null; });
+  const verdict = current.locator('.cui-verdict-strip');
+  await expect(verdict).toContainText('Assessment unavailable');
+  await expect(verdict).not.toContainText('No concerns found');
+  await expect(verdict).not.toContainText('Looks OK');
+});
+
+test("fit reasons show their evidence together and general specs live in product details", async ({ page, request }, testInfo) => {
+  const current = await openOffer(page, request, action => {
+    action.feature_fit = [
+      { feature: 'noise-cancelling', status: 'met', quote: 'Active Noise Cancellation' },
+      { feature: 'wireless', status: 'unknown', quote: '' },
+    ];
+    action.product.attributes = ['Black', 'Over Ear', 'Active Noise Cancellation'];
+    action.product.specifications = { Battery: 'Up to 50 hours playback' };
+  });
+  const fit = current.getByRole('region', { name: 'Priority matches', exact: true });
+  await expect(fit.getByRole('heading', { name: 'Why this fits', exact: true })).toBeVisible();
+  const noise = fit.getByRole('listitem').filter({ hasText: 'noise-cancelling' });
+  await expect(noise).toContainText('Listing: “Active Noise Cancellation”');
+  await expect(noise.locator('.cui-match-evidence')).toBeVisible();
+  const wireless = fit.getByRole('listitem').filter({ hasText: 'wireless' });
+  await expect(wireless).toContainText('not established');
+  await expect(wireless).toContainText('Supporting listing evidence not supplied');
+  await expect(current.locator('summary').filter({ hasText: /^Match evidence/ })).toHaveCount(0);
+  await expect(fit).not.toContainText('Over Ear');
+  const details = current.locator('details').filter({ has: page.locator('summary').filter({ hasText: /^Product details/ }) }).first();
+  await details.locator('summary').first().click();
+  await expect(details.getByText('Up to 50 hours playback', { exact: true })).toBeVisible();
+  await expect(details).toContainText('Black, Over Ear, Active Noise Cancellation');
+  await fit.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath('combined-fit.png'), fullPage: true });
+});

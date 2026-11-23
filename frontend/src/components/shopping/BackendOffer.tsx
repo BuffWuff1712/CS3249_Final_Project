@@ -5,9 +5,7 @@ import { useRef, type ReactNode } from "react";
 import type { Action, Fact, Merchant, MerchantRisk, Product } from "@/lib/beany";
 import { MerchantDetails } from "@/components/MerchantDetails";
 import { money } from "@/lib/shopBackend";
-import { CheckCircleIcon, InfoIcon, ScalesIcon, ShoppingCartIcon, ArrowsLeftRightIcon } from "./ShoppingIcons";
-import { ListBulletsIcon } from "@phosphor-icons/react/dist/csr/ListBullets";
-import { BatteryHighIcon } from "@phosphor-icons/react/dist/csr/BatteryHigh";
+import { CheckCircleIcon, InfoIcon, ShoppingCartIcon, ArrowsLeftRightIcon } from "./ShoppingIcons";
 import { WarningCircleIcon } from "@phosphor-icons/react/dist/csr/WarningCircle";
 import { PackageIcon } from "@phosphor-icons/react/dist/csr/Package";
 import { RatingStars, RiskBadge, SiteBadge, PolicyBadge, MatchedPriorities, uniqueConcerns, concernTitle, concernTone, blockingReasons } from "./ShoppingReadability";
@@ -124,9 +122,12 @@ export function BackendCurrentOffer({ sellerPreferences, sellerPreference, actio
   const header = <OfferIdentity product={action.product} merchant={action.merchant_details} />;
   const concerns = uniqueConcerns(action.risk);
   const dangerCount = concerns.filter(item => concernTone(item.rule_id) === "danger").length;
-  const verdictTone: "block" | "warn" | "caution" | "safe" = action.decision === "BLOCK" ? "block" : dangerCount > 0 ? "warn" : concerns.length > 0 ? "caution" : "safe";
-  const verdictMessage = verdictTone === "block" ? "Blocked under your shopping rules. See reasons below." : verdictTone === "warn" ? `${dangerCount} concern${dangerCount === 1 ? "" : "s"} worth checking before you buy.` : verdictTone === "caution" ? `${concerns.length} thing${concerns.length === 1 ? "" : "s"} to review on this listing.` : "No red flags detected. Open details if you want to dig in.";
-  const verdictIcon = verdictTone === "safe" ? <CheckCircleIcon weight="fill" aria-hidden="true" /> : verdictTone === "block" || verdictTone === "warn" ? <WarningCircleIcon weight="fill" aria-hidden="true" /> : <InfoIcon weight="fill" aria-hidden="true" />;
+  const verdictTone = action.decision === "BLOCK" ? "block" : dangerCount > 0 || action.risk?.level === "HIGH" ? "warn" : concerns.length > 0 || action.risk?.level === "MEDIUM" ? "caution" : !action.risk ? "unknown" : "safe";
+  const verdictMessage = verdictTone === "block" ? "This offer cannot be selected under your shopping rules." : concerns.length > 0 ? `${concerns.length} recorded concern${concerns.length === 1 ? "" : "s"} to review before choosing.` : verdictTone === "unknown" ? "Seller risk has not been assessed." : verdictTone === "safe" ? "No concerns found in the available checks. This is not a safety guarantee." : "The seller assessment needs review. See the available evidence below.";
+  const verdictIcon = verdictTone === "block" || verdictTone === "warn" ? <WarningCircleIcon weight="fill" aria-hidden="true" /> : <InfoIcon aria-hidden="true" />;
+  const concernPreview = concerns.length ? concerns.map(item => concernTitle(item.rule_id)).slice(0, 2).join(" · ") : action.decision === "BLOCK" ? "Blocked under your shopping rules" : !action.risk ? "Assessment unavailable" : action.risk.level === "LOW" ? "No concerns found in available checks" : "Seller assessment needs review";
+  const reviewCount = (action.product.reviews?.length || 0) + (action.product.review_excerpts?.length || 0);
+  const returns = action.product.web_evidence?.return_policy || action.merchant_details?.return_policy;
   const riskRef = useRef<HTMLDetailsElement>(null);
   const jumpToConcerns = () => {
     const details = riskRef.current;
@@ -135,50 +136,28 @@ export function BackendCurrentOffer({ sellerPreferences, sellerPreference, actio
     details.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
     details.querySelector<HTMLElement>("summary")?.focus({ preventScroll: true });
   };
-  const hasReviewTarget = verdictTone !== "safe";
+  const hasReviewTarget = verdictTone === "block" || verdictTone === "warn" || verdictTone === "caution";
   return <article className="cui-recommendation" aria-label="Current recommendation">
     <aside className={`cui-verdict-strip cui-verdict-strip--${verdictTone}`} role="status" aria-live="polite">
-      {verdictIcon}<p><strong>{verdictTone === "safe" ? "Looks OK." : verdictTone === "block" ? "Blocked." : verdictTone === "warn" ? "Needs attention." : "Heads up."}</strong> {verdictMessage}</p>
+      {verdictIcon}<p><strong>{verdictTone === "safe" ? "Checks complete." : verdictTone === "unknown" ? "Assessment unavailable." : verdictTone === "block" ? "Blocked." : "Needs review."}</strong> {verdictMessage}</p>
       {hasReviewTarget && <button type="button" className="cui-verdict-jump" onClick={jumpToConcerns} aria-label="Jump to seller and policy checks">Review ↓</button>}
     </aside>
     {header}
     {sellerPreference && <p className="cui-seller-pref-chip" aria-label={`Seller chosen for ${sellerPreference}`}>Seller chosen for: <strong>{sellerPreference}</strong></p>}
 
-    <details ref={riskRef} className="cui-offer-section cui-risk-disclosure" open={concerns.length > 0 || action.decision === "BLOCK"}><summary>{concerns.length > 0 || action.decision === "BLOCK" ? `Seller & policy checks (${concerns.length || "see reasons"})` : "Seller & policy checks"}</summary>
-      <BackendRisk merchant={action.merchant_details} risk={action.risk} decision={action.decision} rules={action.rules} />
-    </details>
-
-    <details className="cui-offer-section cui-match-disclosure" open={concerns.length === 0 && action.decision !== "BLOCK"}><summary>Why this matches your needs</summary>
+    <section className="cui-fit-overview" aria-label="How this fits your needs">
       <section className="cui-offer-fit" aria-label="Match explanation">
         <MatchedPriorities product={action.product} brief={brief} fit={action.feature_fit} />
         {onEditNeeds && <button className="cui-link cui-edit-needs" disabled={disabled} onClick={onEditNeeds}>Change your needs</button>}
-        <details className="cui-offer-section"><summary>View match evidence</summary>
-          {productTitle(action.product) !== action.product.name && <p className="cui-source">Full listing title: {action.product.name}</p>}
-          <ListingSummary product={action.product} />
-          <ul className="cui-product-points">
-            {(action.product.attributes.length > 0 || !action.product.inferred_attributes?.length) && <li className="cui-icon-fact"><ListBulletsIcon aria-hidden="true" /><span><strong>Listed features:</strong> {action.product.attributes.join(", ") || "Not supplied"}</span></li>}
-            {Object.entries(action.product.specifications).filter(([key]) => /battery|weight|capacity|cushion|drop|laptop/i.test(key)).slice(0, 2).map(([key, value]) => <li key={key} className={/battery|weight/i.test(key) ? "cui-icon-fact" : undefined}>{/battery/i.test(key) ? <BatteryHighIcon aria-hidden="true" /> : /weight/i.test(key) ? <ScalesIcon aria-hidden="true" /> : null}<span><strong>{key}:</strong> {/battery/i.test(key) && /^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i.test(value) ? <><strong className="cui-key-spec">{value.match(/^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i)![0]}</strong>{value.replace(/^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i, "")}</> : value}</span></li>)}
-            {!!action.product.sizes.length && <li><strong>Available sizes:</strong> {action.product.sizes.join(", ")}</li>}
-          </ul>
-          {action.product.availability_note && <aside className="cui-listing-summary" aria-label="Availability and delivery notice"><strong>Availability and delivery</strong><p>{action.product.availability_note}</p><p className="cui-source">Check delivery for your location; stock availability does not confirm shipping eligibility.</p></aside>}
-        </details>
       </section>
       <p className="cui-return-summary"><strong>Listed returns:</strong> {action.product.web_evidence?.return_policy || action.merchant_details?.return_policy || "Unknown; not supplied"}</p>
-    </details>
-
-    <section className="cui-offer-actions" aria-label="Offer actions">
-      <p className="cui-selection-consequence">{action.decision === "BLOCK" ? "This offer cannot be selected under your shopping rules." : "Selecting saves your choice. It does not place an order or make a payment."}</p>
-      <div className="cui-offer-primary">
-        {selected ? <p className="cui-selected-label"><CheckCircleIcon weight="fill" aria-hidden="true" />Offer selected; no receipt created yet</p> : <button className="primary cui-select" disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={select}><CheckCircleIcon aria-hidden="true" />Select this offer</button>}
-        <button disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={addCart}><ShoppingCartIcon aria-hidden="true" />Add to cart</button>
-      </div>
-      <div className="cui-offer-explore">
-        {sellerPreferences}
-        <div className="cui-actions"><button disabled={disabled} onClick={alternative}><PackageIcon aria-hidden="true" />Find another product</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div>
-      </div>
     </section>
 
-    <details className="cui-offer-section"><summary>Reviews &amp; terms</summary>
+    <details ref={riskRef} className={`cui-offer-section cui-risk-disclosure cui-risk-disclosure--${verdictTone}`} open={concerns.length > 0 || action.decision === "BLOCK"}><summary><span>Seller checks<small className="cui-section-preview">{concernPreview}</small></span></summary>
+      <BackendRisk merchant={action.merchant_details} risk={action.risk} decision={action.decision} rules={action.rules} />
+    </details>
+
+    <details className="cui-offer-section"><summary><span>Reviews and returns<small className="cui-section-preview">{returns ? "Return terms supplied" : "Return terms unknown"} · {reviewCount ? `${reviewCount} review excerpts available` : "No review excerpts supplied"}</small></span></summary>
       <dl className="cui-match-facts">
         <div><dt>Returns</dt><dd>{action.product.web_evidence?.return_policy || action.merchant_details?.return_policy || "Not supplied"}</dd></div>
         <div><dt>Product reviews</dt><dd>{action.product.rating == null && action.product.product_rating_text ? <span>{action.product.product_rating_text}</span> : <RatingStars rating={action.product.rating} count={action.product.rating_count} />}<small>{action.product.rating_scope === "variant" ? "Rating for this variant. " : action.product.rating_scope === "product" ? "Product-wide rating; not specific to this variant. " : ""}{(action.product.reviews?.length || 0) + (action.product.review_excerpts?.length || 0)} supplied excerpts</small></dd></div>
@@ -192,13 +171,30 @@ export function BackendCurrentOffer({ sellerPreferences, sellerPreference, actio
       {lowReview && <p className="cui-review-concern"><strong>Review concern:</strong> One supplied product excerpt says “{lowReview.text}” This does not establish a failure rate.</p>}
     </details>
 
-    {["shopify_catalog", "browser_use"].includes(action.product.source || "") && <details className="cui-offer-section"><summary>Full product details</summary>
+    <details className="cui-offer-section"><summary><span>Product details<small className="cui-section-preview">Description, specifications and listed availability</small></span></summary>
+      {productTitle(action.product) !== action.product.name && <p className="cui-source">Full listing title: {action.product.name}</p>}
+      <ListingSummary product={action.product} />
+      {!!action.product.attributes.length && <p><strong>Listed features:</strong> {action.product.attributes.join(", ")}</p>}
+      {!!action.product.sizes.length && <p><strong>Available sizes:</strong> {action.product.sizes.join(", ")}</p>}
+      {action.product.availability_note && <aside aria-label="Availability and delivery notice"><strong>Availability and delivery</strong><p>{action.product.availability_note}</p><p className="cui-source">Check delivery for your location; stock availability does not confirm shipping eligibility.</p></aside>}
       <p className="cui-listing-description">{action.product.description || "Description not supplied."}</p>
       <dl className="cui-spec-grid">{Object.entries(action.product.specifications).map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl>
       <p>Availability: {action.product.stock == null ? "Not supplied" : action.product.stock ? "Listed as in stock" : "Listed as unavailable"}</p>
       {action.product.list_price != null && <p>Listed reference price: {money({ ...action.product, price: action.product.list_price })}. This is the listing's reference price, not a verified saving.</p>}
-    </details>}
+    </details>
 
-    <details className="cui-offer-section" key={evidenceId || 0} open={!!evidenceId}><summary>Comparison &amp; sources</summary><BackendProductEvidence product={action.product} merchant={action.merchant_details} replay={replay} /></details>
+    <details className="cui-offer-section" key={evidenceId || 0} open={!!evidenceId}><summary><span>Sources and evidence<small className="cui-section-preview">Product listing, seller information and supplied reviews</small></span></summary><BackendProductEvidence product={action.product} merchant={action.merchant_details} replay={replay} /></details>
+    <section className="cui-offer-actions" aria-label="Offer actions">
+      <p className="cui-selection-consequence">{action.decision === "BLOCK" ? "This offer cannot be selected under your shopping rules." : "Saves your choice. No order or payment."}</p>
+      <div className="cui-offer-primary">
+        {selected ? <p className="cui-selected-label"><CheckCircleIcon weight="fill" aria-hidden="true" />Offer selected; no receipt created yet</p> : <button className="primary cui-select" disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={select}><CheckCircleIcon aria-hidden="true" />Select this offer</button>}
+        <button className="cui-cart-secondary" aria-describedby="cart-action-help" disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={addCart}><ShoppingCartIcon aria-hidden="true" />Add to cart</button>
+      </div>
+      <p id="cart-action-help" className="cui-action-help">Choosing several items? Add to cart to review them together.</p>
+      <div className="cui-offer-explore">
+        {sellerPreferences}
+        <div className="cui-actions"><button disabled={disabled} onClick={alternative}><PackageIcon aria-hidden="true" />Find another product</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div>
+      </div>
+    </section>
   </article>;
 }
