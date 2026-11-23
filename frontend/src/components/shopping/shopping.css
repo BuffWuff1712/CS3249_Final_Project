@@ -7,7 +7,7 @@
   --cui-review: #B57A00; --cui-review-surface: #F6EFDC;
   max-width: 1536px; padding: 0 36px; font-size: 14px;
 }
-.cui-shell header { height: 68px; gap: 16px; }
+.cui-shell > header { height: 68px; gap: 16px; }
 .cui-shell .brand { font-size: 30px; color: #111d44; letter-spacing: -1.5px; }
 .cui-shell nav { display: flex; gap: 20px; align-items: center; }
 .cui-shell nav a { color: var(--ink); text-decoration: none; }
@@ -170,7 +170,7 @@
 }
 @media (max-width: 760px) {
   .cui-shell { padding: 0 16px; }
-  .cui-shell header { height: 64px; }
+  .cui-shell > header { height: 64px; }
   .cui-shell .brand { font-size: 28px; }
   .cui-shell nav { gap: 14px; }
   .cui-shell nav a { font-size: 12px; }
@@ -234,7 +234,7 @@
 
 /* One persistent chat frame: only the conversation and decision contents scroll. */
 .cui-shell { height: 100dvh; display: flex; flex-direction: column; }
-.cui-shell header { flex-shrink: 0; }
+.cui-shell > header { flex-shrink: 0; }
 .cui-workspace { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: stretch; margin: 0; }
 .cui-needs { flex-shrink: 0; }
 .cui-intent-grid .cui-fact-status { min-height: 14px; line-height: 14px; margin-top: 4px; }
@@ -318,9 +318,9 @@
 
 /* Full shopping navigation remains reachable at narrow widths. */
 @media (max-width: 760px) {
-  .cui-shell header { height: auto; min-height: 64px; flex-wrap: wrap; padding-block: 10px; }
-  .cui-shell header nav { flex-wrap: wrap; gap: 8px 12px; min-width: 0; }
-  .cui-shell header nav a { min-height: 36px; display: inline-flex; align-items: center; }
+  .cui-shell > header { height: auto; min-height: 64px; flex-wrap: wrap; padding-block: 10px; }
+  .cui-shell > header nav { flex-wrap: wrap; gap: 8px 12px; min-width: 0; }
+  .cui-shell > header nav a { min-height: 36px; display: inline-flex; align-items: center; }
 }
 
 /* Each needs card owns a compact editor; opening it keeps the chat in place. */
@@ -584,7 +584,7 @@
 
 .cui-shell .brand { font-family: var(--serif); font-size: 28px; font-weight: 400; letter-spacing: -.02em; color: var(--ink); display: inline-flex; align-items: baseline; gap: 4px; }
 .cui-shell .brand::after { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); margin-left: 2px; transform: translateY(-2px); }
-.cui-shell header { border-bottom: 1px solid var(--line); height: 64px; }
+.cui-shell > header { border-bottom: 1px solid var(--line); height: 64px; }
 .cui-shell nav a { color: var(--ink-2); font-weight: 500; }
 .cui-shell nav a:hover { color: var(--ink); text-decoration: none; }
 

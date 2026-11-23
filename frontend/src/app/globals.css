@@ -30,7 +30,7 @@ button:disabled{cursor:not-allowed;opacity:.45}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 
 .shell{max-width:1480px;margin:auto;padding:0 44px}
-header{height:72px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.shell>header{height:72px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
 .brand{display:inline-flex;gap:4px;align-items:baseline;color:var(--ink);text-decoration:none;font-family:var(--serif);font-size:28px;font-weight:400;letter-spacing:-.02em;line-height:1}
 .brand::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--blue);margin-left:2px;transform:translateY(-2px)}
 .brand-icon{display:none}
@@ -154,7 +154,7 @@ footer{display:flex;justify-content:space-between;padding:26px 0 36px;color:var(
 
 @media(min-width:1450px){main{grid-template-columns:minmax(0,1fr) 370px}}
 @media(max-width:1000px){.shell{padding:0 28px}main{grid-template-columns:minmax(0,1fr) 300px;gap:24px}.promise{display:none}.boundaries,.activity{padding:18px}.proposal{grid-template-columns:110px 1fr}}
-@media(max-width:760px){.shell{padding:0 16px}header{height:60px}.brand{font-size:24px}.header-right{gap:8px}.header-right button{font-size:11px}.intro{padding:28px 0 20px}h1{font-size:34px}main{grid-template-columns:1fr}.sidebar{grid-template-columns:1fr}.messages{max-height:600px;padding:16px}.panel-heading,.composer{padding:16px}.proposal{grid-template-columns:90px 1fr}.product-content{padding:14px}h3{font-size:18px}.audit-event{grid-template-columns:65px 80px 1fr;gap:8px}footer{gap:20px;line-height:1.5;flex-wrap:wrap}.input-wrap button{padding:10px}.review{padding:14px 16px}}
+@media(max-width:760px){.shell{padding:0 16px}.shell>header{height:60px}.brand{font-size:24px}.header-right{gap:8px}.header-right button{font-size:11px}.intro{padding:28px 0 20px}h1{font-size:34px}main{grid-template-columns:1fr}.sidebar{grid-template-columns:1fr}.messages{max-height:600px;padding:16px}.panel-heading,.composer{padding:16px}.proposal{grid-template-columns:90px 1fr}.product-content{padding:14px}h3{font-size:18px}.audit-event{grid-template-columns:65px 80px 1fr;gap:8px}footer{gap:20px;line-height:1.5;flex-wrap:wrap}.input-wrap button{padding:10px}.review{padding:14px 16px}}
 
 .starter-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
 .starter-grid button{text-align:left;line-height:1.55;padding:14px 16px;background:var(--surface);font-weight:400;color:var(--ink-2)}
