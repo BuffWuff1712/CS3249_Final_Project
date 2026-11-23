@@ -1024,6 +1024,9 @@
 .cui-needs-heading .cui-add-need { display: grid; place-items: center; width: 44px; min-height: 44px; padding: 0; font-size: 24px; line-height: 1; color: var(--blue); border-radius: 8px; }
 .cui-needs-heading .cui-add-need:hover, .cui-needs-heading .cui-add-need[aria-expanded="true"] { background: var(--blue-tint); }
 .cui-needs-heading .cui-extra-editor { left: auto; right: 0; }
+.cui-extra-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.cui-extra-nav button { min-width: 36px; min-height: 36px; padding: 6px; }
+.cui-extra-position { margin: 0; font-size: 12px; color: var(--muted); }
 
 /* Alternative models remain browsable without extending the entire decision pane. */
 .cui-product-list { max-height: 480px; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; padding: 4px; margin: 12px 0; }

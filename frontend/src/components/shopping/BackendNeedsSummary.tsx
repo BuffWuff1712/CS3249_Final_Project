@@ -75,7 +75,18 @@ export function BackendNeedsSummary({ brief, busy, edit, requested, live = false
   return <section ref={root} className="cui-needs cui-needs--individual" aria-label="Purchase needs">
     <div className="cui-needs-heading"><h2 aria-label="Your purchase intent">Your needs</h2>
     <div className="cui-more-needs"><button className="cui-add-need" aria-label="More needs" title="More needs" disabled={busy} aria-expanded={!!field && extraFields.includes(field as typeof extraFields[number])} onClick={() => field && !primaryFields.includes(field) ? close() : open("size")}><span aria-hidden="true">+</span></button>
-      {field && !primaryFields.includes(field) && <div className="cui-extra-editor"><label>Additional need<select aria-label="Additional need" disabled={busy} value={field} onChange={event => open(event.target.value as ShopField)}>{extraFields.map(key => <option key={key} value={key}>{key.replaceAll("_", " ")}</option>)}</select></label>{editor()}</div>}
+      {field && !primaryFields.includes(field) && (() => {
+        const index = extraFields.indexOf(field as typeof extraFields[number]);
+        return <div className="cui-extra-editor">
+          <div className="cui-extra-nav" role="group" aria-label="Additional needs navigation">
+            <button type="button" aria-label="Previous additional need" disabled={busy || index <= 0} onClick={() => open(extraFields[index - 1])}>←</button>
+            <p className="cui-extra-position" aria-live="polite">Need {index + 1} of {extraFields.length}</p>
+            <button type="button" aria-label="Next additional need" disabled={busy || index >= extraFields.length - 1} onClick={() => open(extraFields[index + 1])}>→</button>
+          </div>
+          <label>Additional need<select aria-label="Additional need" disabled={busy} value={field} onChange={event => open(event.target.value as ShopField)}>{extraFields.map(key => <option key={key} value={key}>{key.replaceAll("_", " ")}</option>)}</select></label>
+          {editor()}
+        </div>;
+      })()}
     </div>
     </div>
     <dl className="cui-intent-grid">{primaryFields.map(key => <div key={key} className="cui-need-anchor">
