@@ -381,7 +381,9 @@ def another_seller(s, preference=None):
             raise ValueError("Choose longer returns or lowest price.")
         meta(s)["seller_preference"] = preference
     def rank(offer):
-        days = re.search(r"\b(\d+)\s*[- ]?\s*days?\b", (offer["merchant"] or {}).get("return_policy", ""), re.I)
+        # Use the same listing-first return terms shown in the recommendation.
+        terms = (offer["product"].get("web_evidence") or {}).get("return_policy") or (offer["merchant"] or {}).get("return_policy", "")
+        days = re.search(r"\b(\d+)\s*[- ]?\s*days?\b", terms, re.I)
         period = int(days.group(1)) if days else -1
         price = offer["product"]["price"]
         return (price,) if meta(s)["seller_preference"] == "lowest price" else (-period, price)
@@ -397,6 +399,13 @@ def another_seller(s, preference=None):
     chosen = (fresh or candidates)[0]
     seen[key].append(chosen["product"]["id"])
     propose(s, chosen["product"]["id"])
+    if preference is not None:
+        unchanged = chosen["product"]["id"] == current.product.id
+        s.messages[-1].text += f" Applied {preference} across {len(candidates)} eligible offer(s) for this exact model and variant."
+        if unchanged:
+            s.messages[-1].text += " Your current seller already ranks first for this preference, so the product and price are unchanged."
+        if preference == "longer returns" and all(rank(offer)[0] == 1 for offer in candidates):
+            s.messages[-1].text += " No numeric return windows were supplied; lowest price was used as the tie-breaker."
     if not fresh:
         s.messages[-1].text += f" You have now seen all {len(candidates) + 1} eligible sellers of this model, so this starts again from the top-ranked one."
     s.messages[-1].text += " Kept the exact product model and variant while comparing eligible sellers. Return terms are supplied catalogue claims; eligibility and exclusions still need review."

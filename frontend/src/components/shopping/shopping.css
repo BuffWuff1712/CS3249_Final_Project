@@ -911,18 +911,18 @@
 .cui-offer-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; font-weight: 500; }
 .cui-offer-head-text h3 { font-family: var(--serif); font-size: 20px; font-weight: 400; letter-spacing: -.02em; margin: 0 0 6px; line-height: 1.2; }
 .cui-offer-sub { margin: 0; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.cui-offer-sub strong { font-family: var(--serif); font-weight: 400; font-size: 24px; letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cui-offer-sub strong { font-family: var(--serif); font-weight: 600; font-size: 24px; letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
 .cui-offer-sub span { font-size: 12px; color: var(--muted); }
 
-/* Primary actions inside anchor */
-.cui-offer-anchor .cui-offer-actions { margin: 0; padding: 0; gap: 10px; background: transparent; border: 0; }
-.cui-offer-anchor .cui-offer-primary { gap: 8px; }
-.cui-offer-anchor .cui-offer-primary .cui-select { font-size: 13px; font-weight: 500; }
-.cui-offer-anchor .cui-offer-primary button { min-height: 44px; }
-.cui-offer-anchor .cui-offer-explore { margin-top: 2px; }
-.cui-offer-anchor .cui-offer-explore .cui-actions { margin: 0; gap: 8px; }
-.cui-offer-anchor .cui-offer-explore button { min-height: 38px; font-size: 12px; }
-.cui-offer-anchor .cui-seller-reason { padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; }
+/* Primary actions follow fit and assessment. */
+.cui-recommendation > .cui-offer-actions { margin: 0; padding: 0; gap: 10px; background: transparent; border: 0; }
+.cui-recommendation > .cui-offer-actions .cui-offer-primary { gap: 8px; }
+.cui-recommendation > .cui-offer-actions .cui-offer-primary .cui-select { font-size: 13px; font-weight: 500; }
+.cui-recommendation > .cui-offer-actions .cui-offer-primary button { min-height: 44px; }
+.cui-recommendation > .cui-offer-actions .cui-offer-explore { margin-top: 2px; }
+.cui-recommendation > .cui-offer-actions .cui-offer-explore .cui-actions { margin: 0; gap: 8px; }
+.cui-recommendation > .cui-offer-actions .cui-offer-explore button { min-height: 38px; font-size: 12px; }
+.cui-recommendation > .cui-offer-actions .cui-seller-reason { padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; }
 
 /* FIT CHIPS — compact single wrapping row */
 .cui-matched-priorities { margin: 16px 0 8px; }
@@ -972,3 +972,109 @@
 
 /* Remove the old stand-alone cui-product-image rule since the big block is gone */
 .cui-recommendation > .cui-product-image { display: none; }
+
+/* Decision hierarchy: qualified fit, assessment, then actions. */
+.cui-concern-list > li.cui-concern-danger { background: var(--surface); border-left-color: var(--cui-danger); }
+.cui-concern-list > li.cui-concern-review { background: var(--surface); border-left-color: var(--cui-review); }
+.cui-concern-list .cui-concern-danger strong { color: var(--cui-danger-text); }
+.cui-concern-list strong { display: flex; align-items: flex-start; gap: 6px; }
+.cui-concern-list strong svg { width: 16px; height: 16px; flex: 0 0 16px; }
+.cui-concern-list p { color: var(--ink); overflow-wrap: anywhere; }
+.cui-seller-concerns details { margin-top: 8px; }
+.cui-seller-concerns summary { text-transform: none; letter-spacing: normal; font-family: var(--sans); }
+.cui-recommendation > .cui-offer-actions { padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; }
+.cui-recommendation .cui-offer-head-text { overflow-wrap: anywhere; }
+
+.cui-offer-fit { margin-bottom: 16px; }
+.cui-offer-fit .cui-matched-priorities { margin-top: 0; }
+.cui-offer-fit .cui-matched-priorities h4 { font-size: 12px; letter-spacing: normal; }
+.cui-return-summary { margin: 16px 0; padding: 12px; background: var(--surface-2); border-radius: 8px; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.cui-selection-consequence { margin: 0; font-size: 12px; line-height: 1.6; color: var(--ink); }
+
+@media (max-width: 600px) {
+  /* Mobile cell labels contain full product titles, even in price rows. */
+  .cui-compare-table td::before, .cui-offer-table td[data-label]::before { white-space: normal; overflow-wrap: anywhere; }
+}
+@media (max-width: 760px) {
+  .cui-shell > header { height: auto; }
+}
+
+/* Keep the external destination visible without opening evidence disclosures. */
+.cui-original-site { display: grid; justify-items: start; gap: 8px; min-width: 0; }
+.cui-original-site-link { min-height: 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.cui-original-site small { font-size: 11px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; max-width: 100%; }
+
+/* Persistent left-pane checkout card; chat scrolls independently above it. */
+.cui-finish-dock { flex: 0 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 16px; border: 1px solid var(--blue); border-radius: 12px; background: var(--surface); box-shadow: 0 4px 16px rgb(0 0 0 / 8%); }
+.cui-finish-summary { flex: 1 1 220px; min-width: 0; }
+.cui-finish-dock h2 { margin: 0 0 6px; font-size: 16px; font-family: var(--sans); font-weight: 600; }
+.cui-finish-dock p { margin: 4px 0 0; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.cui-finish-dock .cui-finish-product { font-weight: 600; max-height: 3em; overflow-y: auto; }
+.cui-finish-dock .cui-finish-note { color: var(--muted); }
+.cui-finish-dock > button { min-height: 44px; flex: 0 0 auto; }
+@media (max-width: 760px) {
+  .cui-conversation:has(.cui-finish-dock) { height: auto; max-height: none; }
+  .cui-conversation:has(.cui-finish-dock) .cui-chat-scroll { flex: 0 1 auto; max-height: 300px; }
+  .cui-finish-dock > button { width: 100%; }
+}
+
+.cui-needs-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 8px 0 16px; border-bottom: 1px solid var(--line); }
+.cui-needs-heading h2 { margin: 0; font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.cui-needs-heading .cui-more-needs { align-self: center; }
+.cui-needs-heading .cui-add-need { display: grid; place-items: center; width: 44px; min-height: 44px; padding: 0; font-size: 24px; line-height: 1; color: var(--blue); border-radius: 8px; }
+.cui-needs-heading .cui-add-need:hover, .cui-needs-heading .cui-add-need[aria-expanded="true"] { background: var(--blue-tint); }
+.cui-needs-heading .cui-extra-editor { left: auto; right: 0; }
+
+/* Alternative models remain browsable without extending the entire decision pane. */
+.cui-product-list { max-height: 480px; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; padding: 4px; margin: 12px 0; }
+.cui-product-list:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.cui-product-list > ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.cui-product-option { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.cui-option-image { flex: 0 0 64px; }
+.cui-option-image .cui-product-image { margin: 0; padding: 0; min-height: 64px; border-radius: 8px; }
+.cui-option-image .cui-product-image img { height: 64px; width: 64px; object-fit: contain; }
+.cui-option-content { min-width: 0; flex: 1; display: grid; gap: 8px; }
+.cui-option-content h3 { margin: 0; font-size: 18px; overflow-wrap: anywhere; }
+.cui-option-content > p { margin: 0; font-size: 12px; }
+.cui-option-content .cui-badge { justify-self: start; }
+.cui-option-content .cui-actions { margin: 0; }
+.cui-option-content button { min-height: 44px; white-space: normal; }
+.cui-product-comparison > summary { overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+  .cui-product-option { flex-direction: column; padding: 12px; }
+  .cui-product-list { max-height: 420px; }
+}
+
+/* Browse at the top, with sideways navigation and distinct review sections. */
+.cui-product-browser { padding: 16px; margin: 0 0 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+.cui-browser-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cui-browser-heading h2 { margin: 0; font-size: 22px; }
+.cui-carousel-controls { display: flex; gap: 8px; }
+.cui-carousel-controls button { min-width: 44px; min-height: 44px; padding: 8px; }
+.cui-product-list { max-height: none; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-gutter: auto; }
+.cui-product-list > ul { display: flex; gap: 12px; align-items: stretch; }
+.cui-product-list .cui-product-option { flex: 0 0 86%; max-width: none; min-width: 0; flex-direction: column; scroll-snap-align: start; }
+.cui-product-option[aria-current="true"] { border-color: var(--blue); }
+.cui-option-content { width: 100%; align-content: start; }
+.cui-carousel-position { margin: 8px 0; font-size: 12px; color: var(--muted); }
+.cui-recommendation > .cui-offer-fit, .cui-recommendation > .cui-backend-risk { padding: 16px; margin: 0 0 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.cui-recommendation > .cui-offer-actions { padding: 20px 16px; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+
+.cui-product-list { cursor: grab; }
+.cui-product-list[data-dragging="true"] { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+.cui-product-list img { -webkit-user-drag: none; }
+
+/* Recommendation identity cards occupy the original right-column match location. */
+.cui-product-option > .cui-offer-anchor { width: 100%; margin: 0; padding: 0; border: 0; background: transparent; }
+.cui-product-option .cui-offer-head { flex-wrap: wrap; }
+.cui-product-option .cui-offer-head-text { min-width: 0; }
+.cui-product-option .cui-original-site-link { white-space: normal; }
+
+/* Browse complete recommendations without a sideways scrolling surface. */
+.cui-recommendation-navigation { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 16px; }
+.cui-recommendation-navigation button { min-height: 44px; white-space: nowrap; }
+.cui-recommendation-navigation > span { text-align: center; color: var(--muted); font-size: 12px; }
+@media (max-width: 480px) {
+  .cui-recommendation-navigation { flex-wrap: wrap; }
+  .cui-recommendation-navigation > span { order: -1; flex-basis: 100%; }
+}
