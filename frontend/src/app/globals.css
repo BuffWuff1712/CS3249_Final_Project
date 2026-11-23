@@ -223,3 +223,14 @@ details[open]>summary{margin-bottom:12px;background:var(--surface-2)}
 .site-meter.good .filled{background:#5f8a4a}
 .site-meter.mid .filled{background:var(--amber)}
 .site-meter.poor .filled{background:var(--brick)}
+
+.cart-carousel{display:flex;flex-direction:column;gap:12px;margin:16px 0}
+.cart-carousel-controls{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cart-carousel-controls button{min-width:44px;min-height:44px;padding:8px}
+.cart-carousel-position{margin:0;font-size:13px;color:var(--muted)}
+.cart-carousel-track{overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;display:flex;gap:16px;padding:4px;cursor:grab}
+.cart-carousel-track[data-dragging="true"]{cursor:grabbing;scroll-snap-type:none;user-select:none}
+.cart-carousel-track img{-webkit-user-drag:none}
+.cart-carousel-track .cart-card{flex:0 0 92%;scroll-snap-align:start;margin:0}
+.cart-carousel-track .cart-card[aria-current="true"]{border-color:var(--ink-2)}
+.cart-card .error{display:flex;flex-direction:column;gap:8px;align-items:flex-start}

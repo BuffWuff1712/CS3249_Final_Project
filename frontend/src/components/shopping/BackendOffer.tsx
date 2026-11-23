@@ -1,7 +1,7 @@
 "use client";
 import { productTitle } from "@/lib/productTitle";
 import { ProductImage } from "./ProductImage";
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import type { Action, Fact, Merchant, MerchantRisk, Product } from "@/lib/beany";
 import { MerchantDetails } from "@/components/MerchantDetails";
 import { money } from "@/lib/shopBackend";
@@ -119,28 +119,52 @@ export function OfferIdentity({ product, merchant, current = true }: { product: 
     </header>;
 }
 
-export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, selected, disabled, selectionInvalid = false, select, seller, addCart, alternative, replay = false, evidenceId, onEditNeeds }: { sellerPreferences?: ReactNode; action: Action; brief?: Record<string, Fact>; selected: boolean; disabled: boolean; selectionInvalid?: boolean; select: () => void; addCart: () => void; alternative: () => void; seller: () => void; replay?: boolean; evidenceId?: number; onEditNeeds?: () => void }) {
+export function BackendCurrentOffer({ sellerPreferences, sellerPreference, action, brief = {}, selected, disabled, selectionInvalid = false, select, seller, addCart, alternative, replay = false, evidenceId, onEditNeeds }: { sellerPreferences?: ReactNode; sellerPreference?: string | null; action: Action; brief?: Record<string, Fact>; selected: boolean; disabled: boolean; selectionInvalid?: boolean; select: () => void; addCart: () => void; alternative: () => void; seller: () => void; replay?: boolean; evidenceId?: number; onEditNeeds?: () => void }) {
   const lowReview = action.product.reviews?.find(review => review.rating <= 2);
   const header = <OfferIdentity product={action.product} merchant={action.merchant_details} />;
+  const concerns = uniqueConcerns(action.risk);
+  const dangerCount = concerns.filter(item => concernTone(item.rule_id) === "danger").length;
+  const verdictTone: "block" | "warn" | "caution" | "safe" = action.decision === "BLOCK" ? "block" : dangerCount > 0 ? "warn" : concerns.length > 0 ? "caution" : "safe";
+  const verdictMessage = verdictTone === "block" ? "Blocked under your shopping rules. See reasons below." : verdictTone === "warn" ? `${dangerCount} concern${dangerCount === 1 ? "" : "s"} worth checking before you buy.` : verdictTone === "caution" ? `${concerns.length} thing${concerns.length === 1 ? "" : "s"} to review on this listing.` : "No red flags detected. Open details if you want to dig in.";
+  const verdictIcon = verdictTone === "safe" ? <CheckCircleIcon weight="fill" aria-hidden="true" /> : verdictTone === "block" || verdictTone === "warn" ? <WarningCircleIcon weight="fill" aria-hidden="true" /> : <InfoIcon weight="fill" aria-hidden="true" />;
+  const riskRef = useRef<HTMLDetailsElement>(null);
+  const jumpToConcerns = () => {
+    const details = riskRef.current;
+    if (!details) return;
+    details.open = true;
+    details.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    details.querySelector<HTMLElement>("summary")?.focus({ preventScroll: true });
+  };
+  const hasReviewTarget = verdictTone !== "safe";
   return <article className="cui-recommendation" aria-label="Current recommendation">
+    <aside className={`cui-verdict-strip cui-verdict-strip--${verdictTone}`} role="status" aria-live="polite">
+      {verdictIcon}<p><strong>{verdictTone === "safe" ? "Looks OK." : verdictTone === "block" ? "Blocked." : verdictTone === "warn" ? "Needs attention." : "Heads up."}</strong> {verdictMessage}</p>
+      {hasReviewTarget && <button type="button" className="cui-verdict-jump" onClick={jumpToConcerns} aria-label="Jump to seller and policy checks">Review ↓</button>}
+    </aside>
     {header}
-    <section className="cui-offer-fit" aria-label="Match explanation">
-      <MatchedPriorities product={action.product} brief={brief} fit={action.feature_fit} />
-      {onEditNeeds && <button className="cui-link cui-edit-needs" disabled={disabled} onClick={onEditNeeds}>Change your needs</button>}
-      <details className="cui-offer-section"><summary>View match evidence</summary>
-        {productTitle(action.product) !== action.product.name && <p className="cui-source">Full listing title: {action.product.name}</p>}
-        <ListingSummary product={action.product} />
-        <ul className="cui-product-points">
-          {(action.product.attributes.length > 0 || !action.product.inferred_attributes?.length) && <li className="cui-icon-fact"><ListBulletsIcon aria-hidden="true" /><span><strong>Listed features:</strong> {action.product.attributes.join(", ") || "Not supplied"}</span></li>}
-          {Object.entries(action.product.specifications).filter(([key]) => /battery|weight|capacity|cushion|drop|laptop/i.test(key)).slice(0, 2).map(([key, value]) => <li key={key} className={/battery|weight/i.test(key) ? "cui-icon-fact" : undefined}>{/battery/i.test(key) ? <BatteryHighIcon aria-hidden="true" /> : /weight/i.test(key) ? <ScalesIcon aria-hidden="true" /> : null}<span><strong>{key}:</strong> {/battery/i.test(key) && /^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i.test(value) ? <><strong className="cui-key-spec">{value.match(/^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i)![0]}</strong>{value.replace(/^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i, "")}</> : value}</span></li>)}
-          {!!action.product.sizes.length && <li><strong>Available sizes:</strong> {action.product.sizes.join(", ")}</li>}
-        </ul>
-        {action.product.availability_note && <aside className="cui-listing-summary" aria-label="Availability and delivery notice"><strong>Availability and delivery</strong><p>{action.product.availability_note}</p><p className="cui-source">Check delivery for your location; stock availability does not confirm shipping eligibility.</p></aside>}
-      </details>
-    </section>
+    {sellerPreference && <p className="cui-seller-pref-chip" aria-label={`Seller chosen for ${sellerPreference}`}>Seller chosen for: <strong>{sellerPreference}</strong></p>}
 
-    <p className="cui-return-summary"><strong>Listed returns:</strong> {action.product.web_evidence?.return_policy || action.merchant_details?.return_policy || "Unknown; not supplied"}</p>
-    <BackendRisk merchant={action.merchant_details} risk={action.risk} decision={action.decision} rules={action.rules} />
+    <details ref={riskRef} className="cui-offer-section cui-risk-disclosure" open={concerns.length > 0 || action.decision === "BLOCK"}><summary>{concerns.length > 0 || action.decision === "BLOCK" ? `Seller & policy checks (${concerns.length || "see reasons"})` : "Seller & policy checks"}</summary>
+      <BackendRisk merchant={action.merchant_details} risk={action.risk} decision={action.decision} rules={action.rules} />
+    </details>
+
+    <details className="cui-offer-section cui-match-disclosure" open={concerns.length === 0 && action.decision !== "BLOCK"}><summary>Why this matches your needs</summary>
+      <section className="cui-offer-fit" aria-label="Match explanation">
+        <MatchedPriorities product={action.product} brief={brief} fit={action.feature_fit} />
+        {onEditNeeds && <button className="cui-link cui-edit-needs" disabled={disabled} onClick={onEditNeeds}>Change your needs</button>}
+        <details className="cui-offer-section"><summary>View match evidence</summary>
+          {productTitle(action.product) !== action.product.name && <p className="cui-source">Full listing title: {action.product.name}</p>}
+          <ListingSummary product={action.product} />
+          <ul className="cui-product-points">
+            {(action.product.attributes.length > 0 || !action.product.inferred_attributes?.length) && <li className="cui-icon-fact"><ListBulletsIcon aria-hidden="true" /><span><strong>Listed features:</strong> {action.product.attributes.join(", ") || "Not supplied"}</span></li>}
+            {Object.entries(action.product.specifications).filter(([key]) => /battery|weight|capacity|cushion|drop|laptop/i.test(key)).slice(0, 2).map(([key, value]) => <li key={key} className={/battery|weight/i.test(key) ? "cui-icon-fact" : undefined}>{/battery/i.test(key) ? <BatteryHighIcon aria-hidden="true" /> : /weight/i.test(key) ? <ScalesIcon aria-hidden="true" /> : null}<span><strong>{key}:</strong> {/battery/i.test(key) && /^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i.test(value) ? <><strong className="cui-key-spec">{value.match(/^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i)![0]}</strong>{value.replace(/^(up to )?\d+(?:\.\d+)?\s*(?:hours?|h)\b/i, "")}</> : value}</span></li>)}
+            {!!action.product.sizes.length && <li><strong>Available sizes:</strong> {action.product.sizes.join(", ")}</li>}
+          </ul>
+          {action.product.availability_note && <aside className="cui-listing-summary" aria-label="Availability and delivery notice"><strong>Availability and delivery</strong><p>{action.product.availability_note}</p><p className="cui-source">Check delivery for your location; stock availability does not confirm shipping eligibility.</p></aside>}
+        </details>
+      </section>
+      <p className="cui-return-summary"><strong>Listed returns:</strong> {action.product.web_evidence?.return_policy || action.merchant_details?.return_policy || "Unknown; not supplied"}</p>
+    </details>
 
     <section className="cui-offer-actions" aria-label="Offer actions">
       <p className="cui-selection-consequence">{action.decision === "BLOCK" ? "This offer cannot be selected under your shopping rules." : "Selecting saves your choice. It does not place an order or make a payment."}</p>
@@ -148,8 +172,10 @@ export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, sel
         {selected ? <p className="cui-selected-label"><CheckCircleIcon weight="fill" aria-hidden="true" />Offer selected; no receipt created yet</p> : <button className="primary cui-select" disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={select}><CheckCircleIcon aria-hidden="true" />Select this offer</button>}
         <button disabled={disabled || selectionInvalid || action.decision === "BLOCK"} onClick={addCart}><ShoppingCartIcon aria-hidden="true" />Add to cart</button>
       </div>
-      <div className="cui-offer-explore"><div className="cui-actions"><button disabled={disabled} onClick={alternative}><PackageIcon aria-hidden="true" />Find another product</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div></div>
-      {sellerPreferences}
+      <div className="cui-offer-explore">
+        {sellerPreferences}
+        <div className="cui-actions"><button disabled={disabled} onClick={alternative}><PackageIcon aria-hidden="true" />Find another product</button><button disabled={disabled} onClick={seller}><ArrowsLeftRightIcon aria-hidden="true" />Find another seller</button></div>
+      </div>
     </section>
 
     <details className="cui-offer-section"><summary>Reviews &amp; terms</summary>
