@@ -1,4 +1,5 @@
 import { test, expect, type APIRequestContext, type Page } from "@playwright/test";
+import type { ShopView } from "../src/lib/shopBackend";
 import type { Action, MerchantRisk } from "../src/lib/beany";
 
 const API = "http://localhost:8100/shop/sessions";
@@ -20,7 +21,7 @@ function assessment(evidence = secondary): MerchantRisk {
 }
 
 // Patch presentation only; the backend policy and persisted proposal remain intact.
-async function openOffer(page: Page, request: APIRequestContext, patch: (action: Action) => void) {
+async function openOffer(page: Page, request: APIRequestContext, patch: (action: Action) => void, patchView?: (view: ShopView) => void) {
   const createdResponse = await request.post(API);
   expect(createdResponse.ok()).toBeTruthy();
   const created = await createdResponse.json();
@@ -38,6 +39,7 @@ async function openOffer(page: Page, request: APIRequestContext, patch: (action:
     body.current.rules = [{ rule_id: "approval", decision: "REVIEW", explanation: "Explicit selection is required." }];
     body.current.risk = assessment();
     patch(body.current);
+    patchView?.(body);
     await route.fulfill({ response, json: body });
   });
   await page.goto("/");
@@ -257,4 +259,39 @@ test("More needs is a keyboard-accessible plus beside the needs heading", async 
   await expect(needs.getByLabel("Additional need", { exact: true })).toBeVisible();
   await needs.getByRole("button", { name: "Cancel", exact: true }).click();
   await expect(plus).toHaveAttribute("aria-expanded", "false");
+});
+
+
+test("seller price sorting orders the current offer with the other sellers", async ({ page, request }) => {
+  await openOffer(page, request, () => {}, body => {
+    const original = body.offers[0];
+    body.current!.product.price = 90;
+    body.offers = [70, 20, 50].map((price, index) => ({ ...original, model_key: body.current_model_key!, product: { ...original.product, id: `sort-${index}`, price, merchant: `Seller ${index}` }, risk: { ...assessment(), score: index } }));
+  });
+  const table = page.getByRole("table", { name: "Compare sellers of this model", exact: true });
+  const prices = () => table.locator("tbody > tr:not(.cui-expanded-offer) .cui-price-cell .cui-money-amount").allTextContents();
+  await expect.poll(prices).toEqual(["20.00", "50.00", "70.00", "90.00"]);
+  await page.getByLabel("Sort sellers by").selectOption("risk");
+  await page.getByLabel("Sort sellers by").selectOption("price");
+  await expect.poll(prices).toEqual(["20.00", "50.00", "70.00", "90.00"]);
+});
+
+test("recommended product cards scroll and update the current recommendation", async ({ page, request }, testInfo) => {
+  await openOffer(page, request, () => {}, body => {
+    const seed = body.offers.find(offer => offer.model_key !== body.current_model_key)!;
+    body.offers.push(...Array.from({ length: 6 }, (_, index) => ({ ...seed, model_key: `extra-model-${index}`, product: { ...seed.product, id: `extra-product-${index}` } })));
+  });
+  const list = page.getByRole("region", { name: "Recommended products", exact: true });
+  await expect(list).toBeVisible();
+  expect(await list.evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true);
+  await list.focus();
+  await page.keyboard.press("End");
+  await expect.poll(() => list.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+  await list.screenshot({ path: testInfo.outputPath("product-list.png") });
+  const card = list.getByRole("listitem").first();
+  const name = await card.getByRole("heading").innerText();
+  await card.getByRole("button", { name: "View feature comparison", exact: true }).click();
+  await expect(page.locator(".cui-product-comparison")).toHaveAttribute("open", "");
+  await card.getByRole("button", { name: `Compare ${name}`, exact: true }).click();
+  await expect(page.getByRole("article", { name: "Current recommendation", exact: true }).getByRole("heading", { name, exact: true })).toBeVisible();
 });

@@ -1024,3 +1024,23 @@
 .cui-needs-heading .cui-add-need { display: grid; place-items: center; width: 44px; min-height: 44px; padding: 0; font-size: 24px; line-height: 1; color: var(--blue); border-radius: 8px; }
 .cui-needs-heading .cui-add-need:hover, .cui-needs-heading .cui-add-need[aria-expanded="true"] { background: var(--blue-tint); }
 .cui-needs-heading .cui-extra-editor { left: auto; right: 0; }
+
+/* Alternative models remain browsable without extending the entire decision pane. */
+.cui-product-list { max-height: 480px; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; padding: 4px; margin: 12px 0; }
+.cui-product-list:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.cui-product-list > ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.cui-product-option { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.cui-option-image { flex: 0 0 64px; }
+.cui-option-image .cui-product-image { margin: 0; padding: 0; min-height: 64px; border-radius: 8px; }
+.cui-option-image .cui-product-image img { height: 64px; width: 64px; object-fit: contain; }
+.cui-option-content { min-width: 0; flex: 1; display: grid; gap: 8px; }
+.cui-option-content h3 { margin: 0; font-size: 18px; overflow-wrap: anywhere; }
+.cui-option-content > p { margin: 0; font-size: 12px; }
+.cui-option-content .cui-badge { justify-self: start; }
+.cui-option-content .cui-actions { margin: 0; }
+.cui-option-content button { min-height: 44px; white-space: normal; }
+.cui-product-comparison > summary { overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+  .cui-product-option { flex-direction: column; padding: 12px; }
+  .cui-product-list { max-height: 420px; }
+}

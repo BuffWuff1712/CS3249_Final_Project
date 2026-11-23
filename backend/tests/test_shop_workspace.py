@@ -424,3 +424,33 @@ def test_changing_category_in_needs_clears_needs_for_the_old_category():
     view = change(view, "brief", {"field": "category", "fact": {"value": "Backpacks", "source": "confirmed", "hard": True}}, method="PUT")
     assert set(view["session"]["brief"]) == {"category"}
     assert "cleared" in view["session"]["messages"][-1]["text"]
+
+
+def test_lowest_price_preference_chooses_minimum_same_model_and_explains_repeat():
+    view = proposed()
+    eligible = [o for o in view["offers"] if o["model_key"] == view["current_model_key"] and o["decision"] != "BLOCK"]
+    expected = min(o["product"]["price"] for o in eligible)
+    view = change(view, "seller", {"preference": "lowest price"})
+    assert view["current"]["product"]["price"] == expected
+    assert view["seller_preference"] == "lowest price"
+    view = change(view, "seller", {"preference": "lowest price"})
+    assert "already ranks first" in view["session"]["messages"][-1]["text"]
+
+
+def test_return_preference_uses_listing_terms_before_merchant_terms(monkeypatch):
+    view = proposed()
+    session = storage.load(view["session"]["id"])
+    candidates = [o for o in shop.preview(session) if o["model_key"] == view["current_model_key"] and o["decision"] != "BLOCK"]
+    assert len(candidates) >= 2
+    for candidate in candidates:
+        candidate["merchant"]["return_policy"] = "30 days"
+        candidate["product"]["web_evidence"] = {"return_policy": "7 days"}
+    candidates[-1]["product"]["web_evidence"] = {"return_policy": "60 days"}
+    monkeypatch.setattr(shop, "preview", lambda _: candidates)
+    chosen = []
+    def capture(s, product_id):
+        chosen.append(product_id)
+        s.messages.append(shop.Message(role="assistant", text="Compared."))
+    monkeypatch.setattr(shop, "propose", capture)
+    shop.another_seller(session, "longer returns")
+    assert chosen == [candidates[-1]["product"]["id"]]
