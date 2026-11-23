@@ -5,7 +5,7 @@ FIELDS = {"product_type": "category", "budget": "budget", "features": "features"
 # INNOVATION: One-shot validation feedback for ungrounded extractions. Instead of
 # silently accepting a hallucinated preference (as other chat agents do), Beany sends
 # the extraction back to the model once with the grounding issue stated; if it still
-# cannot cite the user, the preference is downgraded, never saved as confirmed.
+# cannot cite the user, the preference is discarded, never saved as confirmed.
 def extraction_issues(session, result, text):
     if result.intent not in ("search", "new_task", "clarify", "alternative"):
         return []

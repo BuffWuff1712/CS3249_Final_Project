@@ -26,9 +26,9 @@ No accounts or personal data are needed for any option. All test data ships in t
 ### Option A: using the hosted version
 
 - Open the link above. If nobody has used it for a while, the first page load can take 10–20 seconds while Google Cloud Run starts the service.
-- The hosted version uses **[recorded listings / live web search: confirm before submission]**. With live web search, one search can take 1–5 minutes; the progress panel shows what Beany is doing while you wait.
+- The hosted version uses **live web search** (Shopify Global Catalog and Browser Use). One search can take 1–5 minutes; the progress panel shows what Beany is doing while you wait.
 - Sessions are kept only while the service is running and may be cleared when it restarts. This is expected: everything is a demo, and checkout is simulated.
-- If the link is unavailable, please contact us ([TEAM_EMAIL]) and we will restart it or arrange a short online session.
+- If the link is unavailable, please contact us (weituyuan@u.nus.edu) and we will restart it or arrange a short online session.
 
 ### Option B: run locally with no API keys
 
@@ -236,7 +236,7 @@ Each item below is marked in the code with a comment starting with `INNOVATION:`
 
    *Regression tests:* [clarification flow](backend/tests/test_clarification_and_stop.py) — `test_partial_answer_does_not_skip_remaining_questions` and `test_ungrounded_skip_is_ignored`.
 
-3. **Two-stage, quote-grounded feature verification.** *How other chat agents handle it:* an offer card says "noise cancelling ✓" because the model paraphrased the listing. There is no distinction between "the listing says this", "the listing doesn't mention this", and "the listing contradicts this". *Beany:* deterministic concept and word-stem rules confirm common features cheaply. Must-haves the rules cannot confirm go to one batched LLM call per search whose met/absent verdicts **must quote the listing**. An absent feature excludes the listing; an unstated or ungrounded verdict keeps it with a REVIEW note ("the listing doesn't mention…"); a model outage leaves the strict filter in place and unconfirmed must-haves still exclude. → `feature_match.py` (`met`), `feature_check.py` (`ensure`)
+3. **Two-stage, quote-grounded feature verification.** *How other chat agents handle it:* an offer card says "noise cancelling ✓" because the model paraphrased the listing. There is no distinction between "the listing says this", "the listing doesn't mention this", and "the listing contradicts this". *Beany:* deterministic concept and word-stem rules confirm common features cheaply. Needs the rules cannot settle (features, size and use, must-have or preferred) go to one batched LLM call per search whose met/absent verdicts **must quote the listing**; an ungrounded verdict counts as unstated. Only must-haves affect eligibility: an absent must-have excludes the listing, and an unstated one keeps it with a REVIEW note ("the listing doesn't mention…"); a model outage leaves the strict filter in place and unconfirmed must-haves still exclude. → `feature_match.py` (`met`), `feature_check.py` (`ensure`)
 
    *Example:* For "connects to two devices", the model can ground a match in "multipoint Bluetooth 5.3". A fabricated quote such as "dual connection" becomes "unstated"; a model outage leaves the strict filter in place.
 
@@ -254,7 +254,7 @@ Each item below is marked in the code with a comment starting with `INNOVATION:`
 
    *Regression tests:* [checkout integrity](backend/tests/test_cart.py) — `test_changed_catalogue_rejected` and `test_atomic_and_fingerprint_bound`.
 
-6. **Bounded hybrid shortlist with search reuse.** *How other chat agents handle it:* every turn fires a fresh web search, and either three cards appear instantly from a cache (no verification) or the user waits several minutes with no feedback. *Beany:* results from Shopify Global Catalog (MCP) and Browser Use are merged, deduplicated and inspected under a fixed budget (6 inspections), stopping at three distinct eligible products. **Narrowing edits reuse the previous search** within 25 minutes — a lower budget, a removed feature, a newly excluded brand — so refinement is instant instead of another paid live browse. Broadening or category changes re-fetch. → `shopping_tools.py` (`screen_candidates`), `discovery.py` (`reusable`)
+6. **Bounded hybrid shortlist with search reuse.** *How other chat agents handle it:* every turn fires a fresh web search, and either three cards appear instantly from a cache (no verification) or the user waits several minutes with no feedback. *Beany:* results from Shopify Global Catalog (MCP) and Browser Use are merged, deduplicated and inspected under a fixed budget (6 inspections), stopping at three distinct eligible products. **Edits that keep the product category and currency reuse the previous search** within 25 minutes — a new budget, added or removed features, a newly excluded brand — so refinement is instant instead of another paid live browse. A new search runs when the category or currency changes, fewer than three listings still qualify, or the needs are unchanged (the user is asking for a fresh search). → `shopping_tools.py` (`screen_candidates`), `discovery.py` (`reusable`)
 
    *Example:* Lowering the budget to SGD50 rechecks the existing pool and keeps the SGD30 and SGD45 listings without calling either search provider again. If reuse yields no eligible listings, discovery performs a new search.
 
@@ -270,7 +270,7 @@ Each item below is marked in the code with a comment starting with `INNOVATION:`
 
 ```sh
 cd backend
-.venv/bin/python -m pytest -q          # 1,084 tests, offline: no paid calls
+.venv/bin/python -m pytest -q          # 1,115 tests, offline: no paid calls
 cd ../frontend
 npm run typecheck
 npm run build

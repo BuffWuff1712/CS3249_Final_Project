@@ -48,12 +48,14 @@ def covered(old, new):
     return all(same(old.get(k), new.get(k)) for k in SAME)
 
 
-# INNOVATION: Search reuse on narrowing edits. Other chat shopping agents re-fire a
-# fresh web search every turn even when the user is only tightening the filter. Beany
-# reuses the last search's listings when the brief can only narrow the results (lower
-# budget, removed feature, newly excluded brand, rejected offer), so refinement is
-# instant instead of another paid Browser Use run. Broadening or category changes
-# still re-fetch.
+# INNOVATION: Search reuse on refining edits. Other chat shopping agents re-fire a
+# fresh web search every turn even when the user is only adjusting the filter. Beany
+# rechecks the last search's listings against the edited brief whenever the product
+# category and currency are unchanged (a new budget, added or removed features, an
+# excluded brand, a rejected offer), so refinement is instant instead of another paid
+# Browser Use run. It searches again when the category or currency changes, fewer
+# than three listings still qualify, the batch is older than 25 minutes, or the needs
+# are unchanged (the user is asking for a fresh search).
 def reusable(session):
     """Listing ids of the current batch, refiltered after any edit that keeps product and currency."""
     from datetime import datetime, timezone

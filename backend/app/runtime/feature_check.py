@@ -54,9 +54,11 @@ def verdict(session, product, term):
 # INNOVATION: Two-stage feature verification, stage two. Unlike competitors whose offer
 # cards flatten everything into "has feature ✓", Beany distinguishes met / absent /
 # unstated and requires a listing quote for met and absent. One batched LLM call per
-# search resolves must-haves the deterministic rules missed; ungrounded verdicts fall
-# back to "unstated" (REVIEW note), and a model outage leaves the strict rules in
-# place so unconfirmed required features still exclude the listing.
+# search resolves the needs the deterministic rules could not settle (features, size
+# and use, must-have or preferred); ungrounded verdicts fall back to "unstated". Only
+# must-have needs affect eligibility: absent excludes the listing and unstated keeps it
+# with a REVIEW note. A model outage leaves the strict rules in place, so unconfirmed
+# must-have features still exclude the listing.
 @timed("product.feature_check")
 def ensure(session, ids):
     """Ask the model about required features the rules could not confirm; cache grounded verdicts."""
