@@ -1028,6 +1028,23 @@
 .cui-extra-nav button { min-width: 36px; min-height: 36px; padding: 6px; }
 .cui-extra-position { margin: 0; font-size: 12px; color: var(--muted); }
 
+.cui-verdict-strip { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 10px 14px; border-radius: 10px; border: 1px solid transparent; }
+.cui-verdict-strip svg { flex: 0 0 auto; width: 20px; height: 20px; }
+.cui-verdict-strip p { margin: 0; font-size: 13px; line-height: 1.4; }
+.cui-verdict-strip strong { font-weight: 700; margin-right: 4px; }
+.cui-verdict-strip--safe { background: var(--blue-tint); border-color: #cfd8ce; color: var(--blue-ink); }
+.cui-verdict-strip--safe svg { color: var(--blue); }
+.cui-verdict-strip--caution { background: var(--amber-tint); border-color: #eacf9b; color: #5d3f05; }
+.cui-verdict-strip--caution svg { color: var(--amber); }
+.cui-verdict-strip--warn { background: var(--amber-tint); border-color: #eacf9b; color: #5d3f05; }
+.cui-verdict-strip--warn svg { color: var(--amber); }
+.cui-verdict-strip--block { background: var(--cui-danger-surface); border-color: var(--cui-danger); color: var(--cui-danger-text); }
+.cui-verdict-strip--block svg { color: var(--cui-danger); }
+
+.cui-risk-disclosure, .cui-match-disclosure { margin-bottom: 14px; }
+.cui-risk-disclosure > summary, .cui-match-disclosure > summary { font-weight: 600; }
+.cui-risk-disclosure[open] > summary { color: var(--cui-danger-text); }
+
 .cui-cart-link { position: relative; display: inline-flex; align-items: center; gap: 6px; }
 .cui-cart-link--filled { font-weight: 600; color: var(--blue); }
 .cui-cart-count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; font-size: 11px; font-weight: 700; color: #fff; background: var(--blue); border-radius: 10px; line-height: 1; }
