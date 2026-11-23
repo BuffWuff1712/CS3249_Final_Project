@@ -17,7 +17,7 @@ The interface has two panes: the conversation on the left, and the current match
 
 | Option | What you need | What you get |
 |---|---|---|
-| **A. Hosted version (small online session with us)** | A browser and a short online session with us | The full system as submitted, running on Google Cloud Run with the real LLM and live web search. **Link: [https://35.240.146.219/shop](https://35.240.146.219/shop)** (self-signed HTTPS — click through the browser warning). Hosting costs money every day, so it is not kept running: see Option A below. |
+| **A. Hosted version (small online session with us)** | A browser and a short online session with us | The full system as submitted, running on Google Cloud Run with the real LLM and live web search. **Link: [https://35.240.146.219/shop](https://35.240.146.219/shop)** (self-signed HTTPS — click through the browser warning). Hosting the live server incurs daily costs, so it is not kept running 24/7: see Option A below. |
 | **B. Local, with the real LLM** | Option C's requirements plus an OpenAI-compatible API key | The full conversational behaviour. Uses the recorded listings, or live search if you also add a Browser Use key. |
 | **C. Local, no keys (offline)** | Python 3.11+, Node 20.9+ | The full interface and backend, with recorded product listings and a keyword-based stand-in for the LLM. Good for checking setup, the UI, risk flags and the selection flow. Conversation quality is limited. |
 
