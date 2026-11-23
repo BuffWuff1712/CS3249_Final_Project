@@ -128,7 +128,7 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 gcloud run deploy beany-backend --source backend --region asia-southeast1 \
   --allow-unauthenticated --timeout 3600 --max-instances 1 --memory 1Gi \
   --set-secrets OPENAI_API_KEY=openai-api-key:latest \
-  --set-env-vars "BEANY_LLM_MODE=openai,OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1,OPENAI_MODEL=qwen3.6:35b,OPENAI_API_MODE=responses,OPENAI_STRUCTURED_MODE=schema,OPENAI_TIMEOUT_SECONDS=200,BEANY_DB=/tmp/beany.sqlite3,BEANY_SEARCH_PROVIDER=browser_use,BROWSER_USE_REPLAY=data/replay/study_listings.json"
+  --set-env-vars "BEANY_LLM_MODE=openai,OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1,OPENAI_MODEL='gpt-6-luna',OPENAI_API_MODE=responses,OPENAI_STRUCTURED_MODE=schema,OPENAI_TIMEOUT_SECONDS=200,BEANY_DB=/tmp/beany.sqlite3,BEANY_SEARCH_PROVIDER=browser_use,BROWSER_USE_REPLAY=data/replay/study_listings.json"
 ```
 
 This uses the recorded listings. For **live web search**, add `BROWSER_USE_API_KEY=browser-use-api-key:latest` to `--set-secrets` (comma-separated), and replace the `--set-env-vars` value with the version below. It starts with `^@^` because the domain list contains commas, so the variables are separated by `@` instead:
