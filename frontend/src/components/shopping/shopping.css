@@ -1044,3 +1044,31 @@
   .cui-product-option { flex-direction: column; padding: 12px; }
   .cui-product-list { max-height: 420px; }
 }
+
+/* Browse at the top, with sideways navigation and distinct review sections. */
+.cui-product-browser { padding: 16px; margin: 0 0 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+.cui-browser-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cui-browser-heading h2 { margin: 0; font-size: 22px; }
+.cui-carousel-controls { display: flex; gap: 8px; }
+.cui-carousel-controls button { min-width: 44px; min-height: 44px; padding: 8px; }
+.cui-product-list { max-height: none; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-gutter: auto; }
+.cui-product-list > ul { display: flex; gap: 12px; align-items: stretch; }
+.cui-product-list .cui-product-option { flex: 0 0 86%; max-width: none; min-width: 0; flex-direction: column; scroll-snap-align: start; }
+.cui-product-option[aria-current="true"] { border-color: var(--blue); }
+.cui-option-content { width: 100%; align-content: start; }
+.cui-carousel-position { margin: 8px 0; font-size: 12px; color: var(--muted); }
+.cui-recommendation > .cui-offer-fit, .cui-recommendation > .cui-backend-risk { padding: 16px; margin: 0 0 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.cui-recommendation > .cui-offer-actions { padding: 20px 16px; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+
+.cui-product-list { cursor: grab; }
+.cui-product-list[data-dragging="true"] { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+.cui-product-list img { -webkit-user-drag: none; }
+
+/* Preference and follow-up suggestions share the sideways card treatment. */
+.cui-suggestion-cards { min-width: 0; max-width: 100%; margin-block: 12px; }
+.cui-suggestion-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.cui-suggestion-heading > span { color: var(--muted); font-size: 12px; }
+.cui-suggestion-track { display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding: 4px 4px 12px; scrollbar-width: thin; }
+.cui-suggestion-track > button { flex: 0 0 72%; min-width: 0; max-width: 240px; min-height: 80px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); text-align: left; white-space: normal; overflow-wrap: anywhere; scroll-snap-align: start; }
+.cui-suggestion-track > button:hover, .cui-suggestion-track > button[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-tint); }
+.cui-suggestion-track:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
