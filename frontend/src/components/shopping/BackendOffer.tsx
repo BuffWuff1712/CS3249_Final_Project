@@ -86,8 +86,24 @@ export function BackendProductEvidence({ product, merchant, replay = false }: { 
   </section>;
 }
 
+function originalSiteLink(product: Product, merchant: Merchant | null) {
+  for (const [value, label] of [
+    [product.source_url, "Visit original listing"],
+    [merchant?.website, "Visit seller’s website"],
+  ]) {
+    if (!value) continue;
+    try {
+      const url = new URL(value);
+      if (!["https:", "http:"].includes(url.protocol) || url.username || url.password) continue;
+      return { href: url.href, domain: url.hostname, label };
+    } catch { /* Missing or malformed destinations are not rendered as links. */ }
+  }
+  return null;
+}
+
 export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, selected, disabled, selectionInvalid = false, select, seller, addCart, alternative, replay = false, evidenceId, onEditNeeds }: { sellerPreferences?: ReactNode; action: Action; brief?: Record<string, Fact>; selected: boolean; disabled: boolean; selectionInvalid?: boolean; select: () => void; addCart: () => void; alternative: () => void; seller: () => void; replay?: boolean; evidenceId?: number; onEditNeeds?: () => void }) {
   const lowReview = action.product.reviews?.find(review => review.rating <= 2);
+  const originalSite = originalSiteLink(action.product, action.merchant_details);
   return <article className="cui-recommendation" aria-label="Current recommendation">
     {/* Product identity stays ahead of fit, concerns, and the decision controls. */}
     <header className="cui-offer-anchor">
@@ -99,6 +115,10 @@ export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, sel
           <p className="cui-offer-sub"><strong>{money(action.product)}</strong><span>{action.product.merchant}</span></p>
         </div>
       </div>
+      {originalSite && <div className="cui-original-site">
+        <a className="cui-policy-link cui-original-site-link" href={originalSite.href} target="_blank" rel="noopener noreferrer" aria-describedby="original-site-destination">{originalSite.label}<span aria-hidden="true">↗</span></a>
+        <small id="original-site-destination">{originalSite.domain} · Opens in a new tab</small>
+      </div>}
     </header>
 
     <section className="cui-offer-fit" aria-label="Match explanation">
@@ -148,7 +168,6 @@ export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, sel
       <dl className="cui-spec-grid">{Object.entries(action.product.specifications).map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl>
       <p>Availability: {action.product.stock == null ? "Not supplied" : action.product.stock ? "Listed as in stock" : "Listed as unavailable"}</p>
       {action.product.list_price != null && <p>Listed reference price: {money({ ...action.product, price: action.product.list_price })}. This is the listing's reference price, not a verified saving.</p>}
-      {action.product.source_url?.startsWith("https://") && <a className="cui-policy-link" href={action.product.source_url} target="_blank" rel="noopener noreferrer">View product listing ↗</a>}
     </details>}
 
     <details className="cui-offer-section" key={evidenceId || 0} open={!!evidenceId}><summary>Comparison &amp; sources</summary><BackendProductEvidence product={action.product} merchant={action.merchant_details} replay={replay} /></details>

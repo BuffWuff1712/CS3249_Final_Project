@@ -998,3 +998,8 @@
 @media (max-width: 760px) {
   .cui-shell > header { height: auto; }
 }
+
+/* Keep the external destination visible without opening evidence disclosures. */
+.cui-original-site { display: grid; justify-items: start; gap: 8px; min-width: 0; }
+.cui-original-site-link { min-height: 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.cui-original-site small { font-size: 11px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; max-width: 100%; }

@@ -145,6 +145,7 @@ test("long content preserves assessment-before-action order and layout at all ta
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   const current = await openOffer(page, request, action => {
+    action.product.source_url = "https://shop.example.test/products/headphones";
     action.product.name = "E7 Active Noise Cancelling Headphones Wireless 5.0 Bluetooth Headphones with Rich Bass";
     action.risk = assessment([concrete[1]]);
     if (action.merchant_details) action.merchant_details.return_policy = "Returns accepted within thirty days, subject to the supplied packaging and condition requirements.";
@@ -188,4 +189,30 @@ test("long content preserves assessment-before-action order and layout at all ta
     expect(layout.buttonsOverlap, `button overlap at ${width}px`).toBe(false);
   }
   expect(errors).toEqual([]);
+});
+
+
+test("original listing is directly accessible from the product header", async ({ page, request }) => {
+  const current = await openOffer(page, request, action => {
+    action.product.source_url = "https://shop.example.test/products/headphones";
+  });
+  const link = current.locator(".cui-offer-anchor").getByRole("link", { name: "Visit original listing", exact: true });
+  await expect(link).toBeVisible();
+  await expect(link).toHaveAttribute("href", "https://shop.example.test/products/headphones");
+  await expect(link).toHaveAttribute("target", "_blank");
+  await expect(link).toHaveAccessibleDescription("shop.example.test · Opens in a new tab");
+  await link.focus();
+  await expect(link).toBeFocused();
+  expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+});
+
+test("missing or unsafe listing URLs fall back to a clearly labelled seller website", async ({ page, request }) => {
+  const current = await openOffer(page, request, action => {
+    action.product.source_url = "javascript:alert(1)";
+    if (action.merchant_details) action.merchant_details.website = "https://seller.example.test/";
+  });
+  await expect(current.getByRole("link", { name: "Visit original listing", exact: true })).toHaveCount(0);
+  const link = current.getByRole("link", { name: "Visit seller’s website", exact: true });
+  await expect(link).toBeVisible();
+  await expect(link).toHaveAttribute("href", "https://seller.example.test/");
 });
