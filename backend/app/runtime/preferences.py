@@ -9,6 +9,10 @@ def task_start(session):
     return len(session.messages) if any(e.kind == "brief_reset" for e in session.events) else 0
 
 
+# INNOVATION: Quote-grounded preference extraction. Other chat shopping agents let the
+# model paraphrase the user's words into stored preferences; Beany saves a preference as
+# "confirmed" only when the model supplies a verbatim quote and Python verifies the quote
+# is in the message. Assumptions can only enter as "suggested".
 def grounded_change(session, change, text, allow_history=True):
     evidence = change.evidence.strip()
     if not evidence:

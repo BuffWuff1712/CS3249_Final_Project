@@ -118,6 +118,11 @@ def screen_candidate(session, product):
     return product if action.decision != "BLOCK" else None
 
 
+# INNOVATION: Bounded hybrid shortlist. Other chat shopping agents either render
+# unverified cache cards instantly or make the user wait minutes with no visibility.
+# Beany merges Shopify (MCP) and Browser Use results, deduplicates them, and inspects
+# under a fixed budget, stopping at three distinct eligible products — one primary
+# recommendation plus up to two alternatives — so verification stays bounded.
 @timed("search.screen_and_rank")
 def screen_candidates(session, ids):
     from .progress import check_cancelled

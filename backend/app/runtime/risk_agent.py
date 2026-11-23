@@ -97,6 +97,13 @@ def observed_text(product):
     return normalize(" \n ".join(strings(fields)))
 
 
+# INNOVATION: Grounded merchant-risk review of untrusted web content. Other chat
+# shopping agents trust a retailer allowlist and feed page content to the model as if
+# it were instructions. Beany treats the listing page as hostile: the LLM reviewer
+# proposes signals but every finding must quote the captured page verbatim, ungrounded
+# findings are discarded, and text addressed to AI assistants is itself a finding
+# (direct defence against prompt injection on product pages). Fixed Python weights,
+# not the model, convert findings into ALLOW / REVIEW / BLOCK.
 def grounded(finding, text):
     quote = normalize(finding.quote)
     return len(quote) >= 3 and quote in text

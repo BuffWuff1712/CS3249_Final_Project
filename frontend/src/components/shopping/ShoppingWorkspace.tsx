@@ -1,4 +1,9 @@
 "use client";
+// INNOVATION: Two-pane, inspectable interface. Other chat shopping UIs bury the agent's
+// interpretation of the user's needs inside a scrolling transcript, so correcting it
+// means arguing in prose. Beany keeps the conversation on the left and an editable
+// needs summary, per-feature fit chips, seller evidence and risk flags on the right —
+// the UI surface through which the grounding work in the backend becomes correctable.
 import { productTitle } from "@/lib/productTitle";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { shopRequest, shopStream, stopShopRequest, ShopRequestError, money, rememberShop, type LiveShopActivity, type OfferPreview, type ShopField, type ShopView } from "@/lib/shopBackend";
