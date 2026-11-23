@@ -216,3 +216,28 @@ test("missing or unsafe listing URLs fall back to a clearly labelled seller webs
   await expect(link).toBeVisible();
   await expect(link).toHaveAttribute("href", "https://seller.example.test/");
 });
+
+test("selected offer stays above the left composer and finishes a simulated decision", async ({ page, request }, testInfo) => {
+  const current = await openOffer(page, request, () => {});
+  const dock = page.getByRole("region", { name: "Selected offer", exact: true });
+  await expect(dock).toHaveCount(0);
+  await current.getByRole("button", { name: "Select this offer", exact: true }).click();
+  await expect(dock).toBeVisible();
+  await expect(dock).toContainText("No real order or payment");
+  const finish = dock.getByRole("button", { name: "Finish decision", exact: true });
+  await expect(finish).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Finish decision", exact: true })).toHaveCount(1);
+  const layout = await dock.evaluate(element => {
+    const dockRect = element.getBoundingClientRect();
+    const conversation = element.closest('.cui-conversation')!;
+    const composer = conversation.querySelector('.cui-composer')!.getBoundingClientRect();
+    const history = conversation.querySelector('.cui-chat-scroll')!.getBoundingClientRect();
+    return { inLeftPane: !!conversation, aboveComposer: dockRect.bottom <= composer.top, belowHistory: dockRect.top >= history.bottom };
+  });
+  expect(layout).toEqual({ inLeftPane: true, aboveComposer: true, belowHistory: true });
+  await page.screenshot({ path: testInfo.outputPath("finish-dock.png"), fullPage: true });
+  await finish.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("region", { name: "Simulated receipt", exact: true })).toBeVisible();
+  await expect(dock).toHaveCount(0);
+});

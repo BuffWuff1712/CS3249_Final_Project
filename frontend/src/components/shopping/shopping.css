@@ -1003,3 +1003,17 @@
 .cui-original-site { display: grid; justify-items: start; gap: 8px; min-width: 0; }
 .cui-original-site-link { min-height: 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
 .cui-original-site small { font-size: 11px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; max-width: 100%; }
+
+/* Persistent left-pane checkout card; chat scrolls independently above it. */
+.cui-finish-dock { flex: 0 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 16px; border: 1px solid var(--blue); border-radius: 12px; background: var(--surface); box-shadow: 0 4px 16px rgb(0 0 0 / 8%); }
+.cui-finish-summary { flex: 1 1 220px; min-width: 0; }
+.cui-finish-dock h2 { margin: 0 0 6px; font-size: 16px; font-family: var(--sans); font-weight: 600; }
+.cui-finish-dock p { margin: 4px 0 0; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.cui-finish-dock .cui-finish-product { font-weight: 600; max-height: 3em; overflow-y: auto; }
+.cui-finish-dock .cui-finish-note { color: var(--muted); }
+.cui-finish-dock > button { min-height: 44px; flex: 0 0 auto; }
+@media (max-width: 760px) {
+  .cui-conversation:has(.cui-finish-dock) { height: auto; max-height: none; }
+  .cui-conversation:has(.cui-finish-dock) .cui-chat-scroll { flex: 0 1 auto; max-height: 300px; }
+  .cui-finish-dock > button { width: 100%; }
+}
