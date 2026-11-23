@@ -35,29 +35,65 @@ def last_failure():
 REUSE_SECONDS = 25 * 60
 # A recheck of the current batch must leave at least this many eligible listings (a full shortlist).
 REUSE_MINIMUM = 3
-# Needs that define what the providers searched for: changing one needs a new search.
-SAME = ("category", "currency")
+# List needs compare as sets: "a, b" and "B, a" ask for the same thing.
+LIST_NEEDS = ("features", "preferred_brands", "excluded_brands", "merchants")
 
 
-def same(a, b):
-    return (a.value.strip().casefold() if a else "") == (b.value.strip().casefold() if b else "")
+def normalized(key, fact):
+    if fact is None:
+        return None
+    text = fact.value.strip().casefold()
+    if key in LIST_NEEDS:
+        return frozenset(part.strip() for part in text.split(",") if part.strip())
+    return text
 
 
-def covered(old, new):
-    """True when the current batch was fetched for the same product and currency."""
-    return all(same(old.get(k), new.get(k)) for k in SAME)
+def same(a, b, key=""):
+    return normalized(key, a) == normalized(key, b)
 
 
-# INNOVATION: Search reuse on refining edits. Other chat shopping agents re-fire a
-# fresh web search every turn even when the user is only adjusting the filter. Beany
-# rechecks the last search's listings against the edited brief whenever the product
-# category and currency are unchanged (a new budget, added or removed features, an
-# excluded brand, a rejected offer), so refinement is instant instead of another paid
-# Browser Use run. It searches again when the category or currency changes, fewer
-# than three listings still qualify, the batch is older than 25 minutes, or the needs
-# are unchanged (the user is asking for a fresh search).
+def same_needs(old, new):
+    """Same value and must-have flag for every need, ignoring case, spacing and list order."""
+    return all(same(old.get(k), new.get(k), k) and bool(old.get(k) and old[k].hard) == bool(new.get(k) and new[k].hard)
+               for k in set(old) | set(new))
+
+
+def narrows(old, new):
+    """True when every changed need can only remove listings from the batch fetched for old.
+
+    A lower or newly added budget and more excluded brands narrow. Anything else (a higher or
+    removed budget, added or removed features, a new usage, size, preferred brand, seller,
+    category or currency) asks for listings the last search was never run for."""
+    for key in set(old) | set(new):
+        a, b = old.get(key), new.get(key)
+        if same(a, b, key):
+            continue
+        if key == "budget" and b is not None:
+            if a is None:
+                continue
+            try:
+                if float(b.value) <= float(a.value):
+                    continue
+            except ValueError:
+                pass
+            return False
+        if key == "excluded_brands" and b is not None and normalized(key, b) >= (normalized(key, a) or frozenset()):
+            continue
+        return False
+    return True
+
+
+# INNOVATION: Search reuse on narrowing edits. Other chat shopping agents re-fire a
+# fresh web search every turn even when the user is only tightening the filter. Beany
+# rechecks the last search's listings when an edit only narrows them (a lower or new
+# budget, a newly excluded brand) or only switches a need between must-have and
+# preferred, so refinement is instant instead of another paid Browser Use run. Any edit that asks
+# for listings the last search never looked for (a higher or removed budget, added or
+# removed features, a new usage, size, brand, category or currency) searches again, as
+# does asking again with unchanged needs, fewer than three listings still qualifying,
+# or a batch older than 25 minutes.
 def reusable(session):
-    """Listing ids of the current batch, refiltered after any edit that keeps product and currency."""
+    """Listing ids of the current batch, refiltered after an edit that only narrows it."""
     from datetime import datetime, timezone
     fetch = session.live_fetch
     if fetch is None or session.search_replay or fetch.provider != session.search_provider:
@@ -65,10 +101,11 @@ def reusable(session):
     age = (datetime.now(timezone.utc) - datetime.fromisoformat(fetch.at)).total_seconds()
     if not 0 <= age <= REUSE_SECONDS:
         return None
-    # Unchanged needs and no rejected offer means the user is asking for a fresh search.
-    if fetch.brief == session.brief and len(session.rejected_products) <= fetch.rejected:
+    # Unchanged needs mean the user is asking for a fresh search, even after rejecting an
+    # offer: "search again" or "find something else" must not show the same batch again.
+    if same_needs(fetch.brief, session.brief):
         return None
-    if not covered(fetch.brief, session.brief):
+    if not narrows(fetch.brief, session.brief):
         return None
     ids = [i for i in fetch.product_ids if i in session.live_products]
     return ids or None

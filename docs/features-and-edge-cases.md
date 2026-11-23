@@ -51,7 +51,7 @@ The 25 cases cover ambiguous input (1–6), changes of mind (7–11), off-topic 
 | 8 | Refinement ("cheaper", "in blue") | Refines the current item instead of starting over | Context carryover across turns | `dialogue.txt` |
 | 9 | Switch to another product ("bags too") | Starts a new task with a fresh brief; cart, receipts and permissions are kept | Task boundary in dialogue state; context management | `dialogue.txt`, `service.py` |
 | 10 | User edits needs after a proposal | Supersedes pending proposals and clears the selection | Consistent dialogue state; stale state is a known LLM weakness | `service.py`, `policy.py` |
-| 11 | Edit that only narrows results (lower budget, removed feature) | Rechecks the previous listings instead of paying for a new search | Efficiency as a non-functional requirement | `discovery.py` (`reusable`) |
+| 11 | Edit that only narrows results (lower budget, newly excluded brand) | Rechecks the previous listings instead of paying for a new search | Efficiency as a non-functional requirement | `discovery.py` (`reusable`) |
 | 12 | Greeting, thanks or banter | Replies naturally; no search and no repeated checkout warnings | Mixed initiative; politeness is social data, not noise | `dialogue.txt` (VOICE, INTENT) |
 | 13 | Conversation drifts off topic | Gently offers to return to the shopping goal, without nagging or inventing a goal | Serve the user's turn, then steer | `dialogue.txt` (VOICE) |
 | 14 | "Don't search yet" | Defers the search while still saving any stated preferences | User initiative; agency and control | `dialogue.txt` (`search_control`) |

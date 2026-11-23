@@ -1,8 +1,8 @@
-"""Reusing the last live search when an edit only changes local filtering."""
+"""Reusing the last live search only when an edit narrows what it already found."""
 from datetime import datetime, timedelta, timezone
 import pytest
 from app.runtime import discovery, browser_search, shopify_catalog
-from app.runtime.discovery import covered
+from app.runtime.discovery import narrows, same_needs
 from app.runtime.schemas import Fact, Product, Merchant, Session
 
 F = lambda value, hard=False: Fact(value=value, source="confirmed", hard=hard)
@@ -23,21 +23,42 @@ def brief(**changes):
 @pytest.mark.parametrize("changes", [
     {"features": F("comfortable, durable, practical", hard=False)},   # must-have -> preferred
     {"budget": F("60", hard=True)},                                   # lower budget
+    {"excluded_brands": F("coofay")},                                 # newly excluded brand
+    {"category": F("Backpack")},                                      # same value, other case
+    {"features": F("Practical, comfortable,  durable", hard=True)},   # same features, other order
+])
+def test_narrowing_edits_refilter_the_batch(changes):
+    assert narrows(BASE, brief(**changes))
+
+
+def test_a_budget_added_to_an_open_search_narrows():
+    assert narrows(brief(budget=None), BASE)
+
+
+def test_more_excluded_brands_narrow_but_fewer_do_not():
+    one, two = brief(excluded_brands=F("coofay")), brief(excluded_brands=F("coofay, nike"))
+    assert narrows(one, two) and not narrows(two, one)
+
+
+@pytest.mark.parametrize("changes", [
     {"budget": F("120", hard=True)},                                  # higher budget
+    {"budget": None},                                                 # budget removed
     {"features": F("comfortable, durable, practical, waterproof")},   # new feature
+    {"features": F("comfortable, durable")},                          # feature removed
     {"usage": F("hiking")},
     {"size": F("30L")},
     {"preferred_brands": F("osprey")},
-    {"excluded_brands": F("coofay")},
-    {"category": F("Backpack")},                                      # same value, other case
+    {"category": F("suitcase")},
+    {"currency": F("USD")},
 ])
-def test_edits_that_keep_product_and_currency_refilter_the_batch(changes):
-    assert covered(BASE, brief(**changes))
+def test_edits_beyond_the_last_search_need_a_new_search(changes):
+    assert not narrows(BASE, brief(**changes))
 
 
-@pytest.mark.parametrize("changes", [{"category": F("suitcase")}, {"currency": F("USD")}])
-def test_new_product_or_currency_needs_a_new_search(changes):
-    assert not covered(BASE, brief(**changes))
+def test_same_needs_ignore_case_spacing_and_order():
+    assert same_needs(BASE, brief(features=F("Durable, practical, comfortable", hard=True), category=F(" Backpack ")))
+    assert not same_needs(BASE, brief(budget=F("60", hard=True)))
+    assert not same_needs(BASE, brief(features=F("comfortable, durable, practical")))   # must-have -> preferred
 
 
 DESC = "travel backpack, padded straps, durable ripstop, laptop compartment and pockets"
@@ -133,24 +154,35 @@ def test_unchanged_needs_mean_a_fresh_search(providers):
     assert len(providers) == 4
 
 
-def test_rejected_offer_with_unchanged_needs_reuses(providers):
+def test_rejected_offer_with_unchanged_needs_searches_again(providers):
+    # "search again" / "find something else" is interpreted as an alternative, which rejects
+    # the current offer; with the same needs it must still be a fresh search.
     s = session()
     first = discovery.discover(s)
     s.rejected_products.append(first[0])
     assert first[0] not in discovery.discover(s)
+    assert len(providers) == 4
+
+
+def test_rejection_with_a_narrowing_edit_reuses(providers):
+    s = session()
+    first = discovery.discover(s)
+    s.rejected_products.append(first[0])
+    s.brief["excluded_brands"] = F("coofay")
+    again = discovery.discover(s)
     assert len(providers) == 2
+    assert first[0] not in again and len(again) == 3
 
 
-def test_added_needs_refilter_and_search_only_when_nothing_fits(providers):
+def test_broadening_and_new_needs_search_again(providers):
     s = session()
     discovery.discover(s)
-    s.brief["budget"] = F("120", hard=True)
-    s.brief["features"] = F("waterproof")                 # preferred: the batch still fits
-    discovery.discover(s)
-    assert len(providers) == 2
-    s.brief["features"] = F("waterproof", hard=True)      # nothing in the batch shows it
+    s.brief["budget"] = F("120", hard=True)               # higher budget: listings never searched
     discovery.discover(s)
     assert len(providers) == 4
+    s.brief["features"] = F("comfortable, durable, practical, waterproof", hard=False)
+    discovery.discover(s)                                 # new feature: a new search too
+    assert len(providers) == 6
 
 
 def test_a_new_search_replaces_the_batch(providers):

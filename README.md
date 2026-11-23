@@ -255,11 +255,11 @@ Each item below is marked in the code with a comment starting with `INNOVATION:`
 
    *Regression tests:* [checkout integrity](backend/tests/test_cart.py) — `test_changed_catalogue_rejected` and `test_atomic_and_fingerprint_bound`.
 
-6. **Bounded hybrid shortlist with search reuse.** *How other chat agents handle it:* every turn fires a fresh web search, and either three cards appear instantly from a cache (no verification) or the user waits several minutes with no feedback. *Beany:* results from Shopify Global Catalog (MCP) and Browser Use are merged, deduplicated and inspected under a fixed budget (6 inspections), stopping at three distinct eligible products. **Edits that keep the product category and currency reuse the previous search** within 25 minutes — a new budget, added or removed features, a newly excluded brand — so refinement is instant instead of another paid live browse. A new search runs when the category or currency changes, fewer than three listings still qualify, or the needs are unchanged (the user is asking for a fresh search). → `shopping_tools.py` (`screen_candidates`), `discovery.py` (`reusable`)
+6. **Bounded hybrid shortlist with search reuse.** *How other chat agents handle it:* every turn fires a fresh web search, and either three cards appear instantly from a cache (no verification) or the user waits several minutes with no feedback. *Beany:* results from Shopify Global Catalog (MCP) and Browser Use are merged, deduplicated and inspected under a fixed budget (6 inspections), stopping at three distinct eligible products. **Narrowing edits reuse the previous search** within 25 minutes — a lower or newly added budget, a newly excluded brand, a need switched between must-have and preferred — so refinement is instant instead of another paid live browse. Any edit that asks for listings the last search never looked for (a higher or removed budget, added or removed features, a new usage, size, preferred brand, category or currency) searches again, as does asking again with unchanged needs ("search again", "find something else"), even after rejecting an offer, or fewer than three listings still qualifying. → `shopping_tools.py` (`screen_candidates`), `discovery.py` (`reusable`)
 
    *Example:* Lowering the budget to SGD50 rechecks the existing pool and keeps the SGD30 and SGD45 listings without calling either search provider again. If reuse yields no eligible listings, discovery performs a new search.
 
-   *Regression tests:* [search reuse](backend/tests/test_search_reuse.py) — `test_lower_budget_refilters_without_searching` and `test_empty_reuse_falls_back_to_a_real_search`; [hybrid shortlist](backend/tests/test_hybrid_shortlist.py) — `test_both_successes_are_combined_and_best_three_screened`.
+   *Regression tests:* [search reuse](backend/tests/test_search_reuse.py) — `test_lower_budget_refilters_without_searching`, `test_broadening_and_new_needs_search_again`, `test_rejected_offer_with_unchanged_needs_searches_again` and `test_empty_reuse_falls_back_to_a_real_search`; [hybrid shortlist](backend/tests/test_hybrid_shortlist.py) — `test_both_successes_are_combined_and_best_three_screened`.
 
 7. **Two-pane, inspectable interface.** *How other chat agents handle it:* the agent's interpretation of the user's needs is buried inside a scrolling transcript, if it is shown at all; correcting it means arguing in prose. *Beany:* the conversation scrolls on the left while an **editable needs summary**, per-feature fit chips, seller evidence and risk flags stay visible on the right. Every value is labelled confirmed / suggested / unspecified and can be edited directly, which is the UI surface through which the grounding work above becomes correctable at any point. → `frontend/src/components/shopping/`
 
@@ -271,7 +271,7 @@ Each item below is marked in the code with a comment starting with `INNOVATION:`
 
 ```sh
 cd backend
-.venv/bin/python -m pytest -q          # 1,115 tests, offline: no paid calls
+.venv/bin/python -m pytest -q          # 1,122 tests, offline: no paid calls
 cd ../frontend
 npm run typecheck
 npm run build
@@ -405,13 +405,18 @@ New sessions default to `BEANY_SEARCH_PROVIDER=hybrid`: each new search queries 
 and Browser Use once, sequentially, with cancellation checked between sources.
 Both sources are searched even if the first succeeds. No automatic paid retry occurs.
 
-After an edit that keeps the product category and currency, the next search first rechecks the
-current batch, the listings from the latest search, against the new needs
-(`reusable()` in `app/runtime/discovery.py`). Earlier batches are never brought back: they were
-fetched for other needs. If at least three listings in the batch are eligible (`REUSE_MINIMUM`, a
-full shortlist) they are used without a new search; otherwise, or when the category or currency changes, the needs are unchanged since the last search or recheck (the user asks
-again) or the batch is older than 25 minutes (snapshots older than 30 minutes cannot check out),
-a new search runs and its listings replace the batch. A batch from a search where one source
+After an edit that only narrows the needs (a lower or newly added budget, a newly excluded brand, or a
+need switched between must-have and preferred), the next search first rechecks the current batch,
+the listings from the latest search, against the new needs (`reusable()` and `narrows()` in
+`app/runtime/discovery.py`). Earlier batches are never brought back: they were fetched for other
+needs. If at least three listings in the batch are eligible (`REUSE_MINIMUM`, a full shortlist) they
+are used without a new search. A new search runs and its listings replace the batch otherwise:
+after any edit that asks for listings the last search never looked for (a higher or removed budget,
+added or removed features, a new usage, size, preferred brand or seller, category or currency), when
+the needs are unchanged since the last search or recheck (the user asks again, including "search
+again" or "find something else" after rejecting an offer), when fewer than three listings still
+qualify, or when the batch is older than 25 minutes (snapshots older than 30 minutes cannot check
+out). Needs are compared ignoring case, spacing and list order. A batch from a search where one source
 failed is still rechecked. Reuse is logged as a `search_reuse` event and shown as "Rechecked N offers
 from your last search".
 
