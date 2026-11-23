@@ -884,3 +884,91 @@
   .cui-workspace:has(.cui-needs details[open]) .cui-conversation,
   .cui-workspace:has(.cui-needs details[open]) .cui-decision-column { height: auto; }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   Editorial pass 3: decision anchor, collapsed evidence, tight chips.
+   ─────────────────────────────────────────────────────────────── */
+
+/* Recommendation card — no visible frame; evidence rhythm is our spacing */
+.cui-recommendation { background: transparent; border: 0; padding: 0; }
+.cui-recommendation-heading { display: none; }
+
+/* ANCHOR — compact head with image + title + price, then primary actions. */
+.cui-offer-anchor {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 16px; margin-bottom: 20px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+}
+.cui-offer-head { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: start; }
+.cui-offer-thumb {
+  width: 72px; height: 72px; border-radius: 8px; overflow: hidden;
+  background: var(--surface-2); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+}
+.cui-offer-thumb .cui-product-image { margin: 0; padding: 0; border: 0; background: transparent; min-height: 0; width: 100%; height: 100%; }
+.cui-offer-thumb .cui-product-image img { width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.cui-offer-head-text { min-width: 0; }
+.cui-offer-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; font-weight: 500; }
+.cui-offer-head-text h3 { font-family: var(--serif); font-size: 20px; font-weight: 400; letter-spacing: -.02em; margin: 0 0 6px; line-height: 1.2; }
+.cui-offer-sub { margin: 0; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.cui-offer-sub strong { font-family: var(--serif); font-weight: 400; font-size: 24px; letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cui-offer-sub span { font-size: 12px; color: var(--muted); }
+
+/* Primary actions inside anchor */
+.cui-offer-anchor .cui-offer-actions { margin: 0; padding: 0; gap: 10px; background: transparent; border: 0; }
+.cui-offer-anchor .cui-offer-primary { gap: 8px; }
+.cui-offer-anchor .cui-offer-primary .cui-select { font-size: 13px; font-weight: 500; }
+.cui-offer-anchor .cui-offer-primary button { min-height: 44px; }
+.cui-offer-anchor .cui-offer-explore { margin-top: 2px; }
+.cui-offer-anchor .cui-offer-explore .cui-actions { margin: 0; gap: 8px; }
+.cui-offer-anchor .cui-offer-explore button { min-height: 38px; font-size: 12px; }
+.cui-offer-anchor .cui-seller-reason { padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; }
+
+/* FIT CHIPS — compact single wrapping row */
+.cui-matched-priorities { margin: 16px 0 8px; }
+.cui-matched-priorities h4 { font-size: 10px; letter-spacing: .1em; }
+.cui-matched-priorities ul { gap: 5px; }
+.cui-matched-priorities li { padding: 3px 8px; font-size: 11px; font-weight: 500; border-radius: 999px; gap: 4px; }
+.cui-matched-priorities svg { width: 13px; height: 13px; }
+
+/* COLLAPSED EVIDENCE sections — hairline rules, serif summaries */
+.cui-offer-section {
+  border-top: 1px solid var(--line); padding: 14px 0 0; margin-top: 4px;
+}
+.cui-offer-section > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 2px; min-height: 40px;
+  font-family: var(--sans); font-size: 13px; font-weight: 500; letter-spacing: 0;
+  text-transform: none; color: var(--ink);
+  background: transparent; border: 0; border-radius: 0;
+  cursor: pointer; list-style: none;
+}
+.cui-offer-section > summary::-webkit-details-marker { display: none; }
+.cui-offer-section > summary::after {
+  content: "+"; font-family: var(--mono); font-size: 18px; font-weight: 400;
+  color: var(--muted); line-height: 1; transition: transform .15s;
+}
+.cui-offer-section[open] > summary::after { content: "−"; }
+.cui-offer-section > summary:hover { background: transparent; color: var(--ink); }
+.cui-offer-section[open] > summary { color: var(--blue-ink); }
+
+/* Content inside each section stays breathable */
+.cui-offer-section > :not(summary) { padding: 4px 2px 12px; }
+.cui-offer-section .cui-match-facts { margin: 8px 0; border-block: 1px solid var(--line); }
+.cui-offer-section .cui-listing-summary { background: var(--surface-2); margin: 10px 0; }
+.cui-offer-section .cui-product-points { margin: 10px 0; padding-left: 18px; }
+.cui-offer-section > details > summary { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--blue); }
+
+/* Risk block — stays open, sits between anchor and chips */
+.cui-recommendation > .cui-backend-risk { margin: 0 0 16px; padding: 0; }
+
+/* Responsive: anchor stacks image full-width on narrow */
+@media (max-width: 480px) {
+  .cui-offer-head { grid-template-columns: 56px 1fr; gap: 10px; }
+  .cui-offer-thumb { width: 56px; height: 56px; }
+  .cui-offer-head-text h3 { font-size: 18px; }
+  .cui-offer-sub strong { font-size: 20px; }
+}
+
+/* Remove the old stand-alone cui-product-image rule since the big block is gone */
+.cui-recommendation > .cui-product-image { display: none; }
