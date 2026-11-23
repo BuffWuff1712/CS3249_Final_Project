@@ -17,20 +17,39 @@ The interface has two panes: the conversation on the left, and the current match
 
 | Option | What you need | What you get |
 |---|---|---|
-| **A. Hosted version (recommended)** | A browser | The full system as submitted, running on Google Cloud Run with the real LLM. **Link: [https://35.240.146.219/shop](https://35.240.146.219/shop)** (self-signed HTTPS — click through the browser warning). |
-| **B. Local, no keys (offline)** | Python 3.11+, Node 20.9+ | The full interface and backend, with recorded product listings and a keyword-based stand-in for the LLM. Good for checking setup, the UI, risk flags and the selection flow. Conversation quality is limited. |
-| **C. Local, with the real LLM** | Option B plus an OpenAI-compatible API key | The full conversational behaviour. Uses the recorded listings, or live search if you also add a Browser Use key. |
+| **A. Hosted version (small online session with us)** | A browser and a short online session with us | The full system as submitted, running on Google Cloud Run with the real LLM and live web search. **Link: [https://35.240.146.219/shop](https://35.240.146.219/shop)** (self-signed HTTPS — click through the browser warning). Hosting costs money every day, so it is not kept running: see Option A below. |
+| **B. Local, with the real LLM** | Option C's requirements plus an OpenAI-compatible API key | The full conversational behaviour. Uses the recorded listings, or live search if you also add a Browser Use key. |
+| **C. Local, no keys (offline)** | Python 3.11+, Node 20.9+ | The full interface and backend, with recorded product listings and a keyword-based stand-in for the LLM. Good for checking setup, the UI, risk flags and the selection flow. Conversation quality is limited. |
 
 No accounts or personal data are needed for any option. All test data ships in this repository (`backend/data/`).
 
+**Paid API keys.** The full system uses API keys that are not included in this submission: a **paid Browser Use Cloud key** for live web search (charged per search) and an API key for the OpenAI-compatible LLM. Option A uses both. Option B needs the LLM key, plus the Browser Use key only for live search. Option C runs with no keys at all.
+
 ### Option A: using the hosted version
 
-- Open the link above. If nobody has used it for a while, the first page load can take 10–20 seconds while Google Cloud Run starts the service.
+- **Please contact us to arrange a short online session.** The hosted version runs on paid services (cloud hosting, the LLM and Browser Use) that cost money for every day it stays online, so we do not keep it running for the whole grading period. If you would like to view or use the web version, please email weituyuan@u.nus.edu. We will start the service for the session, and you can then use it yourself at the link above.
 - The hosted version uses **live web search** (Shopify Global Catalog and Browser Use). One search can take 1–5 minutes; the progress panel shows what Beany is doing while you wait.
 - Sessions are kept only while the service is running and may be cleared when it restarts. This is expected: everything is a demo, and checkout is simulated.
-- If the link is unavailable, please contact us (weituyuan@u.nus.edu) and we will restart it or arrange a short online session.
 
-### Option B: run locally with no API keys
+### Option B: run locally with the real LLM
+
+Follow the setup steps in Option C below, but in `backend/.env` set `BEANY_LLM_MODE=openai` and fill in:
+
+```
+OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1   # or any OpenAI-compatible endpoint
+OPENAI_API_KEY=<your key>
+OPENAI_MODEL=qwen3.6:35b                                  # the model we used
+OPENAI_API_MODE=responses
+OPENAI_STRUCTURED_MODE=schema
+```
+
+DeepSeek also works: `OPENAI_BASE_URL=https://api.deepseek.com/v1`, `OPENAI_API_MODE=chat`, `OPENAI_STRUCTURED_MODE=json` and a model listed by `python -m app.check_gateway`. Run `python -m app.check_gateway --generate` from `backend/` to test the connection.
+
+For **live web search** instead of recorded listings, leave `BROWSER_USE_REPLAY` empty, set `BEANY_SEARCH_PROVIDER=hybrid` and add a `BROWSER_USE_API_KEY` plus `BROWSER_USE_ALLOWED_DOMAINS` (for example `amazon.sg,qoo10.sg`). Shopify Global Catalog needs no key. Live search is paid per run (capped by `BROWSER_USE_MAX_COST_USD`) and takes 1–4 minutes per search.
+
+After changing `.env`, restart the backend and click **Start fresh** in the interface, because each session keeps the search provider it started with.
+
+### Option C: run locally with no API keys
 
 macOS / Linux:
 
@@ -78,24 +97,6 @@ The recorded listings (`backend/data/replay/study_listings.json`) cover **headph
 - `Running shoes under 150 SGD, size 42, with cushioning`
 
 Leave out a detail (for example `I need a backpack under 80 SGD`) to see Beany ask a clarifying question first. Then inspect the current match, open the seller evidence, use **Find another seller** or **Find another product**, and select an offer to finish the simulated decision. Some replayed sellers trigger REVIEW or BLOCK so that you can see the risk flags.
-
-### Option C: run locally with the real LLM
-
-Follow Option B, but in `backend/.env` set `BEANY_LLM_MODE=openai` and fill in:
-
-```
-OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1   # or any OpenAI-compatible endpoint
-OPENAI_API_KEY=<your key>
-OPENAI_MODEL=qwen3.6:35b                                  # the model we used
-OPENAI_API_MODE=responses
-OPENAI_STRUCTURED_MODE=schema
-```
-
-DeepSeek also works: `OPENAI_BASE_URL=https://api.deepseek.com/v1`, `OPENAI_API_MODE=chat`, `OPENAI_STRUCTURED_MODE=json` and a model listed by `python -m app.check_gateway`. Run `python -m app.check_gateway --generate` from `backend/` to test the connection.
-
-For **live web search** instead of recorded listings, leave `BROWSER_USE_REPLAY` empty, set `BEANY_SEARCH_PROVIDER=hybrid` and add a `BROWSER_USE_API_KEY` plus `BROWSER_USE_ALLOWED_DOMAINS` (for example `amazon.sg,qoo10.sg`). Shopify Global Catalog needs no key. Live search is paid per run (capped by `BROWSER_USE_MAX_COST_USD`) and takes 1–4 minutes per search.
-
-After changing `.env`, restart the backend and click **Start fresh** in the interface, because each session keeps the search provider it started with.
 
 ## Deploying to Google Cloud Run (how the hosted version runs)
 
@@ -288,7 +289,7 @@ Open http://localhost:3000/research and enter `BEANY_RESEARCH_KEY` from `backend
 
 - This is a local, single-worker research prototype, not a production deployment. There are no user accounts; session IDs act as local access tokens.
 - LLM extraction is probabilistic. Quote grounding prevents invented preferences but cannot prove semantic correctness, which is why the needs summary is editable.
-- Mock mode uses keyword matching and does not represent the real conversation quality. Use the hosted version or Option C for that.
+- Mock mode uses keyword matching and does not represent the real conversation quality. Use the hosted version or Option B for that.
 - Live search covers only the allowlisted retailers and Shopify's catalogue, and compares a bounded shortlist rather than every listing. Risk signals are indicators, not proof of fraud or safety.
 - All checkout and receipts are simulated. Do not enter real personal or payment data.
 
