@@ -181,7 +181,7 @@ export function ShoppingWorkspace() {
   const finish = () => { if (view?.selected) void mutate("finish", { proposal_id: view.selected.id, fingerprint: view.selected.fingerprint }); };
   return <div className="shell cui-shell">
     <a className="cui-skip" href="#shopping-main">Skip to shopping</a>
-    <header><a className="brand" href="/"><span>beany</span><BeanGlyph size={16} /></a><nav aria-label="Shopping navigation"><a href="/cart">Cart ({session?.cart.length || 0})</a><a href="/receipts">Purchase history</a><button disabled={disabled || !session} aria-label="Open settings" onClick={() => window.location.assign("/settings")}>Settings</button><button onClick={() => void load(true)}>Start fresh</button></nav></header>
+    <header><a className="brand" href="/"><span>beany</span><BeanGlyph size={16} /></a><nav aria-label="Shopping navigation"><a className={`cui-cart-link${session?.cart.length ? " cui-cart-link--filled" : ""}`} href="/cart" aria-label={`Cart, ${session?.cart.length || 0} items`}>Cart{!!session?.cart.length && <span className="cui-cart-count" aria-hidden="true">{session.cart.length}</span>}</a><a href="/receipts">Purchase history</a><button disabled={disabled || !session} aria-label="Open settings" onClick={() => window.location.assign("/settings")}>Settings</button><button onClick={() => void load(true)}>Start fresh</button></nav></header>
     <main className="cui-workspace" id="shopping-main"><h1 className="sr-only">Shopping decision assistant</h1>
       <nav className="cui-mobile-jumps" aria-label="Workspace sections"><a href="#shopping-conversation">Conversation</a><a href="#shopping-decision">Current decision</a></nav>
       <ResizablePanes><section className="cui-conversation" id="shopping-conversation" aria-label="Shopping conversation">
@@ -236,6 +236,18 @@ export function ShoppingWorkspace() {
           {!!sellers.length && <section className="cui-alternative" aria-label="Sellers of the same model"><SellerComparison offers={currentOffer ? [currentOffer, ...sellers] : sellers} currentId={current?.product.id} disabled={disabled} replay={!!session?.search_replay} choose={id => void mutate("propose", { product_id: id })} /></section>}
           {!!view?.offers.length && <details onToggle={event => setAllOffersOpen(event.currentTarget.open)}><summary>Compare all {view.offers.length} eligible offers</summary>{allOffersOpen && <SellerComparison offers={view.offers} all currentId={current?.product.id} disabled={disabled} replay={!!session?.search_replay} choose={id => void mutate("propose", { product_id: id })} />}</details>}
           </>}
+          {!!session?.cart.length && (() => {
+            const totals = session.cart.reduce<Record<string, number>>((out, item) => {
+              const p = item.action.product;
+              out[p.currency] = Math.round(((out[p.currency] || 0) + p.price) * 100) / 100;
+              return out;
+            }, {});
+            const totalText = Object.entries(totals).map(([currency, total]) => `${currency} ${total.toFixed(2)}`).join(" · ");
+            return <aside className="cui-checkout-bar" role="region" aria-label="Cart summary">
+              <div className="cui-checkout-bar-summary"><strong>{session.cart.length} {session.cart.length === 1 ? "item" : "items"} in cart</strong><span>{totalText}</span></div>
+              <a className="primary cui-checkout-bar-cta" href="/cart">Go to checkout →</a>
+            </aside>;
+          })()}
           {session && <details className="cui-oversight"><summary>Shopping activity · {session.stage.replaceAll("_", " ")}</summary><ol>{session.events.filter(event => ["search", "intervention", "approve", "reject", "simulated_checkout", "cancel", "brief_edit", "permissions", "cart_added", "cart_removed", "cart_checkout"].includes(event.kind)).slice(-12).map(event => <li key={event.id}>{({ search: "Compared matching products", intervention: "Requested your review", approve: "You approved this action", reject: "You rejected this action", simulated_checkout: "Created a simulated receipt", cancel: "Shopping task cancelled", brief_edit: "Updated your shopping brief", permissions: "Updated permissions", cart_added: "Saved an item to cart", cart_removed: "Removed an item from cart", cart_checkout: "Checked out a cart item" } as Record<string, string>)[event.kind]}</li>)}</ol></details>}
         </fieldset>
       </section></ResizablePanes>

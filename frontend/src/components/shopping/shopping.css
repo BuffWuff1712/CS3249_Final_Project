@@ -1028,6 +1028,18 @@
 .cui-extra-nav button { min-width: 36px; min-height: 36px; padding: 6px; }
 .cui-extra-position { margin: 0; font-size: 12px; color: var(--muted); }
 
+.cui-cart-link { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+.cui-cart-link--filled { font-weight: 600; color: var(--blue); }
+.cui-cart-count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; font-size: 11px; font-weight: 700; color: #fff; background: var(--blue); border-radius: 10px; line-height: 1; }
+
+.cui-checkout-bar { position: sticky; bottom: 0; z-index: 10; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0 0; padding: 14px 16px; border: 1px solid var(--blue); border-radius: 12px; background: var(--blue-tint); box-shadow: 0 4px 16px rgb(0 0 0 / 8%); }
+.cui-checkout-bar-summary { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cui-checkout-bar-summary strong { font-size: 14px; color: var(--ink); }
+.cui-checkout-bar-summary span { font-size: 12px; color: var(--muted); }
+.cui-checkout-bar-cta { flex: 0 0 auto; display: inline-grid; place-items: center; min-height: 40px; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: #fff; background: var(--blue); font-weight: 600; }
+.cui-checkout-bar-cta:hover { background: var(--blue-ink); }
+@media (max-width: 720px) { .cui-checkout-bar-cta { width: 100%; } }
+
 /* Alternative models remain browsable without extending the entire decision pane. */
 .cui-product-list { max-height: 480px; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; padding: 4px; margin: 12px 0; }
 .cui-product-list:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
