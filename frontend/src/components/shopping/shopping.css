@@ -1,7 +1,10 @@
 .cui-shell {
-  --ink: #14234b; --muted: #54647f; --blue: #315ce9; --line: #d9e2f1;
-  --cui-danger: #b42318; --cui-danger-text: #842c2a; --cui-danger-surface: #fff1f1;
-  --cui-review: #965d16; --cui-review-surface: #fff8e8;
+  --ink: #141414; --ink-2: #3A3A3A; --muted: #6B6F76;
+  --blue: #2F5D50; --blue-ink: #234A3F; --blue-tint: #EBEEE9;
+  --line: #ECEBE7; --line-2: #D9D7D1;
+  --surface: #FFFFFF; --surface-2: #FAFAF9;
+  --cui-danger: #A4341F; --cui-danger-text: #6B1F10; --cui-danger-surface: #F3E3DD;
+  --cui-review: #B57A00; --cui-review-surface: #F6EFDC;
   max-width: 1536px; padding: 0 36px; font-size: 14px;
 }
 .cui-shell header { height: 68px; gap: 16px; }
@@ -573,3 +576,399 @@
 .cui-policy-link { display: inline-flex; padding: 9px 12px; border: 1px solid #b9cdfb; border-radius: 8px; color: #1946b9; background: #f4f7ff; text-decoration: none; }
 .cui-policy-link:hover { background: #e5edff; }
 .cui-policy-link:focus-visible { outline: 2px solid #2455ef; outline-offset: 3px; }
+
+/* ───────────────────────────────────────────────────────────────────
+   Editorial redesign overrides. Keep class names intact; retune
+   surfaces, typography, and colour. Later rules win.
+   ─────────────────────────────────────────────────────────────── */
+
+.cui-shell .brand { font-family: var(--serif); font-size: 28px; font-weight: 400; letter-spacing: -.02em; color: var(--ink); display: inline-flex; align-items: baseline; gap: 4px; }
+.cui-shell .brand::after { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); margin-left: 2px; transform: translateY(-2px); }
+.cui-shell header { border-bottom: 1px solid var(--line); height: 64px; }
+.cui-shell nav a { color: var(--ink-2); font-weight: 500; }
+.cui-shell nav a:hover { color: var(--ink); text-decoration: none; }
+
+.cui-shell button { border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); font-weight: 500; border-radius: 8px; }
+.cui-shell button:hover { background: var(--surface-2); border-color: var(--ink-2); }
+.cui-shell button:disabled { opacity: .45; }
+.cui-shell button.primary, .cui-shell button.cui-select { background: var(--blue); color: #fff; border-color: var(--blue); }
+.cui-shell button.primary:hover, .cui-shell button.cui-select:hover { background: var(--blue-ink); border-color: var(--blue-ink); }
+.cui-shell .cui-link { color: var(--blue); }
+.cui-shell .cui-link:hover { color: var(--blue-ink); }
+
+/* Typography: serif for product/display headings, mono for labels/eyebrows */
+.cui-workspace h2 { font-family: var(--serif); font-weight: 400; font-size: 18px; letter-spacing: -.02em; }
+.cui-workspace h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -.025em; }
+.cui-welcome h2 { font-family: var(--serif); font-size: 36px; letter-spacing: -.025em; font-weight: 400; }
+.cui-product-heading h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -.025em; }
+.cui-product-heading strong { font-family: var(--serif); font-weight: 400; font-size: 26px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+
+/* Brief row — needs summary */
+.cui-needs { border-bottom: 1px solid var(--line); padding: 16px 0; }
+.cui-needs > h2 { font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.cui-need-chip { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; color: var(--ink); font-weight: 500; }
+.cui-need-chip:hover { background: var(--surface-2); border-color: var(--ink-2); }
+.cui-need-chip--empty:disabled { background: var(--surface-2); border-style: dashed; color: var(--muted); }
+.cui-need-chip .cui-edit-icon { color: var(--muted); }
+.cui-intent-grid small { color: var(--muted); font-size: 11px; }
+.cui-needs > details > summary { color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; border: 0; padding: 4px 0; background: transparent; }
+.cui-needs > details > summary:hover { background: transparent; color: var(--ink); }
+
+/* Chat surface */
+.cui-conversation { gap: 16px; padding-right: 28px; }
+.cui-chat-scroll { padding: 12px 10px 16px 0; }
+.cui-turn { gap: 14px; margin: 12px 0 18px; }
+
+/* Assistant avatar — shimmering sage orb */
+.cui-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: transparent; color: #fff;
+  font-size: 0; font-weight: 500;
+  background-image: conic-gradient(from 210deg, var(--blue), #7AA69B, #E6D7A8, var(--blue));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+  animation: cui-orb-rotate 8s linear infinite;
+}
+.cui-turn--assistant .cui-avatar::after,
+.cui-progress .cui-avatar::after { content: ""; position: absolute; }
+.cui-avatar svg { display: none; }
+.cui-turn--user .cui-avatar {
+  background: var(--blue); background-image: none; color: #fff; animation: none;
+  box-shadow: none;
+}
+.cui-turn--user .cui-avatar svg { display: block; width: 18px; height: 18px; color: #fff; }
+@keyframes cui-orb-rotate { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .cui-avatar { animation: none; } }
+
+/* Assistant text: plain, no bubble. User text: sage bubble. */
+.cui-turn-body > p { border-radius: 0; padding: 0; background: transparent; font-size: 14px; line-height: 1.65; color: var(--ink); }
+.cui-turn--user .cui-turn-body > p {
+  background: var(--blue-tint); color: var(--ink);
+  border-radius: 16px 16px 4px 16px; padding: 12px 14px;
+  display: inline-block; max-width: 100%;
+}
+
+/* Suggested replies and example starters as pills */
+.cui-suggestions button, .cui-examples button {
+  border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface);
+  color: var(--ink-2); font-weight: 500; padding: 8px 14px; font-size: 12px;
+}
+.cui-suggestions button:hover, .cui-examples button:hover { background: var(--blue-tint); border-color: var(--blue); color: var(--blue-ink); }
+.cui-examples span { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* Composer — pill */
+.cui-compose-row {
+  border: 1px solid var(--line-2); border-radius: 22px; background: var(--surface);
+  padding: 6px 6px 6px 16px; gap: 8px; align-items: center;
+  transition: border-color .15s, box-shadow .15s;
+}
+.cui-compose-row:focus-within { border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-tint); }
+.cui-compose-row textarea { border: 0; background: transparent; padding: 10px 0; min-height: 40px; }
+.cui-compose-row button {
+  min-width: 40px; min-height: 40px; padding: 0 16px; border-radius: 999px;
+  background: var(--blue); color: #fff; border-color: var(--blue); font-weight: 500;
+}
+.cui-compose-row button:hover { background: var(--blue-ink); border-color: var(--blue-ink); }
+
+/* Decision column */
+.cui-decision-column { border-left: 1px solid var(--line); }
+.cui-decision-frame { background: var(--surface); border: 0; padding: 20px 24px; }
+.cui-decision-empty { padding: 32px 0; color: var(--muted); }
+.cui-decision-empty h2 { color: var(--ink); }
+.cui-decision-empty > p { color: var(--muted); line-height: 1.7; }
+.cui-source { color: var(--muted); font-size: 12px; }
+
+/* Recommendation card */
+.cui-recommendation { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; }
+.cui-product-heading > div span { color: var(--muted); }
+
+/* Fit chips */
+.cui-matched-priorities h4 { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.cui-matched-priorities li { background: var(--blue-tint); border: 1px solid #c7d0c6; color: var(--blue-ink); font-weight: 500; border-radius: 6px; }
+.cui-matched-priorities li.cui-constraint-unknown { background: var(--amber-tint); border-color: #eacf9b; color: #5d3f05; }
+.cui-matched-priorities li.cui-constraint-mismatch { background: var(--brick-tint); border-color: #e3b9ad; color: #6b1f10; }
+
+/* Spec highlights */
+.cui-key-spec { background: var(--blue-tint); color: var(--blue-ink); padding: 1px 5px; border-radius: 3px; }
+.cui-icon-fact > svg { color: var(--blue); }
+.cui-benefit svg { color: var(--blue); }
+.cui-tradeoff svg { color: var(--muted); }
+.cui-checks svg { color: var(--blue); }
+
+/* Seller preference block */
+.cui-seller-reason { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.cui-seller-reason dd { color: var(--ink-2); }
+
+/* Risk flags — keep three distinct tones */
+.cui-flag--danger { background: var(--cui-danger-surface); border-color: var(--cui-danger); color: var(--cui-danger-text); }
+.cui-flag--review { background: var(--cui-review-surface); border-color: var(--cui-review); color: #704a05; }
+
+/* Selection confirmation */
+.cui-selection { background: var(--blue-tint); border: 1px solid var(--blue); color: var(--blue-ink); border-radius: 8px; }
+.cui-selected-label { color: var(--blue-ink); }
+
+/* Comparison / offer tables */
+.cui-compare-table thead, .cui-offer-table thead { background: var(--surface-2); }
+.cui-compare-table th, .cui-offer-table th { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.cui-offer-table tr[aria-current="true"] { background: var(--blue-tint); }
+.cui-offer-table .cui-current-offer { color: var(--blue); font-weight: 600; }
+.cui-offer-table .cui-table-details { color: var(--blue); }
+.cui-expanded-offer > td { background: var(--surface-2); }
+
+/* Change / notice / clarification */
+.cui-change, .cui-notice, .cui-clarification { background: var(--surface-2); border: 1px solid var(--line); border-left: 3px solid var(--blue); color: var(--ink-2); }
+.cui-updated-label { background: var(--blue-tint); color: var(--blue-ink); font-family: var(--mono); font-size: 10px; letter-spacing: .04em; }
+
+/* Live activity */
+.cui-live-activity { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; }
+.cui-live-steps svg { color: var(--blue); }
+.cui-step-spinner { border-color: var(--line-2); border-top-color: var(--blue); }
+.cui-typing { color: var(--blue); }
+
+/* Evidence block */
+.cui-source-record { border-color: var(--line); }
+.cui-source-record blockquote { background: var(--surface-2); border-color: var(--line-2); }
+.cui-site { background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; }
+
+/* Assessment info */
+.cui-assessment-info { background: var(--surface-2); border-color: var(--line); color: var(--muted); }
+.cui-assessment-info > svg { color: var(--blue); }
+
+/* Backend evidence tweaks */
+.cui-match-facts dt { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.cui-match-facts > div + div { border-top-color: var(--line); }
+.cui-review-concern { background: var(--cui-review-surface); border-left-color: var(--cui-review); color: #704a05; }
+.cui-concern-list > li { background: var(--cui-review-surface); border-left-color: var(--cui-review); }
+.cui-concern-list strong { color: #704a05; }
+.cui-policy-block { background: var(--cui-danger-surface); border-left-color: var(--cui-danger); color: var(--cui-danger-text); }
+
+/* Need editor popover — hairline, no heavy shadow */
+.cui-needs .cui-need-editor { border: 1px solid var(--line-2); box-shadow: 0 8px 24px rgba(20,20,20,.06); border-radius: 10px; background: var(--surface); }
+.cui-extra-editor { border: 1px solid var(--line-2); box-shadow: 0 8px 24px rgba(20,20,20,.06); background: var(--surface); border-radius: 10px; }
+.cui-need-suggestions button[aria-pressed="true"] { color: var(--blue); border-color: var(--blue); background: var(--blue-tint); }
+.cui-need-editor legend { font-family: var(--serif); font-size: 16px; font-weight: 400; letter-spacing: -.015em; }
+
+/* Product image frame */
+.cui-product-image { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+
+/* Resizable pane divider */
+.cui-pane-divider { background: linear-gradient(var(--line-2), var(--line-2)) center / 1px 100% no-repeat; }
+.cui-pane-divider:focus-visible { background-color: var(--blue-tint); outline-color: var(--blue); }
+
+/* Reply table */
+.cui-reply-table th { background: var(--surface-2); font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+
+/* Policy links */
+.cui-policy-link { background: var(--surface-2); border-color: var(--line-2); color: var(--ink); }
+.cui-policy-link:hover { background: var(--blue-tint); border-color: var(--blue); color: var(--blue-ink); }
+
+/* Listing summary */
+.cui-listing-summary { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; }
+
+/* Price — serif on current offer */
+.cui-money, .cui-price-cell { font-variant-numeric: tabular-nums; }
+
+/* Progress history control */
+.cui-progress-history > summary > span:first-child { color: var(--muted); }
+
+/* Stars keep amber */
+.cui-star-fill { color: var(--amber); }
+
+/* Keep the sandbox callout in a neutral hairline card */
+.cui-participate { background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-2); }
+.cui-participate svg { color: var(--blue); }
+
+/* Catalogue offer list */
+.cui-catalogue-offer { border-bottom-color: var(--line); }
+
+/* Size-up decision frame max width so it reads like a document */
+.cui-recommendation-heading .cui-link { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+
+/* Section rhythm */
+.cui-alternative, .cui-excluded { border-top-color: var(--line); }
+
+/* Fact-status indicator color */
+.cui-intent-grid .cui-fact-status { color: var(--muted); font-size: 11px; }
+
+/* Make the eligible-offers summary feel like a hairline control */
+.cui-shell details > summary { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); }
+
+/* ───────────────────────────────────────────────────────────────────
+   Editorial pass 2: brief on right, bean mascot, orb typing dots.
+   ─────────────────────────────────────────────────────────────── */
+
+/* Wordmark — bean lives inside the brand anchor */
+.cui-shell .brand { display: inline-flex; align-items: baseline; gap: 2px; }
+.cui-shell .brand::after { display: none; }
+.cui-shell .brand > svg { color: var(--blue); align-self: center; margin-left: 2px; transform: translateY(1px); }
+
+/* Brief lives inside the decision column now — reset the full-width grid
+   layout and present it as a tidy hairline card above the offer. */
+.cui-decision-column > .cui-needs {
+  display: block; padding: 0; margin: 0 0 16px; border: 1px solid var(--line);
+  border-radius: 10px; background: var(--surface); position: static; flex-shrink: 0;
+}
+.cui-decision-column > .cui-needs > h2,
+.cui-decision-column > .cui-needs > .cui-intent-grid,
+.cui-decision-column > .cui-needs > details,
+.cui-decision-column > .cui-needs > .cui-currency { grid-area: auto; position: static; width: auto; }
+.cui-decision-column > .cui-needs > h2 {
+  margin: 0; padding: 14px 16px 10px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted); font-weight: 500;
+  border-bottom: 1px solid var(--line);
+}
+.cui-decision-column > .cui-needs > .cui-intent-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 12px 14px; margin: 0;
+}
+.cui-decision-column > .cui-needs > details {
+  margin: 0; padding: 8px 16px 10px; border-top: 1px solid var(--line);
+}
+.cui-decision-column > .cui-needs > details > summary { font-size: 10px; padding: 4px 0; }
+.cui-decision-column > .cui-needs > .cui-currency {
+  padding: 0 16px 10px; color: var(--muted); font-size: 11px;
+}
+.cui-decision-column > .cui-needs:has(details[open]) { display: block; }
+.cui-decision-column > .cui-needs:has(details[open]) > .cui-intent-grid { margin: 0; padding: 12px 14px; }
+
+/* Keep the needs form popover readable inside the narrower right column */
+.cui-decision-column .cui-needs .cui-need-editor { width: min(300px, calc(100vw - 48px)); }
+.cui-decision-column .cui-need-anchor:nth-child(even) .cui-need-editor { left: auto; right: 0; }
+
+/* The desktop grid rule at min-width:761px no longer applies — the brief
+   isn't a child of cui-workspace anymore, so its grid-template-areas
+   reset is handled by the block overrides above. */
+
+/* Decision column spacing */
+.cui-decision-column { padding-top: 20px; }
+.cui-decision-frame { padding: 0; min-height: 0; }
+
+/* Empty state bean */
+.cui-decision-empty { text-align: left; padding: 24px 4px; }
+.cui-empty-bean { color: var(--blue); opacity: .85; margin-bottom: 20px; }
+.cui-decision-empty h2 { font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -.02em; margin: 0 0 12px; }
+
+/* Receipt / completed state bean */
+.cui-selection--receipt { text-align: left; padding: 24px; background: var(--blue-tint); border: 1px solid var(--blue); border-radius: 10px; }
+.cui-receipt-bean { color: var(--blue); margin-bottom: 14px; }
+.cui-selection--receipt h2 { font-family: var(--serif); font-size: 24px; font-weight: 400; letter-spacing: -.02em; margin: 0 0 10px; color: var(--blue-ink); }
+
+/* Orb avatar needs a real gradient surface, not conic — conic in Safari drops without
+   percentage stops. Use radial + conic layered for the shimmering effect. */
+.cui-avatar {
+  position: relative; overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 30%, #E6D7A8 0%, transparent 42%),
+    conic-gradient(from 210deg, #2F5D50, #7AA69B, #E6D7A8, #2F5D50);
+}
+.cui-turn--user .cui-avatar { background: var(--blue); overflow: visible; }
+
+/* Typing dots inside the progress-state avatar */
+.cui-progress .cui-avatar::before,
+.cui-progress .cui-avatar::after,
+.cui-progress .cui-avatar > .cui-orb-dot {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 4px; height: 4px; border-radius: 50%; background: #fff;
+  box-shadow: 0 0 6px rgba(255,255,255,.6);
+}
+.cui-progress .cui-avatar::before { transform: translate(-10px, -2px); animation: cui-orb-pulse 1.2s ease-in-out .0s infinite; }
+.cui-progress .cui-avatar::after { transform: translate(-2px, -2px); animation: cui-orb-pulse 1.2s ease-in-out .2s infinite; }
+@keyframes cui-orb-pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .cui-progress .cui-avatar::before, .cui-progress .cui-avatar::after { animation: none; opacity: .7; }
+}
+
+/* Keep the needs-open sizing rule from clamping heights — it referenced the
+   old top-of-page position of the brief. */
+@media (min-width: 761px) {
+  .cui-shell:has(.cui-needs details[open]) { height: 100dvh; min-height: 0; }
+  .cui-workspace:has(.cui-needs details[open]) .cui-columns { flex: 1; }
+  .cui-workspace:has(.cui-needs details[open]) .cui-conversation,
+  .cui-workspace:has(.cui-needs details[open]) .cui-decision-column { height: auto; }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Editorial pass 3: decision anchor, collapsed evidence, tight chips.
+   ─────────────────────────────────────────────────────────────── */
+
+/* Recommendation card — no visible frame; evidence rhythm is our spacing */
+.cui-recommendation { background: transparent; border: 0; padding: 0; }
+.cui-recommendation-heading { display: none; }
+
+/* ANCHOR — compact head with image + title + price, then primary actions. */
+.cui-offer-anchor {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 16px; margin-bottom: 20px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+}
+.cui-offer-head { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: start; }
+.cui-offer-thumb {
+  width: 72px; height: 72px; border-radius: 8px; overflow: hidden;
+  background: var(--surface-2); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+}
+.cui-offer-thumb .cui-product-image { margin: 0; padding: 0; border: 0; background: transparent; min-height: 0; width: 100%; height: 100%; }
+.cui-offer-thumb .cui-product-image img { width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.cui-offer-head-text { min-width: 0; }
+.cui-offer-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; font-weight: 500; }
+.cui-offer-head-text h3 { font-family: var(--serif); font-size: 20px; font-weight: 400; letter-spacing: -.02em; margin: 0 0 6px; line-height: 1.2; }
+.cui-offer-sub { margin: 0; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.cui-offer-sub strong { font-family: var(--serif); font-weight: 400; font-size: 24px; letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cui-offer-sub span { font-size: 12px; color: var(--muted); }
+
+/* Primary actions inside anchor */
+.cui-offer-anchor .cui-offer-actions { margin: 0; padding: 0; gap: 10px; background: transparent; border: 0; }
+.cui-offer-anchor .cui-offer-primary { gap: 8px; }
+.cui-offer-anchor .cui-offer-primary .cui-select { font-size: 13px; font-weight: 500; }
+.cui-offer-anchor .cui-offer-primary button { min-height: 44px; }
+.cui-offer-anchor .cui-offer-explore { margin-top: 2px; }
+.cui-offer-anchor .cui-offer-explore .cui-actions { margin: 0; gap: 8px; }
+.cui-offer-anchor .cui-offer-explore button { min-height: 38px; font-size: 12px; }
+.cui-offer-anchor .cui-seller-reason { padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; }
+
+/* FIT CHIPS — compact single wrapping row */
+.cui-matched-priorities { margin: 16px 0 8px; }
+.cui-matched-priorities h4 { font-size: 10px; letter-spacing: .1em; }
+.cui-matched-priorities ul { gap: 5px; }
+.cui-matched-priorities li { padding: 3px 8px; font-size: 11px; font-weight: 500; border-radius: 999px; gap: 4px; }
+.cui-matched-priorities svg { width: 13px; height: 13px; }
+
+/* COLLAPSED EVIDENCE sections — hairline rules, serif summaries */
+.cui-offer-section {
+  border-top: 1px solid var(--line); padding: 14px 0 0; margin-top: 4px;
+}
+.cui-offer-section > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 2px; min-height: 40px;
+  font-family: var(--sans); font-size: 13px; font-weight: 500; letter-spacing: 0;
+  text-transform: none; color: var(--ink);
+  background: transparent; border: 0; border-radius: 0;
+  cursor: pointer; list-style: none;
+}
+.cui-offer-section > summary::-webkit-details-marker { display: none; }
+.cui-offer-section > summary::after {
+  content: "+"; font-family: var(--mono); font-size: 18px; font-weight: 400;
+  color: var(--muted); line-height: 1; transition: transform .15s;
+}
+.cui-offer-section[open] > summary::after { content: "−"; }
+.cui-offer-section > summary:hover { background: transparent; color: var(--ink); }
+.cui-offer-section[open] > summary { color: var(--blue-ink); }
+
+/* Content inside each section stays breathable */
+.cui-offer-section > :not(summary) { padding: 4px 2px 12px; }
+.cui-offer-section .cui-match-facts { margin: 8px 0; border-block: 1px solid var(--line); }
+.cui-offer-section .cui-listing-summary { background: var(--surface-2); margin: 10px 0; }
+.cui-offer-section .cui-product-points { margin: 10px 0; padding-left: 18px; }
+.cui-offer-section > details > summary { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--blue); }
+
+/* Risk block — stays open, sits between anchor and chips */
+.cui-recommendation > .cui-backend-risk { margin: 0 0 16px; padding: 0; }
+
+/* Responsive: anchor stacks image full-width on narrow */
+@media (max-width: 480px) {
+  .cui-offer-head { grid-template-columns: 56px 1fr; gap: 10px; }
+  .cui-offer-thumb { width: 56px; height: 56px; }
+  .cui-offer-head-text h3 { font-size: 18px; }
+  .cui-offer-sub strong { font-size: 20px; }
+}
+
+/* Remove the old stand-alone cui-product-image rule since the big block is gone */
+.cui-recommendation > .cui-product-image { display: none; }
