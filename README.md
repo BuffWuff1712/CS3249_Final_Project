@@ -36,14 +36,12 @@ No accounts or personal data are needed for any option. All test data ships in t
 Follow the setup steps in Option C below, but in `backend/.env` set `BEANY_LLM_MODE=openai` and fill in:
 
 ```
-OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1   # or any OpenAI-compatible endpoint
+OPENAI_BASE_URL=https://api.openai.com/v1   # or any OpenAI-compatible endpoint
 OPENAI_API_KEY=<your key>
-OPENAI_MODEL=qwen3.6:35b                                  # the model we used
+OPENAI_MODEL='gpt-6-luna'                               # the model we used
 OPENAI_API_MODE=responses
 OPENAI_STRUCTURED_MODE=schema
 ```
-
-DeepSeek also works: `OPENAI_BASE_URL=https://api.deepseek.com/v1`, `OPENAI_API_MODE=chat`, `OPENAI_STRUCTURED_MODE=json` and a model listed by `python -m app.check_gateway`. Run `python -m app.check_gateway --generate` from `backend/` to test the connection.
 
 For **live web search** instead of recorded listings, leave `BROWSER_USE_REPLAY` empty, set `BEANY_SEARCH_PROVIDER=hybrid` and add a `BROWSER_USE_API_KEY` plus `BROWSER_USE_ALLOWED_DOMAINS` (for example `amazon.sg,qoo10.sg`). Shopify Global Catalog needs no key. Live search is paid per run (capped by `BROWSER_USE_MAX_COST_USD`) and takes 1–4 minutes per search.
 
@@ -128,13 +126,13 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 gcloud run deploy beany-backend --source backend --region asia-southeast1 \
   --allow-unauthenticated --timeout 3600 --max-instances 1 --memory 1Gi \
   --set-secrets OPENAI_API_KEY=openai-api-key:latest \
-  --set-env-vars "BEANY_LLM_MODE=openai,OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1,OPENAI_MODEL='gpt-6-luna',OPENAI_API_MODE=responses,OPENAI_STRUCTURED_MODE=schema,OPENAI_TIMEOUT_SECONDS=200,BEANY_DB=/tmp/beany.sqlite3,BEANY_SEARCH_PROVIDER=browser_use,BROWSER_USE_REPLAY=data/replay/study_listings.json"
+  --set-env-vars "BEANY_LLM_MODE=openai,OPENAI_BASE_URL=https://api.openai.com/v1,OPENAI_MODEL='gpt-6-luna',OPENAI_API_MODE=responses,OPENAI_STRUCTURED_MODE=schema,OPENAI_TIMEOUT_SECONDS=200,BEANY_DB=/tmp/beany.sqlite3,BEANY_SEARCH_PROVIDER=browser_use,BROWSER_USE_REPLAY=data/replay/study_listings.json"
 ```
 
 This uses the recorded listings. For **live web search**, add `BROWSER_USE_API_KEY=browser-use-api-key:latest` to `--set-secrets` (comma-separated), and replace the `--set-env-vars` value with the version below. It starts with `^@^` because the domain list contains commas, so the variables are separated by `@` instead:
 
 ```sh
-  --set-env-vars "^@^BEANY_LLM_MODE=openai@OPENAI_BASE_URL=https://soclaas-api.comp.nus.edu.sg/v1@OPENAI_MODEL=qwen3.6:35b@OPENAI_API_MODE=responses@OPENAI_STRUCTURED_MODE=schema@OPENAI_TIMEOUT_SECONDS=200@BEANY_DB=/tmp/beany.sqlite3@BEANY_SEARCH_PROVIDER=hybrid@BROWSER_USE_ALLOWED_DOMAINS=amazon.sg,qoo10.sg@BROWSER_USE_TIMEOUT_SECONDS=600@BROWSER_USE_MAX_COST_USD=1"
+  --set-env-vars "^@^BEANY_LLM_MODE=openai@OPENAI_BASE_URL=https://api.openai.com/v1@OPENAI_MODEL='gpt-6-luna'@OPENAI_API_MODE=responses@OPENAI_STRUCTURED_MODE=schema@OPENAI_TIMEOUT_SECONDS=200@BEANY_DB=/tmp/beany.sqlite3@BEANY_SEARCH_PROVIDER=hybrid@BROWSER_USE_ALLOWED_DOMAINS=amazon.sg,qoo10.sg@BROWSER_USE_TIMEOUT_SECONDS=600@BROWSER_USE_MAX_COST_USD=1"
 ```
 
 Why these settings:
@@ -175,7 +173,7 @@ Open `$FRONTEND_URL`. This is the hosted link to put at the top of this README.
 
 | Service | Used for | Key needed |
 |---|---|---|
-| OpenAI-compatible LLM. We used **NUS SoCLaaS with `qwen3.6:35b`**; DeepSeek was also tested. | Interpreting each turn (intent and preference extraction), grounded feature checks, merchant-risk review and explanations | Yes (not for mock mode) |
+| OpenAI-compatible LLM. We used **OpenAI GPT-6 Luna**; | Interpreting each turn (intent and preference extraction), grounded feature checks, merchant-risk review and explanations | Yes (not for mock mode) |
 | **Shopify Global Catalog** via the Model Context Protocol (MCP), read-only | Structured live product discovery | No (anonymous) |
 | **Browser Use Cloud** | A browser agent that reads listings, seller and return-policy pages on allowlisted retailers | Yes (not for replay mode) |
 | SQLite (local file) | Sessions, conversations, cart and simulated receipts | No |
@@ -332,10 +330,6 @@ are per item; there is no aggregate basket budget or quantity editing (one unit 
 Even ALLOW proposals now wait for explicit checkout. Fresh session retains prior server sessions;
 receipt history uses session IDs stored in this browser, not a user account. Clearing browser storage
 loses access to that history. No real payment, tax, shipping or order processing is performed.
-
-Chat requests now use a bounded search-and-inspect workflow over the fictional catalogue before
-policy evaluation. The new planner has offline regression coverage. Its
-multi-step behaviour was exercised manually with DeepSeek (replay and live search), not yet with the NUS model.
 
 Separate product and merchant databases support fictional multi-merchant offers. Risk is predicted from observable signals; hidden labels are joined only in authenticated researcher reports. Configure thresholds, warning profiles, scenarios and evaluation using [docs/configuration-guide.md](docs/configuration-guide.md). The participant UI offers merchant details and deterministic “Find another seller” (same model) and “Find another product” (different model) controls; repeated presses walk through every option before starting again. Every checkout still passes policy rechecks and action-specific approval checks.
 
