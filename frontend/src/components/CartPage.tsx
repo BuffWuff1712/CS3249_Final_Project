@@ -1,6 +1,6 @@
 "use client";
 import { productTitle } from "@/lib/productTitle";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Action } from "@/lib/beany";
 import { activeShop, rememberShop, shopRequest, SHOP_KEY, type ShopView } from "@/lib/shopBackend";
 import { MerchantDetails } from "@/components/MerchantDetails";
@@ -13,6 +13,16 @@ export function CartPage({ checkout = false }: { checkout?: boolean }) {
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const carousel = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState(0);
+  const drag = useRef<{ x: number; scrollLeft: number } | null>(null);
+  function moveTo(index: number) {
+    const list = carousel.current;
+    const items = list?.querySelectorAll<HTMLElement>(".cart-card");
+    if (!list || !items?.[index]) return;
+    list.scrollTo({ left: items[index].offsetLeft - items[0].offsetLeft, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+  useEffect(() => { if (position > Math.max(0, rows.length - 1)) setPosition(Math.max(0, rows.length - 1)); }, [rows.length, position]);
   async function load(id: string) {
     const next = await activeShop();
     if (next.session.id !== id) throw new Error("Session changed. Reload this page.");
@@ -50,17 +60,53 @@ export function CartPage({ checkout = false }: { checkout?: boolean }) {
       {busy && <p role="status">Updating cart…</p>}
       {done && <div role="status" className="notice"><p>Simulated checkout complete. No real payment or order was made.</p><a className="action-link" href="/receipts">View receipts</a></div>}
       {!busy && !rows.length && !done && <div><p>Your cart has no items to review.</p><a className="action-link primary" href="/">Find something with Beany</a></div>}
-      {rows.map(({action: a, error: issue}) => <article className="panel boundaries" key={a.id}>
-        <h2>{productTitle(a.product)}</h2><p>{a.product.merchant} · Quantity: 1</p>
-        <p className="price">{a.product.currency} {a.product.price.toFixed(2)}</p>
-        <p>Payment: {a.payment_method} · Data sharing: {a.shares_personal_data ? "requested" : "none"}</p>
-        <MerchantDetails action={a} replay={!!workspace?.session.search_replay} />
-        <ul>{a.rules.map(r => <li key={r.rule_id}>{r.explanation}</li>)}</ul>
-        {issue && <p className="error" role="alert">{issue}</p>}
-        <button disabled={busy} onClick={() => void act(async () => {
-          const next = await shopRequest(`/${sid}/cart/${a.id}`, "DELETE", { revision: workspace!.revision }); rememberShop(next); await load(sid);
-        })}>Remove {productTitle(a.product)}</button>
-      </article>)}
+      {!!rows.length && <div className="cart-carousel">
+        {rows.length > 1 && <div className="cart-carousel-controls">
+          <button aria-label="Previous item" disabled={busy || position === 0} onClick={() => moveTo(position - 1)}>←</button>
+          <p className="cart-carousel-position" aria-live="polite">Item {position + 1} of {rows.length}</p>
+          <button aria-label="Next item" disabled={busy || position >= rows.length - 1} onClick={() => moveTo(position + 1)}>→</button>
+        </div>}
+        <div ref={carousel} className="cart-carousel-track" role="region" aria-label="Cart items" tabIndex={0}
+          onPointerDown={event => {
+            if (rows.length < 2 || event.pointerType !== "mouse" || event.button !== 0 || (event.target as HTMLElement).closest("button, a, summary, input, select")) return;
+            drag.current = { x: event.clientX, scrollLeft: event.currentTarget.scrollLeft };
+            event.currentTarget.setPointerCapture(event.pointerId);
+            event.currentTarget.dataset.dragging = "true";
+            event.currentTarget.focus({ preventScroll: true });
+            event.preventDefault();
+          }}
+          onPointerMove={event => { if (drag.current) event.currentTarget.scrollLeft = drag.current.scrollLeft + drag.current.x - event.clientX; }}
+          onPointerUp={event => { drag.current = null; delete event.currentTarget.dataset.dragging; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }}
+          onLostPointerCapture={event => { drag.current = null; delete event.currentTarget.dataset.dragging; }}
+          onPointerCancel={event => { drag.current = null; delete event.currentTarget.dataset.dragging; }}
+          onKeyDown={event => {
+            if (event.target !== event.currentTarget || rows.length < 2) return;
+            const next = event.key === "ArrowRight" ? Math.min(rows.length - 1, position + 1) : event.key === "ArrowLeft" ? Math.max(0, position - 1) : event.key === "Home" ? 0 : event.key === "End" ? rows.length - 1 : null;
+            if (next !== null) { event.preventDefault(); moveTo(next); }
+          }}
+          onScroll={event => {
+            const list = event.currentTarget;
+            const items = Array.from(list.querySelectorAll<HTMLElement>(".cart-card"));
+            if (!items.length) return;
+            const nearest = items.reduce((best, item, index) => Math.abs(item.offsetLeft - items[0].offsetLeft - list.scrollLeft) < Math.abs(items[best].offsetLeft - items[0].offsetLeft - list.scrollLeft) ? index : best, 0);
+            setPosition(nearest);
+          }}>
+          {rows.map(({action: a, error: issue}) => <article className="panel boundaries cart-card" key={a.id} aria-current={rows[position]?.action.id === a.id ? "true" : undefined}>
+            <h2>{productTitle(a.product)}</h2><p>{a.product.merchant} · Quantity: 1</p>
+            <p className="price">{a.product.currency} {a.product.price.toFixed(2)}</p>
+            <p>Payment: {a.payment_method} · Data sharing: {a.shares_personal_data ? "requested" : "none"}</p>
+            <MerchantDetails action={a} replay={!!workspace?.session.search_replay} />
+            <ul>{a.rules.map(r => <li key={r.rule_id}>{r.explanation}</li>)}</ul>
+            {issue
+              ? <div className="error" role="alert"><p>{issue}</p><button className="primary" disabled={busy} onClick={() => void act(async () => {
+                  const next = await shopRequest(`/${sid}/cart/${a.id}`, "DELETE", { revision: workspace!.revision }); rememberShop(next); await load(sid);
+                })}>Remove from cart</button></div>
+              : <button disabled={busy} onClick={() => void act(async () => {
+                  const next = await shopRequest(`/${sid}/cart/${a.id}`, "DELETE", { revision: workspace!.revision }); rememberShop(next); await load(sid);
+                })}>Remove from cart</button>}
+          </article>)}
+        </div>
+      </div>}
       {!!rows.length && <section className="panel boundaries">
         <h2>Total ({rows.length} items)</h2>
         {Object.entries(totals).map(([currency, total]) => <p key={currency}>{currency} {total.toFixed(2)}</p>)}
