@@ -17,7 +17,7 @@ The interface has two panes: the conversation on the left, and the current match
 
 | Option | What you need | What you get |
 |---|---|---|
-| **A. Hosted version (recommended)** | A browser | The full system as submitted, running on Google Cloud Run with the real LLM. **Link: [HOSTED_URL, add before submission]** |
+| **A. Hosted version (recommended)** | A browser | The full system as submitted, running on Google Cloud Run with the real LLM. **Link: [https://35.240.146.219/shop](https://35.240.146.219/shop)** (self-signed HTTPS — click through the browser warning). |
 | **B. Local, no keys (offline)** | Python 3.11+, Node 20.9+ | The full interface and backend, with recorded product listings and a keyword-based stand-in for the LLM. Good for checking setup, the UI, risk flags and the selection flow. Conversation quality is limited. |
 | **C. Local, with the real LLM** | Option B plus an OpenAI-compatible API key | The full conversational behaviour. Uses the recorded listings, or live search if you also add a Browser Use key. |
 
@@ -189,6 +189,17 @@ Stack: **Next.js 15 / React 19** frontend, **FastAPI / Pydantic** backend, Pytho
 - Ask questions about the results ("why this one?", "what's the return policy?"). Beany answers from the captured evidence only.
 - Off-topic chat gets a brief natural reply and a gentle offer to return to shopping. A failed search is reported as unavailable, never as "no matches".
 - Nothing is bought without your explicit selection, and checkout is always simulated. Blocked offers cannot be selected.
+
+## Features at a glance
+
+Beany has 24 user-facing features and handles 25 edge cases. In summary:
+
+- **Understanding the shopper** — one-question clarification covering product, budget and features; editable needs summary with confirmed / suggested / unspecified values; quote-grounded preference extraction; "not sure" accepted without stalling the turn.
+- **Finding products** — hybrid live search over Shopify Global Catalog (MCP) and a Browser Use browser agent on allowlisted retailers; bounded shortlist (1 match + up to 2 alternatives); search reuse when edits only narrow results; live progress panel with stop control.
+- **Explaining and protecting** — per-feature fit chips ("met / absent / not stated"); expandable specs, ratings, verbatim review excerpts and policy links; merchant-risk review with quoted evidence scored to ALLOW / REVIEW / BLOCK; per-website reputation; evidence-only Q&A.
+- **Handing the decision back** — explicit selection with simulated checkout; approval bound to a hash of what the user saw; "Find another seller" and "Find another product" controls; two-pane resizable layout.
+
+Full mapping of every feature and edge case to the design principle and source file: [docs/features-and-edge-cases.md](docs/features-and-edge-cases.md).
 
 ## Where the main code is
 
