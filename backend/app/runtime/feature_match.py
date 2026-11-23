@@ -55,6 +55,10 @@ def listing_text(product):
     return " ".join(x for x in parts if x).casefold()
 
 
+# INNOVATION: Two-stage feature verification, stage one. Where other chat shopping
+# agents paraphrase "has feature X" straight from the model, Beany first runs
+# deterministic concept and word-stem rules against the listing text; only features
+# the rules cannot confirm are escalated to the LLM (see feature_check.ensure).
 def met(feature, text):
     """True when the listing text shows this feature's concept or most of its own words."""
     feature = feature.casefold().strip()

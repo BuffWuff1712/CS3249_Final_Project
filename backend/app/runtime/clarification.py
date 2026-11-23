@@ -2,6 +2,10 @@
 FIELDS = {"product_type": "category", "budget": "budget", "features": "features"}
 
 
+# INNOVATION: One-shot validation feedback for ungrounded extractions. Instead of
+# silently accepting a hallucinated preference (as other chat agents do), Beany sends
+# the extraction back to the model once with the grounding issue stated; if it still
+# cannot cite the user, the preference is downgraded, never saved as confirmed.
 def extraction_issues(session, result, text):
     if result.intent not in ("search", "new_task", "clarify", "alternative"):
         return []
@@ -40,6 +44,11 @@ def resume_uncertainty(session, result, text):
             result.clarification_answers = [ClarificationAnswer(field=f, status="unknown", evidence=text) for f in missing]
 
 
+# INNOVATION: Conversation is evidence, not permission. Other chat agents search as
+# soon as the brief looks complete and treat any "not sure" as answering something.
+# Beany tracks asked/answered state separately from the brief: a search runs only on
+# explicit user request with the asked fields resolved, and "not sure" only clears
+# a question that was actually asked.
 def clarify_before_search(session, result, text):
     for field, brief_key in FIELDS.items():
         fact = session.brief.get(brief_key)

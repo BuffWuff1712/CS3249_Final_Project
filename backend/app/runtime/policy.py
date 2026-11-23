@@ -183,6 +183,12 @@ def search(s, *, limit=CONFIG["recommendation_limit"]):
     return ranked if limit is None else ranked[:limit]
 
 
+# INNOVATION: Approval is bound to exactly what the user saw. "Buy-for-me" agents
+# elsewhere either act autonomously on a page that may have since changed or hand off
+# to a retailer checkout with no link back to what the user actually approved. Beany
+# hashes each proposal over product, merchant, risk rules, payment and data-sharing
+# details; checkout compares the hash, so any later change — price, return policy, a
+# new risk finding — invalidates the earlier approval.
 def fingerprint(a):
     payload = {
         "product": a.product.model_dump(exclude={"image_url", "image_alt"}),
