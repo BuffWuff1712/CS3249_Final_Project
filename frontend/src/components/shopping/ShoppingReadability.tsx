@@ -19,9 +19,10 @@ function BadgeLabel({ full, short }: { full: string; short?: string }) {
   return short ? <><span className="sr-only">{full}</span><span aria-hidden="true">{short}</span></> : <span>{full}</span>;
 }
 export function RiskBadge({ risk, merchant = false, compact = false }: { risk: MerchantRisk | null; merchant?: boolean; compact?: boolean }) {
-  const level = risk?.level.toLowerCase() || "Unknown";
-  const full = `${merchant ? "Merchant" : "Seller"} risk: ${risk ? `${level} estimate` : "Unknown"}`;
-  return <span className={`cui-badge cui-risk-badge cui-tone-${risk?.level.toLowerCase() || "unknown"}`}><WarningCircleIcon aria-hidden="true" /><BadgeLabel full={full} short={compact ? `Seller risk: ${level}` : undefined} /></span>;
+  const level = risk ? risk.level[0] + risk.level.slice(1).toLowerCase() : "Unknown";
+  const full = `Estimated ${merchant ? "merchant" : "seller"} risk: ${level}`;
+  const tone = !risk || risk.level === "LOW" ? "unknown" : risk.level.toLowerCase();
+  return <span className={`cui-badge cui-risk-badge cui-tone-${tone}`}><WarningCircleIcon aria-hidden="true" /><BadgeLabel full={full} short={compact ? `Estimated risk: ${level}` : undefined} /></span>;
 }
 export function SiteBadge({ site, compact = false }: { site?: Site | null; compact?: boolean }) {
   const tier = site ? site.tier[0].toUpperCase() + site.tier.slice(1) : "Unknown";
@@ -117,6 +118,10 @@ export function MatchedPriorities({ product, brief, fit }: { product: Product; b
 export function concernTitle(id: string) {
   const titles: Record<string, string> = { inconsistent: "Conflicting information", injection: "Instructions aimed at the assistant", low_price: "Unusually low price", missing_business: "Incomplete business details", excessive_data: "Unrelated personal data requested", unusual_payment: "Unsupported payment channel", external_payment: "Payment outside checkout", misleading_returns: "Conflicting return terms", lookalike: "Lookalike branding", pressure: "Pressure to act quickly", site_reputation_mid: "Website reputation concern", site_reputation_poor: "Poor website reputation" };
   return titles[id] || "Recorded concern";
+}
+// Tone describes the recorded signal, not certainty that a seller is fraudulent.
+export function concernTone(id: string): "danger" | "review" {
+  return ["inconsistent", "injection", "excessive_data", "unusual_payment", "external_payment", "misleading_returns"].includes(id) ? "danger" : "review";
 }
 export function uniqueConcerns(risk: MerchantRisk | null) {
   return (risk?.evidence || []).filter((item, index, items) => items.findIndex(other => other.evidence.trim() === item.evidence.trim()) === index);

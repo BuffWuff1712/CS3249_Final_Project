@@ -36,7 +36,7 @@ test("priorities, fractional ratings, unique evidence and compact seller control
   const blocked = sellers.getByRole("row", { name: "Seller offer Everyday Value Co", exact: true });
   await expect(blocked.getByRole("button", { name: "Compare offer from Everyday Value Co", exact: true })).toBeDisabled();
   await expect(blocked).toContainText("Website reputation: Good");
-  await expect(blocked).toContainText("Seller risk: high estimate");
+  await expect(blocked).toContainText("Estimated seller risk: High");
   await expect(blocked.getByRole("button", { name: "Compare offer from Everyday Value Co", exact: true })).toHaveText("Blocked");
   await expect(blocked).not.toContainText("not proof of fraud");
   const amountsFit = await sellers.locator(".cui-money-amount").evaluateAll(elements => elements.every(element => { const range = document.createRange(); range.selectNodeContents(element); const rects = [...range.getClientRects()]; return rects.length === 1 && rects[0].right <= element.closest("td")!.getBoundingClientRect().right; }));
@@ -61,7 +61,7 @@ test("missing ratings and assessments remain unknown rather than reassuring", as
   const current = page.getByRole("article", { name: "Current recommendation", exact: true });
   await expect(current.getByText("Rating not supplied", { exact: true })).toHaveCount(2);
   await expect(current.getByRole("img", { name: /out of 5 stars/ })).toHaveCount(0);
-  await expect(current).toContainText("Merchant risk: Unknown");
+  await expect(current).toContainText("Estimated merchant risk: Unknown");
   await expect(current).toContainText("Website reputation: Unknown");
 });
 

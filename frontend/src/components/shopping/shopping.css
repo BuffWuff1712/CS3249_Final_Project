@@ -911,18 +911,18 @@
 .cui-offer-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; font-weight: 500; }
 .cui-offer-head-text h3 { font-family: var(--serif); font-size: 20px; font-weight: 400; letter-spacing: -.02em; margin: 0 0 6px; line-height: 1.2; }
 .cui-offer-sub { margin: 0; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.cui-offer-sub strong { font-family: var(--serif); font-weight: 400; font-size: 24px; letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cui-offer-sub strong { font-family: var(--serif); font-weight: 600; font-size: 24px; letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
 .cui-offer-sub span { font-size: 12px; color: var(--muted); }
 
-/* Primary actions inside anchor */
-.cui-offer-anchor .cui-offer-actions { margin: 0; padding: 0; gap: 10px; background: transparent; border: 0; }
-.cui-offer-anchor .cui-offer-primary { gap: 8px; }
-.cui-offer-anchor .cui-offer-primary .cui-select { font-size: 13px; font-weight: 500; }
-.cui-offer-anchor .cui-offer-primary button { min-height: 44px; }
-.cui-offer-anchor .cui-offer-explore { margin-top: 2px; }
-.cui-offer-anchor .cui-offer-explore .cui-actions { margin: 0; gap: 8px; }
-.cui-offer-anchor .cui-offer-explore button { min-height: 38px; font-size: 12px; }
-.cui-offer-anchor .cui-seller-reason { padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; }
+/* Primary actions follow fit and assessment. */
+.cui-recommendation > .cui-offer-actions { margin: 0; padding: 0; gap: 10px; background: transparent; border: 0; }
+.cui-recommendation > .cui-offer-actions .cui-offer-primary { gap: 8px; }
+.cui-recommendation > .cui-offer-actions .cui-offer-primary .cui-select { font-size: 13px; font-weight: 500; }
+.cui-recommendation > .cui-offer-actions .cui-offer-primary button { min-height: 44px; }
+.cui-recommendation > .cui-offer-actions .cui-offer-explore { margin-top: 2px; }
+.cui-recommendation > .cui-offer-actions .cui-offer-explore .cui-actions { margin: 0; gap: 8px; }
+.cui-recommendation > .cui-offer-actions .cui-offer-explore button { min-height: 38px; font-size: 12px; }
+.cui-recommendation > .cui-offer-actions .cui-seller-reason { padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; }
 
 /* FIT CHIPS — compact single wrapping row */
 .cui-matched-priorities { margin: 16px 0 8px; }
@@ -972,3 +972,29 @@
 
 /* Remove the old stand-alone cui-product-image rule since the big block is gone */
 .cui-recommendation > .cui-product-image { display: none; }
+
+/* Decision hierarchy: qualified fit, assessment, then actions. */
+.cui-concern-list > li.cui-concern-danger { background: var(--surface); border-left-color: var(--cui-danger); }
+.cui-concern-list > li.cui-concern-review { background: var(--surface); border-left-color: var(--cui-review); }
+.cui-concern-list .cui-concern-danger strong { color: var(--cui-danger-text); }
+.cui-concern-list strong { display: flex; align-items: flex-start; gap: 6px; }
+.cui-concern-list strong svg { width: 16px; height: 16px; flex: 0 0 16px; }
+.cui-concern-list p { color: var(--ink); overflow-wrap: anywhere; }
+.cui-seller-concerns details { margin-top: 8px; }
+.cui-seller-concerns summary { text-transform: none; letter-spacing: normal; font-family: var(--sans); }
+.cui-recommendation > .cui-offer-actions { padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; }
+.cui-recommendation .cui-offer-head-text { overflow-wrap: anywhere; }
+
+.cui-offer-fit { margin-bottom: 16px; }
+.cui-offer-fit .cui-matched-priorities { margin-top: 0; }
+.cui-offer-fit .cui-matched-priorities h4 { font-size: 12px; letter-spacing: normal; }
+.cui-return-summary { margin: 16px 0; padding: 12px; background: var(--surface-2); border-radius: 8px; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.cui-selection-consequence { margin: 0; font-size: 12px; line-height: 1.6; color: var(--ink); }
+
+@media (max-width: 600px) {
+  /* Mobile cell labels contain full product titles, even in price rows. */
+  .cui-compare-table td::before, .cui-offer-table td[data-label]::before { white-space: normal; overflow-wrap: anywhere; }
+}
+@media (max-width: 760px) {
+  .cui-shell > header { height: auto; }
+}

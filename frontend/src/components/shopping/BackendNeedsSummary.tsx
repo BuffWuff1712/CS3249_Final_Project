@@ -33,11 +33,12 @@ export function BackendNeedsSummary({ brief, busy, edit, requested, live = false
   useEffect(() => {
     if (!field) return;
     const editor = root.current?.querySelector<HTMLElement>(".cui-need-editor input, .cui-need-editor select");
-    editor?.focus();
+    editor?.scrollIntoView({ block: "nearest" });
+    editor?.focus({ preventScroll: true });
     function dismiss(event: PointerEvent) { if (!busy && event.target instanceof Node && !root.current?.contains(event.target)) close(); }
     document.addEventListener("pointerdown", dismiss);
     return () => document.removeEventListener("pointerdown", dismiss);
-  }, [field, busy]);
+  }, [field, busy, requested]);
   function toggleFeature(feature: string) {
     const selected = value.split(",").map(item => item.trim()).filter(Boolean);
     setValue(selected.some(item => item.toLowerCase() === feature.toLowerCase()) ? selected.filter(item => item.toLowerCase() !== feature.toLowerCase()).join(", ") : [...selected, feature].join(", "));
