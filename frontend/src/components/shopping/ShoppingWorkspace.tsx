@@ -1,5 +1,4 @@
 "use client";
-import { SuggestionCards } from "./SuggestionCards";
 // INNOVATION: Two-pane, inspectable interface. Other chat shopping UIs bury the agent's
 // interpretation of the user's needs inside a scrolling transcript, so correcting it
 // means arguing in prose. Beany keeps the conversation on the left and an editable
@@ -10,7 +9,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { shopRequest, shopStream, stopShopRequest, ShopRequestError, money, rememberShop, type LiveShopActivity, type OfferPreview, type ShopField, type ShopView } from "@/lib/shopBackend";
 import type { Action, Fact } from "@/lib/beany";
 import { ShoppingReply } from "./ShoppingReply";
-import { ProductComparison, SellerComparison } from "./OfferComparisons";
+import { SellerComparison } from "./OfferComparisons";
 import { BackendNeedsSummary } from "./BackendNeedsSummary";
 import { BackendCurrentOffer, BackendProductEvidence, BackendRisk } from "./BackendOffer";
 import { ComparisonActivity, LiveProgress } from "./ComparisonActivity";
@@ -162,13 +161,20 @@ export function ShoppingWorkspace() {
   }, [view]);
   useEffect(() => { if (view?.selected) selection.current?.scrollIntoView({ block: "nearest" }); }, [view?.selected?.id]);
   const latestReply = session?.messages.filter(message => message.role === "assistant").at(-1)?.text;
-  const alternativesByModel = new Map<string, NonNullable<ShopView["offers"]>[number]>();
+  // Preserve catalogue order while showing one eligible seller per model.
+  const recommendationsByModel = new Map<string, OfferPreview>();
   for (const offer of view?.offers || []) {
-    if (offer.model_key === view?.current_model_key) continue;
-    const previous = alternativesByModel.get(offer.model_key);
-    if (!previous || previous.decision === "BLOCK" && offer.decision !== "BLOCK") alternativesByModel.set(offer.model_key, offer);
+    if (offer.decision === "BLOCK") continue;
+    const key = offer.model_key || offer.product.id;
+    if (!recommendationsByModel.has(key) || offer.product.id === current?.product.id) recommendationsByModel.set(key, offer);
   }
-  const alternativeModels = [...alternativesByModel.values()];
+  if (currentOffer) recommendationsByModel.set(view?.current_model_key || currentOffer.product.id, currentOffer);
+  const recommendations = [...recommendationsByModel.values()];
+  const recommendationIndex = recommendations.findIndex(offer => offer.product.id === current?.product.id);
+  const browseRecommendation = (offset: number) => {
+    const offer = recommendations[recommendationIndex + offset];
+    if (offer && !disabled) void mutate("propose", { product_id: offer.product.id });
+  };
   const sellers = (view?.offers || []).filter(offer => offer.model_key === view?.current_model_key && offer.product.id !== current?.product.id);
   const receipt = session?.stage === "completed" ? session.receipts.at(-1) : undefined;
   const inspect = (action: Action) => { setHistorical(action); if (panel.current) panel.current.scrollTop = 0; };
@@ -198,7 +204,7 @@ export function ShoppingWorkspace() {
           {!busy && session?.messages.length === 1 && <div className="cui-examples"><span>Editable examples</span>{examples.map(([label, example]) => <button key={label} disabled={disabled} onClick={() => { setText(example); document.getElementById("cui-message")?.focus(); }}>{label}</button>)}</div>}
           {pendingText && <div className="cui-turn cui-turn--user"><span className="cui-avatar" aria-hidden="true"><UserCircleIcon /></span><div className="cui-turn-body"><span className="sr-only">You</span><p>{pendingText}</p></div></div>}
           {(busy || !!error && !!liveSteps.length) && <div className="cui-turn cui-progress" aria-label="Backend request in progress"><span className="cui-avatar" aria-hidden="true">b.</span><div className="cui-turn-body"><LiveProgress activity={liveSteps} elapsed={elapsed} stopped={!busy} /></div></div>}
-          {!busy && !!session?.suggestions.length && <SuggestionCards label="Suggested replies">{session.suggestions.map(suggestion => <button key={suggestion} disabled={disabled} onClick={() => void mutate("messages", { text: suggestion }, "POST", suggestion)}>{suggestion}</button>)}</SuggestionCards>}
+          {!busy && !!session?.suggestions.length && <div className="cui-actions cui-suggestions" aria-label="Suggested replies">{session.suggestions.map(suggestion => <button key={suggestion} disabled={disabled} onClick={() => void mutate("messages", { text: suggestion }, "POST", suggestion)}>{suggestion}</button>)}</div>}
           {!busy && session && session.stage !== "clarifying" && !current && !receipt && !!session.brief.category && <div className="cui-actions"><button disabled={disabled} onClick={() => void mutate("compare")}>Compare current needs</button></div>}
         </div>
         {session && busy && activeRequest.current && !!liveSteps.length && <div className="cui-actions"><button disabled={stopping} onClick={() => void stop()}>{stopping ? "Stopping…" : "Stop"}</button></div>}
@@ -220,8 +226,12 @@ export function ShoppingWorkspace() {
           {historical ? <section aria-label="Historical comparison evidence"><h2>Evidence from this comparison</h2><p className="cui-source">Historical proposal snapshot. This is not a current selectable offer.</p><button onClick={() => setHistorical(null)}>Back to current decision</button><BackendRisk merchant={historical.merchant_details} risk={historical.risk} decision={historical.decision} rules={historical.rules} /><BackendProductEvidence replay={!!session?.search_replay} product={historical.product} merchant={historical.merchant_details} /></section> : <>
           {!current && <div className="cui-decision-empty"><div className="cui-empty-bean" aria-hidden="true"><BeanGlyph size={72} /></div><h2>Nothing to review yet</h2><p>{busy ? "One moment — I’m finding something that fits." : session?.stage === "no_match" ? "I couldn’t find anything that matches all your needs. Try loosening one, or ask me for alternatives." : receipt ? "All done. Your choice is saved below." : "Tell me what you’re shopping for on the left. I’ll find one match, show how it fits, and flag anything worth knowing about the seller — you decide."}</p></div>}
           {view?.current_error && <div className="cui-stale" role="alert"><p>{view.current_error}</p><button disabled={disabled} onClick={() => void mutate("compare")}>Compare current needs</button></div>}
-          {current && !!alternativeModels.length && <ProductComparison replay={!!session?.search_replay} current={current} alternatives={alternativeModels} disabled={disabled} choose={id => void mutate("propose", { product_id: id })} />}
-          {current && <BackendCurrentOffer sellerPreferences={<section className="cui-seller-reason" aria-label="Seller preference"><p>Same model &amp; variant:</p><div className="cui-actions">{(["longer returns", "lowest price"] as const).map(preference => <button key={preference} disabled={disabled} aria-pressed={view?.seller_preference === preference} onClick={() => void mutate("seller", { preference })}>{preference === "longer returns" ? <ArrowCounterClockwiseIcon aria-hidden="true" /> : <CoinsIcon aria-hidden="true" />}{preference === "longer returns" ? "Prefer longer returns" : "Prefer lowest price"}</button>)}</div></section>} brief={session?.brief || {}} replay={!!session?.search_replay} action={current} selected={selected} disabled={disabled} selectionInvalid={!!view?.current_error} onEditNeeds={editRelevantNeed} evidenceId={evidenceId} select={() => void mutate("select", { proposal_id: current.id, fingerprint: current.fingerprint })} seller={() => void mutate("seller")} addCart={() => void mutate("cart", { proposal_id: current.id, fingerprint: current.fingerprint })} alternative={() => void mutate("alternative")} />}
+          {current && <nav className="cui-recommendation-navigation" aria-label="Browse recommendations">
+            <button type="button" disabled={disabled || recommendationIndex <= 0} onClick={() => browseRecommendation(-1)}>← Previous</button>
+            <span role="status" aria-live="polite">Recommendation {recommendationIndex + 1} of {recommendations.length}</span>
+            <button type="button" disabled={disabled || recommendationIndex >= recommendations.length - 1} onClick={() => browseRecommendation(1)}>Next →</button>
+          </nav>}
+          {current && <BackendCurrentOffer key={current.id} sellerPreferences={<section className="cui-seller-reason" aria-label="Seller preference"><p>Same model &amp; variant:</p><div className="cui-actions">{(["longer returns", "lowest price"] as const).map(preference => <button key={preference} disabled={disabled} aria-pressed={view?.seller_preference === preference} onClick={() => void mutate("seller", { preference })}>{preference === "longer returns" ? <ArrowCounterClockwiseIcon aria-hidden="true" /> : <CoinsIcon aria-hidden="true" />}{preference === "longer returns" ? "Prefer longer returns" : "Prefer lowest price"}</button>)}</div></section>} brief={session?.brief || {}} replay={!!session?.search_replay} action={current} selected={selected} disabled={disabled} selectionInvalid={!!view?.current_error} onEditNeeds={editRelevantNeed} evidenceId={evidenceId} select={() => void mutate("select", { proposal_id: current.id, fingerprint: current.fingerprint })} seller={() => void mutate("seller")} addCart={() => void mutate("cart", { proposal_id: current.id, fingerprint: current.fingerprint })} alternative={() => void mutate("alternative")} />}
           {receipt && <section className="cui-selection cui-selection--receipt" aria-label="Simulated receipt"><div className="cui-receipt-bean" aria-hidden="true"><BeanHappy size={56} /></div><h2>Decision complete</h2><p>{productTitle(receipt.product)} · {money(receipt.product)}</p><p>Receipt: {receipt.id}</p><p>No real order or payment was created.</p></section>}
           {!!sellers.length && <section className="cui-alternative" aria-label="Sellers of the same model"><SellerComparison offers={currentOffer ? [currentOffer, ...sellers] : sellers} currentId={current?.product.id} disabled={disabled} replay={!!session?.search_replay} choose={id => void mutate("propose", { product_id: id })} /></section>}
           {!!view?.offers.length && <details onToggle={event => setAllOffersOpen(event.currentTarget.open)}><summary>Compare all {view.offers.length} eligible offers</summary>{allOffersOpen && <SellerComparison offers={view.offers} all currentId={current?.product.id} disabled={disabled} replay={!!session?.search_replay} choose={id => void mutate("propose", { product_id: id })} />}</details>}

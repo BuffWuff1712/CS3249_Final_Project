@@ -1064,11 +1064,17 @@
 .cui-product-list[data-dragging="true"] { cursor: grabbing; scroll-snap-type: none; user-select: none; }
 .cui-product-list img { -webkit-user-drag: none; }
 
-/* Preference and follow-up suggestions share the sideways card treatment. */
-.cui-suggestion-cards { min-width: 0; max-width: 100%; margin-block: 12px; }
-.cui-suggestion-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-.cui-suggestion-heading > span { color: var(--muted); font-size: 12px; }
-.cui-suggestion-track { display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding: 4px 4px 12px; scrollbar-width: thin; }
-.cui-suggestion-track > button { flex: 0 0 72%; min-width: 0; max-width: 240px; min-height: 80px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); text-align: left; white-space: normal; overflow-wrap: anywhere; scroll-snap-align: start; }
-.cui-suggestion-track > button:hover, .cui-suggestion-track > button[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-tint); }
-.cui-suggestion-track:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+/* Recommendation identity cards occupy the original right-column match location. */
+.cui-product-option > .cui-offer-anchor { width: 100%; margin: 0; padding: 0; border: 0; background: transparent; }
+.cui-product-option .cui-offer-head { flex-wrap: wrap; }
+.cui-product-option .cui-offer-head-text { min-width: 0; }
+.cui-product-option .cui-original-site-link { white-space: normal; }
+
+/* Browse complete recommendations without a sideways scrolling surface. */
+.cui-recommendation-navigation { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 16px; }
+.cui-recommendation-navigation button { min-height: 44px; white-space: nowrap; }
+.cui-recommendation-navigation > span { text-align: center; color: var(--muted); font-size: 12px; }
+@media (max-width: 480px) {
+  .cui-recommendation-navigation { flex-wrap: wrap; }
+  .cui-recommendation-navigation > span { order: -1; flex-basis: 100%; }
+}

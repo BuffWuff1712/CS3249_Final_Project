@@ -101,26 +101,29 @@ function originalSiteLink(product: Product, merchant: Merchant | null) {
   return null;
 }
 
-export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, selected, disabled, selectionInvalid = false, select, seller, addCart, alternative, replay = false, evidenceId, onEditNeeds }: { sellerPreferences?: ReactNode; action: Action; brief?: Record<string, Fact>; selected: boolean; disabled: boolean; selectionInvalid?: boolean; select: () => void; addCart: () => void; alternative: () => void; seller: () => void; replay?: boolean; evidenceId?: number; onEditNeeds?: () => void }) {
-  const lowReview = action.product.reviews?.find(review => review.rating <= 2);
-  const originalSite = originalSiteLink(action.product, action.merchant_details);
-  return <article className="cui-recommendation" aria-label="Current recommendation">
-    {/* Product identity stays ahead of fit, concerns, and the decision controls. */}
-    <header className="cui-offer-anchor">
+export function OfferIdentity({ product, merchant, current = true }: { product: Product; merchant: Merchant | null; current?: boolean }) {
+  const originalSite = originalSiteLink(product, merchant);
+  return <header className="cui-offer-anchor">
       <div className="cui-offer-head">
-        <div className="cui-offer-thumb"><ProductImage key={action.product.id + (action.product.image_url || "")} product={action.product} /></div>
+        <div className="cui-offer-thumb"><ProductImage key={product.id + (product.image_url || "")} product={product} /></div>
         <div className="cui-offer-head-text">
-          <p className="cui-offer-eyebrow">Your current match</p>
-          <h3>{productTitle(action.product)}</h3>
-          <p className="cui-offer-sub"><strong>{money(action.product)}</strong><span>{action.product.merchant}</span></p>
+          <p className="cui-offer-eyebrow">{current ? "Your current match" : "Another recommendation"}</p>
+          <h3>{productTitle(product)}</h3>
+          <p className="cui-offer-sub"><strong>{money(product)}</strong><span>{product.merchant}</span></p>
         </div>
       </div>
       {originalSite && <div className="cui-original-site">
-        <a className="cui-policy-link cui-original-site-link" href={originalSite.href} target="_blank" rel="noopener noreferrer" aria-describedby="original-site-destination">{originalSite.label}<span aria-hidden="true">↗</span></a>
-        <small id="original-site-destination">{originalSite.domain} · Opens in a new tab</small>
+        <a className="cui-policy-link cui-original-site-link" href={originalSite.href} target="_blank" rel="noopener noreferrer" aria-describedby={`original-site-destination-${product.id}`}>{originalSite.label}<span aria-hidden="true">↗</span></a>
+        <small id={`original-site-destination-${product.id}`}>{originalSite.domain} · Opens in a new tab</small>
       </div>}
-    </header>
+    </header>;
+}
 
+export function BackendCurrentOffer({ sellerPreferences, action, brief = {}, selected, disabled, selectionInvalid = false, select, seller, addCart, alternative, replay = false, evidenceId, onEditNeeds }: { sellerPreferences?: ReactNode; action: Action; brief?: Record<string, Fact>; selected: boolean; disabled: boolean; selectionInvalid?: boolean; select: () => void; addCart: () => void; alternative: () => void; seller: () => void; replay?: boolean; evidenceId?: number; onEditNeeds?: () => void }) {
+  const lowReview = action.product.reviews?.find(review => review.rating <= 2);
+  const header = <OfferIdentity product={action.product} merchant={action.merchant_details} />;
+  return <article className="cui-recommendation" aria-label="Current recommendation">
+    {header}
     <section className="cui-offer-fit" aria-label="Match explanation">
       <MatchedPriorities product={action.product} brief={brief} fit={action.feature_fit} />
       {onEditNeeds && <button className="cui-link cui-edit-needs" disabled={disabled} onClick={onEditNeeds}>Change your needs</button>}

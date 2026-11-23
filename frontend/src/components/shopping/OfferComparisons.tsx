@@ -1,6 +1,6 @@
 "use client";
 import { productTitle } from "@/lib/productTitle";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Action, Product } from "@/lib/beany";
 import { money, type OfferPreview } from "@/lib/shopBackend";
 import { PriceValue, RatingStars, RiskBadge, SiteBadge, PolicyBadge, blockingReasons } from "./ShoppingReadability";
@@ -14,7 +14,7 @@ export function OfferDetails({ offer, replay = false }: { offer: OfferPreview; r
   const [open, setOpen] = useState(false);
   return <details className="cui-row-details" onToggle={event => setOpen(event.currentTarget.open)}><summary>Details</summary>{open && <><BackendRisk merchant={offer.merchant} risk={offer.risk} decision={offer.decision} rules={offer.rules} /><BackendProductEvidence product={offer.product} merchant={offer.merchant} replay={replay} /></>}</details>;
 }
-export function ProductComparison({ current, alternatives, disabled, choose, replay = false }: { current: Action; alternatives: OfferPreview[]; disabled: boolean; choose: (id: string) => void; replay?: boolean }) {
+export function ProductComparison({ renderOfferCard, currentCard, current, alternatives, disabled, choose, replay = false }: { renderOfferCard?: (offer: OfferPreview) => ReactNode; currentCard?: ReactNode; current: Action; alternatives: OfferPreview[]; disabled: boolean; choose: (id: string) => void; replay?: boolean }) {
   const [alternativeId, setAlternativeId] = useState("");
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const carousel = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ export function ProductComparison({ current, alternatives, disabled, choose, rep
     ["Battery", product => listedSpec(product, "battery")], ["Weight", product => listedSpec(product, "weight")],
     ["Product rating", product => product.rating == null ? "Not supplied" : `${product.rating}/5`],
   ];
-  return <section className="cui-alternative cui-product-browser" aria-label="Other models"><div className="cui-browser-heading"><h2>Browse products</h2>
+  return <section className="cui-alternative cui-product-browser" aria-label="Other models"><div className="cui-browser-heading"><h2>Recommendations</h2>
     <div className="cui-carousel-controls"><button aria-label="Previous product" disabled={position === 0} onClick={() => moveTo(position - 1)}>←</button><button aria-label="Next product" disabled={position >= cards.length - 1} onClick={() => moveTo(position + 1)}>→</button></div></div>
     <p className="cui-source">{cards.length} matching models · Drag, swipe sideways, or use the arrows.</p>
     <div ref={carousel} className="cui-product-list" role="region" aria-label="Recommended products" tabIndex={0}
@@ -68,13 +68,14 @@ export function ProductComparison({ current, alternatives, disabled, choose, rep
       setPosition(nearest);
     }}>
       <ul>{cards.map(offer => <li key={offer.product.id} className="cui-product-option" aria-current={offer.product.id === current.product.id ? "true" : undefined}>
-        <div className="cui-option-image"><ProductImage product={offer.product} /></div>
-        <div className="cui-option-content"><h3>{productTitle(offer.product)}</h3><p>{offer.product.merchant}</p><strong><PriceValue product={offer.product} /></strong>
+        {offer.product.id === current.product.id && currentCard ? <>{currentCard}<button disabled>Current match</button></> : <>
+        {renderOfferCard ? renderOfferCard(offer) : <div className="cui-option-image"><ProductImage product={offer.product} /></div>}
+        <div className="cui-option-content">{!renderOfferCard && <><h3>{productTitle(offer.product)}</h3><p>{offer.product.merchant}</p><strong><PriceValue product={offer.product} /></strong></>}
           <PolicyBadge decision={offer.decision} />
           <div className="cui-actions"><button disabled={disabled || offer.decision === "BLOCK" || offer.product.id === current.product.id} onClick={() => choose(offer.product.id)}>{offer.product.id === current.product.id ? "Current match" : `Compare ${productTitle(offer.product)}`}</button>
           {offer.product.id !== current.product.id && <button className="cui-link" disabled={disabled} onClick={() => { setAlternativeId(offer.product.id); setComparisonOpen(true); }}>View feature comparison</button>}</div>
           {offer.decision === "BLOCK" && <p className="cui-source">Unavailable under your shopping rules. Review its comparison for details.</p>}
-        </div>
+        </div></>}
       </li>)}</ul>
     </div>
     <p className="cui-carousel-position" aria-live="polite">Product {position + 1} of {cards.length}</p>

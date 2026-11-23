@@ -276,37 +276,43 @@ test("seller price sorting orders the current offer with the other sellers", asy
   await expect.poll(prices).toEqual(["20.00", "50.00", "70.00", "90.00"]);
 });
 
-test("recommended product cards swipe horizontally and update the current recommendation", async ({ page, request }, testInfo) => {
-  await openOffer(page, request, () => {}, body => {
-    const seed = body.offers.find(offer => offer.model_key !== body.current_model_key)!;
-    body.offers.push(...Array.from({ length: 6 }, (_, index) => ({ ...seed, model_key: `extra-model-${index}`, product: { ...seed.product, id: `extra-product-${index}` } })));
-  });
-  const list = page.getByRole("region", { name: "Recommended products", exact: true });
-  await expect(list).toBeVisible();
-  const browser = page.getByRole("region", { name: "Other models", exact: true });
-  expect(await browser.evaluate(element => Boolean(element.compareDocumentPosition(document.querySelector('article[aria-label="Current recommendation"]')!) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
-  await expect(list.getByRole("button", { name: "Current match", exact: true })).toBeDisabled();
-  expect(await list.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
-  await list.scrollIntoViewIfNeeded();
-  const rect = (await list.boundingBox())!;
-  await page.mouse.move(rect.x + rect.width * 0.75, rect.y + 20);
-  await page.mouse.down();
-  await page.mouse.move(rect.x + 12, rect.y + 20, { steps: 12 });
-  await page.mouse.up();
-  await expect.poll(() => list.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
-  await list.focus();
-  await page.keyboard.press("End");
-  await expect.poll(() => list.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
-  const count = await list.getByRole("listitem").count();
-  await expect(page.locator(".cui-carousel-position")).toHaveText(`Product ${count} of ${count}`);
-  await expect(page.getByRole("button", { name: "Next product", exact: true })).toBeDisabled();
-  await list.screenshot({ path: testInfo.outputPath("product-list.png") });
-  await expect(page.getByRole("button", { name: "Previous product", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "Previous product", exact: true }).click();
-  const card = list.getByRole("listitem").nth(1);
-  const name = await card.getByRole("heading").innerText();
-  await card.getByRole("button", { name: "View feature comparison", exact: true }).click();
-  await expect(page.locator(".cui-product-comparison")).toHaveAttribute("open", "");
-  await card.getByRole("button", { name: `Compare ${name}`, exact: true }).click();
-  await expect(page.getByRole("article", { name: "Current recommendation", exact: true }).getByRole("heading", { name, exact: true })).toBeVisible();
+test("recommendation buttons replace the complete offer without selecting it", async ({ page, request }, testInfo) => {
+  await openOffer(page, request, () => {});
+  const navigation = page.getByRole("navigation", { name: "Browse recommendations" });
+  const previous = navigation.getByRole("button", { name: "Previous" });
+  const next = navigation.getByRole("button", { name: "Next" });
+  const current = page.getByRole("article", { name: "Current recommendation", exact: true });
+  await expect(navigation).toBeVisible();
+  while (await previous.isEnabled()) {
+    await previous.click();
+    await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
+  }
+  await expect(navigation.getByRole("status")).toHaveText(/Recommendation 1 of \d+/);
+  const firstTitle = await current.locator(".cui-offer-head h3").innerText();
+  await expect(next).toBeEnabled();
+  await next.click();
+  await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
+  await expect(navigation.getByRole("status")).toHaveText(/Recommendation 2 of \d+/);
+  await expect(current.locator(".cui-offer-head h3")).not.toHaveText(firstTitle);
+  await expect(current.getByRole("region", { name: "Match explanation", exact: true })).toBeVisible();
+  await expect(current.getByRole("button", { name: "Select this offer", exact: true })).toBeEnabled();
+  await expect(page.getByRole("region", { name: "Selected offer", exact: true })).toHaveCount(0);
+  await expect(page.locator(".cui-product-list")).toHaveCount(0);
+  const sessionId = await page.evaluate(() => localStorage.getItem("beany-shop-backend-session"));
+  const state = await (await request.get(`${API}/${sessionId}`)).json();
+  expect(state.selected).toBeNull();
+  await expect(current.locator(".cui-offer-sub")).toContainText(state.current.product.merchant);
+  await previous.click();
+  await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
+  await expect(current.locator(".cui-offer-head h3")).toHaveText(firstTitle);
+  await expect(previous).toBeDisabled();
+  while (await next.isEnabled()) {
+    await next.click();
+    await expect(page.getByRole("button", { name: "Send", exact: true })).toBeEnabled();
+  }
+  const counter = await navigation.getByRole("status").innerText();
+  const [, position, total] = counter.match(/Recommendation (\d+) of (\d+)/)!;
+  expect(position).toBe(total);
+  await expect(next).toBeDisabled();
+  await navigation.screenshot({ path: testInfo.outputPath("recommendation-navigation.png") });
 });
